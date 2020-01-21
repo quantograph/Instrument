@@ -1,0 +1,20 @@
+{
+  "name": "QuantoGraph",
+  "keywords": "",
+  "description": "",
+  "authors": [
+    {
+        "name": "Andy Belov",
+        "url": "http://QuantoGraph.com"
+    }
+  ],
+  "exclude": [
+  ],
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/QuantoGraph/QuantoGraph.git"
+  },
+  "frameworks": "arduino",
+  "platforms": "*"
+}
