@@ -1,5 +1,6 @@
 #include "AudioBoard.h"
 #include "AudioInput.h"
+#include "../Music/Effects.h"
 
 //=================================================================================================
 AudioInput::AudioInput(AudioBoard* audio) : _audio(audio) {
@@ -9,15 +10,15 @@ AudioInput::AudioInput(AudioBoard* audio) : _audio(audio) {
 void AudioInput::Init() {
     attachInterrupt(GUITAR_PLUG, OnPlug, CHANGE);
 
-    _audio->_audioControl.inputSelect(AUDIO_INPUT_MIC);
-    //_audio->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
+    //_audio->_audioControl.inputSelect(AUDIO_INPUT_MIC);
+    _audio->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
 
     _audio->_audioControl.lineInLevel(22); // Potentiometer pin
     //_audio->_audioControl.inputLevel(0.2);
     _audio->_audioControl.micGain(40); // 0 - 63
 
-    Passthrough();
-    //Chorus();
+    //Passthrough();
+    Chorus();
 }
 
 //=================================================================================================

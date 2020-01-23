@@ -1,10 +1,13 @@
 #pragma once
 
 #include <Arduino.h>
+#include <USBHost_t36.h>
+
+class Synth;
 
 class MidiInput {
 public:
-    void Init();
+    void Init(Synth* synth);
     void Process();
     static void myNoteOn(byte channel, byte note, byte velocity);
     static void myNoteOff(byte channel, byte note, byte velocity);
@@ -27,4 +30,6 @@ public:
     static void mySystemReset();
     static void myRealTimeSystem(uint8_t realtimebyte);
     static void printBytes(const byte *data, unsigned int size);
+
+    static Synth* _synth;
 };

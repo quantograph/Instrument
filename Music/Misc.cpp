@@ -1,5 +1,31 @@
 #include "Misc.h"
 
+//-----------------------------------------------------------------------------
+// Reverses 2 bytes
+void Reverse2Bytes(char* data) {
+    char byte = 0; // Temporary byte
+
+    byte = data[0];
+    data[0] = data[1];
+    data[1] = byte;
+}
+
+//-----------------------------------------------------------------------------
+// Reverses 4 bytes
+void Reverse4Bytes(char* data) {
+    char byte = 0; // Temporary byte
+
+    // Outer bytes
+    byte = data[0];
+    data[0] = data[3];
+    data[3] = byte;
+
+    // Inner bytes
+    byte = data[1];
+    data[1] = data[2];
+    data[2] = byte;
+}
+
 // Shows a number as bits
 /*void ShowBits(uint32_t value, String& s) {
     char buffer[8];

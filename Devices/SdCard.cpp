@@ -14,6 +14,41 @@ void SdCard::Init() {
 }
 
 //=================================================================================================
+bool SdCard::ReadFile(const char* path, char*& data, uint32_t& dataSize) {
+    File file;
+    uint32_t bytesRead = 0;
+
+    data = nullptr;
+    dataSize = 0;
+
+    // Open the file
+    file = SD.open(path);
+    if(!file) {
+        Serial.printf("Can't open '%s' file\n", path);
+        return false;
+    }
+    
+    // Get the file size and read if its all bytes, one at a time
+    dataSize = file.size();
+    Serial.printf("Opened '%s' file, size=%d\n", path, dataSize);
+    data = (char*)malloc(dataSize);
+    if(data == NULL) {
+        Serial.printf("Can't allocate %d bytes\n", dataSize);
+    }
+
+    while(file.available()) {
+    	data[bytesRead++] = file.read();
+    }
+
+    if(bytesRead != dataSize)
+        Serial.printf("Read %d bytes out of %d\n", bytesRead, dataSize);
+
+    file.close();
+
+    return true;
+}
+
+//=================================================================================================
 void SdCard::PrintDirectory(File dir, int numTabs) {
     //Serial.println("SdCard::PrintDirectory");
     while(true) {

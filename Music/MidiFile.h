@@ -1,13 +1,15 @@
-// MidiFile.h
+// For MIDI specifications, see "midiformat.pdf" in Docs folder, 
+// taken from here: http://www.music.mcgill.ca/~ich/classes/mumt306/midiformat.pdf
 
-#ifndef MUSIC_MIDI_FILE_H
-#define MUSIC_MIDI_FILE_H
-namespace QuantoGraph {
+#ifndef MidiFile_h
+#define MidiFile_h
 
-class MidiFile : public File {
+class Song;
+
+class MidiFile {
 public:
     MidiFile();
-    virtual ~MidiFile(void);
+    virtual ~MidiFile();
 
     // Definitions ------------------------------------------------------------
     #define	ID_FILE_HEADER "MThd"// File header
@@ -113,106 +115,98 @@ public:
     };
 
     // Chunk header
-    struct CHUNK_HEADER {
+    struct ChunkHeader {
         char _id[4]; // Chunk ID
-        int	_length; // Chunk length. Does not include the 8 byte chunk header.
+        uint32_t _length{}; // Chunk length. Does not include this 8-byte chunk header.
     };
 
     // Chunk info
-    struct CHUNK_INFO {
-        CHUNK_HEADER _header; // Chunk header
-        char* _data; // Chunk data
+    struct ChunkInfo {
+        ChunkHeader _header{}; // Chunk header
+        char* _data{nullptr}; // Chunk data
     };
 
     // MIDI file header
-    struct FILE_HEADER {
-        unsigned short _format; // MIDI format
-        unsigned short _tracks; // Number of tracks
-        unsigned short _division; // Time division
+    struct FileHeader {
+        uint16_t _format; // MIDI format
+        uint16_t _tracks; // Number of tracks
+        uint16_t _division; // Time division
     };
 
     // Data members -----------------------------------------------------------
 protected:
-    String _error; // Last error desription
-    char* _data; // File data
-    char* _dataOffset; // Offset to the current data
-    int _dataSize; // Data size
-    int _format; // MIDI format
-    int _tracks; // Number of tracks in the file
-    int _timeDivision; // Time division
-    double _beatTime; // Note time
-    NOTES _notes; // Notes of a track, which were started
+    char* _data{nullptr}; // File data
+    char* _dataOffset{nullptr}; // Offset to the current data
+    uint32_t _dataSize{}; // Data size
+    uint32_t _dataRead{}; // Size of data read
+    uint8_t _format{}; // MIDI format
+    uint16_t _tracks{}; // Number of tracks in the file
+    uint16_t _timeDivision{}; // Time division
+    float _beatTime; // Note time
     String _report; // Trace report
-    Note _note; // Current note's info
-    Chord::CHORD _chordType; // Chord type for the current note
-    int _chordRoot; // Chor's root note for the current note
-    static double _volumeRate; // Logarithmic convertion rate
+    static float _volumeRate; // Logarithmic convertion rate
 
     // Functions --------------------------------------------------------------
 protected:
-//    bool		GetChunks(Song* pSong);
-//    bool		NextChunk(CHUNK_INFO& Chunk, bool& bDone);
-//    bool		GetFileHeader(CHUNK_INFO& Chunk, Song* pSong);
-//    bool		GetTrack(CHUNK_INFO& Chunk, Song* pSong, Track* track);
-//    bool		GetMetaEvent(char* data, int dataSize, int& nProcessed, double dTrackTime, Song* pSong, Track* track);
-//    bool		GetSystemEvent(char* data, int dataSize, int& nProcessed);
-//    bool		GetMidiEvent(unsigned char nEvent, char* data, int dataSize, int& nProcessed, double dTrackTime, Track* track);
-//    bool		GetNote(int nChannel, bool bNoteOn, char* data, int dataSize, int& nProcessed, double dTrackTime, Track* track);
-//    bool		GetProgram(int nChannel, char* data, int dataSize, int& nProcessed, double dTrackTime, Track* track);
-//    bool        AddNote(Note* pNote, double dTrackTime, Track* track);
-//    bool		GetControl(int nChannel, char* data, int dataSize, int& nProcessed, double dTrackTime, Track* track);
-    bool		PutVarLen(int nValue, char* data, int dataSize, int& nBytes);
-//    bool		GetVarLen(char* data, int dataSize, int& nValue, int& nProcessed);
-//    bool		ResetNotes();
-//    bool		GetProgramInfo(int nProgram, String& sName, THING& nInstrument);
-    bool		GetControlInfo(int nControl, String& sName);
-//    bool        GetMarker(const char* pMarker, double dTrackTime, Song* pSong, Track* track);
-//    bool        GetChord(const char* pMarker, double dTrackTime, Song* pSong, Track* track);
-//    bool        GetSongPart(const char* pMarker, double dTrackTime, Song* pSong, Track* track);
-//    bool        GetMeasure(const char* pMarker, double dTrackTime, Song* pSong, Track* track);
-    bool		SaveHeader(Song* pSong);
-    bool		SaveSongInfo(Song* pSong);
-    bool		SaveAllTracks(Song* pSong);
-    //bool        SaveParts(Song* pSong, Buffer& sTrackData);
-    bool		SaveTrack(const char* pTrackData, int nTrackLength);
-    int GetTimeDiff(double dTimeDiff);
-    double GetTimeDiff(int nTimeDiff);
-    bool		SaveMetaEvent(int nTimeDiff, META_EVENT nMetaEvent, int nChannel, const char* pEventData, int nEventDataSize, Buffer& sTrackData);
-    bool		SaveControlEvent(int nTimeDiff, int nChannel, unsigned char nType, unsigned char nValue, Buffer& sTrackData);
-    bool SaveNote(int nTimeDiff, bool bEVent, int nChannel, bool bOn, int nNote, double fVolume, Buffer& sTrackData);
-    bool        SaveTab(int nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
-    bool        SaveMarker(int nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
-    bool        SaveChord(int nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
-    //bool        SaveMix(int nTimeDiff, CMix* pMix, Buffer& sTrackData);
-//    bool        GetMix(const char* pMarker, Song* pSong);
-    //bool        SavePartInfo(int nTimeDiff, SongPart* pPart, Buffer& sTrackData);
-//    bool        SaveNoteInfo(int nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
-//    bool        GetPartInfo(const char* pMarker, double dTrackTime, Song* pSong, Track* track);
-//    bool        GetNoteInfo(const char* pMarker, double dTrackTime, Song* pSong, Track* track);
-//    bool        GetSongInfo(const char* pMarker, double dTrackTime, Song* pSong, Track* track);
-//    bool        SaveSongInfo(Song* pSong, Buffer& sTrackData);
-    bool SaveSongPart(int nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
-    bool SaveMeasure(int nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
-    bool SaveEvent(int nTimeDiff, MIDI_EVENT nEvent, int nChannel, const char* pEventData, int nEventDataSize, Buffer& sTrackData);
-    bool SaveTrackInfo(Track* track, Buffer& sTrackData);
-    bool SaveTrackNotes(Track* track, Buffer& sTrackData);
-    unsigned char GetProgram(INSTRUMENT instrument);
-    bool Log(const char* pFormat, const char* pMessage = NULL);
-    double GetBeatTime(double dTime);
-    bool AddData(void* data, int size);
-    unsigned char GetMidiDrumNote(INSTRUMENT instrument);
-    bool GetDrumInfo(int nNote, String& sName, INSTRUMENT& nInstrument);
+    float GetBeatTime(float dTime);
+    uint16_t GetTimeDiff(float dTimeDiff);
+    float GetTimeDiff(uint16_t nTimeDiff);
+    bool GetChunks(Song* song);
+    bool NextChunk(ChunkInfo& chunk, bool& done);
+    bool GetFileHeader(ChunkInfo& chunk, Song* song);
+    bool GetTrack(ChunkInfo& Chunk, Song* pSong, Track* track);
+    bool GetMetaEvent(char* data, uint16_t dataSize, uint16_t& nProcessed, float dTrackTime, Song* pSong, Track* track);
+    bool GetSystemEvent(char* data, uint16_t dataSize, uint16_t& nProcessed);
+    bool GetMidiEvent(uint8_t nEvent, char* data, uint16_t dataSize, uint16_t& nProcessed, float dTrackTime, Track* track);
+    bool GetNote(uint16_t nChannel, bool bNoteOn, char* data, uint16_t dataSize, uint16_t& nProcessed, float dTrackTime, Track* track);
+    bool AddNote(Note* pNote, float dTrackTime, Track* track);
+    uint8_t GetProgram(INSTRUMENT instrument);
+    bool GetProgram(uint16_t nChannel, char* data, uint16_t dataSize, uint16_t& nProcessed, float dTrackTime, Track* track);
+    bool GetControl(uint16_t nChannel, char* data, uint16_t dataSize, uint16_t& nProcessed, float dTrackTime, Track* track);
+    bool ResetNotes();
+    bool PutVarLen(uint16_t nValue, char* data, uint16_t dataSize, uint16_t& nBytes);
+    bool GetVarLen(char* data, uint16_t dataSize, uint16_t& nValue, uint16_t& nProcessed);
+    bool GetProgramInfo(uint16_t nProgram, String& sName, THING& nInstrument);
+    bool GetControlInfo(uint16_t nControl, String& sName);
+    uint8_t GetMidiDrumNote(INSTRUMENT instrument);
+    bool GetDrumInfo(uint16_t nNote, String& sName, INSTRUMENT& nInstrument);
+    //bool GetMarker(const char* pMarker, float dTrackTime, Song* pSong, Track* track);
+    //bool GetChord(const char* pMarker, float dTrackTime, Song* pSong, Track* track);
+    //bool GetSongPart(const char* pMarker, float dTrackTime, Song* pSong, Track* track);
+    //bool GetMeasure(const char* pMarker, float dTrackTime, Song* pSong, Track* track);
+    //bool SaveHeader(Song* pSong);
+    //bool SaveSongInfo(Song* pSong);
+    //bool SaveAllTracks(Song* pSong);
+    //bool SaveParts(Song* pSong, Buffer& sTrackData);
+    //bool SaveTrack(const char* pTrackData, uint16_t nTrackLength);
+    //bool SaveMetaEvent(uint16_t nTimeDiff, META_EVENT nMetaEvent, uint16_t nChannel, const char* pEventData, uint16_t nEventDataSize, Buffer& sTrackData);
+    //bool SaveControlEvent(uint16_t nTimeDiff, uint16_t nChannel, uint8_t nType, uint8_t nValue, Buffer& sTrackData);
+    //bool SaveNote(uint16_t nTimeDiff, bool bEVent, uint16_t nChannel, bool bOn, uint16_t nNote, float fVolume, Buffer& sTrackData);
+    //bool SaveTab(uint16_t nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
+    //bool SaveMarker(uint16_t nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
+    //bool SaveChord(uint16_t nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
+    //bool SaveMix(uint16_t nTimeDiff, CMix* pMix, Buffer& sTrackData);
+    //bool GetMix(const char* pMarker, Song* pSong);
+    //bool SavePartInfo(uint16_t nTimeDiff, SongPart* pPart, Buffer& sTrackData);
+    //bool SaveNoteInfo(uint16_t nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
+    //bool GetPartInfo(const char* pMarker, float dTrackTime, Song* pSong, Track* track);
+    //bool GetNoteInfo(const char* pMarker, float dTrackTime, Song* pSong, Track* track);
+    //bool GetSongInfo(const char* pMarker, float dTrackTime, Song* pSong, Track* track);
+    //bool SaveSongInfo(Song* pSong, Buffer& sTrackData);
+    //bool SaveSongPart(uint16_t nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
+    //bool SaveMeasure(uint16_t nTimeDiff, Note* pNote, Track* track, Buffer& sTrackData);
+    //bool SaveEvent(uint16_t nTimeDiff, MIDI_EVENT nEvent, uint16_t nChannel, const char* pEventData, uint16_t nEventDataSize, Buffer& sTrackData);
+    //bool SaveTrackInfo(Track* track, Buffer& sTrackData);
+    //bool SaveTrackNotes(Track* track, Buffer& sTrackData);
+    //bool Log(const char* pFormat, const char* pMessage = NULL);
+    //bool AddData(void* data, uint16_t size);
 
 public:
-    const char*	GetError();
-//    bool		ReadData(const char* pFile, Song* pSong);
-    bool SaveData(const char* pFile, Song* pSong);
-//    bool        ReadData(char* data, int dwDataSize, Song* pSong);
-//    bool        SaveData(char*& data, int& dwDataSize, Song* pSong);
-//    bool		Test();
-    static unsigned char VolumeToMidi(double fVolume);
-//    static double    MidiToVolume(unsigned char nVelocity);
+    bool Read(char* data, uint32_t size, Song* song);
+    //bool SaveData(const char* pFile, Song* pSong);
+    //bool SaveData(char*& data, uint16_t& dwDataSize, Song* pSong);
+    static uint8_t VolumeToMidi(float fVolume);
+    static float    MidiToVolume(uint8_t nVelocity);
 };
 
-} // namespace QuantoGraph
-#endif // MUSIC_MIDI_FILE_H
+#endif // MidiFile_h

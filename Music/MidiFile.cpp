@@ -1,235 +1,212 @@
-// MidiFile.cpp
-// MIDI file
-
-#include "MusicDef.h"
-#include "MusicMisc.h"
-#include "Buffer.h"
+#include "Misc.h"
 #include "Note.h"
-#include "Chord.h"
-#include "Scale.h"
 #include "Track.h"
 #include "Song.h"
 #include "MidiFile.h"
-namespace QuantoGraph {
 
-double MidiFile::_volumeRate = 0.3322;
+float MidiFile::_volumeRate = 0.3322;
 
 //=================================================================================================
-MidiFile::MidiFile() : _data(NULL), _dataOffset(NULL), _dataSize(0), _format(0), _tracks(0),
-        _timeDivision(0), _beatTime(0.0), _chordType(Chord::CHORD_NONE), _chordRoot(NO_MIDI_NOTE) {
+MidiFile::MidiFile() {
 }
 
 //=================================================================================================
-MidiFile::~MidiFile(void) {
-    // Delete the data
-    if(_data) {
-        free(_data);
-        _data = NULL;
+MidiFile::~MidiFile() {
+}
+
+//=================================================================================================
+// Rounds the beat time to the nearest time division
+float MidiFile::GetBeatTime(float dTime) {
+    float dBeatTime;
+
+    if(_timeDivision == 0) {
+        return false;
     }
+
+    dBeatTime = (float)((int)(dTime * _timeDivision + 0.5)) / _timeDivision;
+
+    return dBeatTime;
 }
 
 //=================================================================================================
-// Gets last error's description
-const char*	MidiFile::GetError() {
-    return (const char*)_error;
+uint16_t MidiFile::GetTimeDiff(float dTimeDiff) {
+    if(dTimeDiff == 0.0)
+        return 0;
+
+    if(_beatTime == 0.0) {
+        return 0;
+    }
+
+    return (int)((dTimeDiff / _beatTime) * _timeDivision + 0.5);
 }
-/*
+
 //=================================================================================================
-// Reads the MIDI file
-bool MidiFile::ReadData(char* data, int dwDataSize, Song* pSong) {
-    // Set the data
+float MidiFile::GetTimeDiff(int nTimeDiff) {
+    if(nTimeDiff == 0)
+        return 0.0;
+
+    if(_beatTime == 0.0) {
+        return 0;
+    }
+
+    return _beatTime * ((float)nTimeDiff / _timeDivision);
+}
+
+//=================================================================================================
+// Reads the MIDI file into a Song object
+bool MidiFile::Read(char* data, uint32_t size, Song* song) {
+    Serial.printf("===== Reading MIDI file, %d bytes\n", size);
     _data = data;
-    _dataSize = dwDataSize;
+    _dataSize = size;
+    _dataRead = 0;
 
     _report = ""; // Reset the report
-    pSong->Reset(); // Reset the song
     _beatTime = 0.0;
     _timeDivision = 0;
 
     // Get all chunks
-    if(!GetChunks(pSong))
+    if(!GetChunks(song))
         return false;
 
-    //pSong->Show("MidiFile::ReadData");
-
-    return true;
-}
-
-//=================================================================================================
-// Reads the MIDI file
-bool MidiFile::ReadData(const char* pFile, Song* pSong) {
-    #ifndef _DEBUG
-    __try {
-    #endif
-
-        Log("========== MIDI file '%s': read ===============", pFile);
-
-        _report = ""; // Reset the report
-        pSong->Reset(); // Reset the song
-        _beatTime = 0.0;
-        _timeDivision = 0;
-
-        // Read the whole file
-        if(!Read(pFile, _data, _dataSize)) {
-            _error.Format("Can't read file '%s': %s", pFile, (const char*)_error);
-            return false;
-        }
-
-        // Get all chunks
-        if(!GetChunks(pSong))
-            return false;
-
-        // Set the number of measures
-        pSong->GetMeasures(pSong->_measures);
-
-        // Update song info for all tracks.
-        // Do it after all tracks have been read, since song info can be updated while reading the tracks.
-        pSong->UpdateTrackInfo();
-
-        pSong->_sFile = pFile;
-
-        //pSong->Show("MidiFile::ReadData");
-        Log("========== MIDI file: end of read ===============");
-
-    #ifndef _DEBUG
-    } __except(::ExceptionFilter(GetExceptionInformation())) {
-        _error.Format("Can't read file '%s'", pFile);
-        return false;
-    }
-    #endif
+    Serial.printf("===== Done reading MIDI file\n");
 
     return true;
 }
 
 //=================================================================================================
 // Gets all file chunks
-bool MidiFile::GetChunks(Song* pSong) {
-    CHUNK_INFO	Chunk;			// Chunk info
-    bool		bDone = false;	// Whether done reading
-    int			nFileTrack = 1;	// Ttrack number in the file
-    int			nSaveTrack = 1;	// Track number to be saved
-    Track		Track(NULL);    // Current track info
+bool MidiFile::GetChunks(Song* song) {
+    ChunkInfo chunk;			// chunk info
+    bool done = false;	// Whether done reading
+    uint16_t fileTrack = 1;	// Track number in the file
+    uint16_t saveTrack = 1;	// Track number to be saved
+    Track* track;    // Current track info
 
     // Read all chunks
     _dataOffset = _data;
     do {
         // Read the next chunk
-        if(!NextChunk(Chunk, bDone)) {
+        if(!NextChunk(chunk, done)) {
             return false;
         }
 
-        if(bDone) // No more data
+        if(done) // No more data
             break;
 
         // Check for file header
-        if(!strncmp(Chunk._header._id, ID_FILE_HEADER, lstrlen(ID_FILE_HEADER))) { // File header
-            if(!GetFileHeader(Chunk, pSong))
+        if(!strncmp(chunk._header._id, ID_FILE_HEADER, strlen(ID_FILE_HEADER))) { // File header
+            if(!GetFileHeader(chunk, song))
                 return false;
-        } else if(!strncmp(Chunk._header._id, ID_TRACK_HEADER, lstrlen(ID_TRACK_HEADER))) { // Track
+        } else if(!strncmp(chunk._header._id, ID_TRACK_HEADER, strlen(ID_TRACK_HEADER))) { // Track
             // Get track's data
-            Track.Reset();
-            Track._trackNumber = nFileTrack;
-            if(!GetTrack(Chunk, pSong, &Track))
+            track = new Track();
+            track->_trackNumber = fileTrack;
+            if(!GetTrack(chunk, song, track))
                 return false;
-
-            //Track.Show();
 
             // Save this track into the song
-            if(_format == 1 && nFileTrack == 1) {
+            if(_format == 1 && fileTrack == 1) {
                 // Don't save first track if MIDI file format is 1. It only has song's data, no track notes.
             } else {
-                if(!pSong->AddTrack(Track)) {
-                    _error.Format("Can't add track to the song: %s", pSong->GetError());
-                    return false;
-                }
-
-                nSaveTrack++;
+                song->_tracks.push_back(track);
+                saveTrack++;
             }
 
-            nFileTrack++;
+            fileTrack++;
         } else { // Unknown chunk, ignore
         }
 
-    } while(!bDone);
+    } while(!done);
 
     return true;
 }
 
 //=================================================================================================
 // Gets the next chunk from the file
-bool MidiFile::NextChunk(CHUNK_INFO& Chunk, bool& bDone) {
-    bDone = false;	// Whether done processing
+bool MidiFile::NextChunk(ChunkInfo& chunk, bool& done) {
+    Serial.printf(">>>>> NextChunk\n");
+    done = false;	// Whether done processing
 
     // Read the chunk header
-    if(_dataOffset + sizeof(CHUNK_HEADER) > _data + _dataSize) { // Make sure we have enought data in the file
-        bDone = true;
+    if(_dataOffset + sizeof(ChunkHeader) > _data + _dataSize) { // Make sure we have enought data in the file
+        // Check the size of data actually read
+        uint32_t read = _dataOffset - _data;
+        if(read == _dataSize)
+            Serial.printf("Done reading: read %d bytes\n", read);
+        else
+            Serial.printf("ERROR: done reading, but read %d bytes out of %d\n", read, _dataSize);
+
+        done = true; // Read all data
         return true;
     }
 
-    memcpy(&Chunk._header, _dataOffset, sizeof(CHUNK_HEADER));
-    _dataOffset += sizeof(CHUNK_HEADER);
-    Reverse4Bytes((char*)&Chunk._header._length); // Length is stored in reversed byte order
+    memcpy(&chunk._header, _dataOffset, sizeof(ChunkHeader));
+    _dataOffset += sizeof(ChunkHeader);
+    Reverse4Bytes((char*)&chunk._header._length); // Length is stored in reversed byte order
 
     // Find the data
-    if(_dataOffset + Chunk._header._length > _data + _dataSize) { // Make sure we have enought data in the file
-        bDone = true;
-        _error.Format("Not enought data in the file for the chunk data: need %d, have only %d left", Chunk._header._length, _data - _dataOffset);
+    if(_dataOffset + chunk._header._length > _data + _dataSize) { // Make sure we have enought data in the file
+        done = true;
+        Serial.printf("ERROR: Not enought data in the file for the chunk data: need %d, have only %d left\n", chunk._header._length, _data - _dataOffset);
         return false;
     }
 
-    if(Chunk._header._length > 0)
-        Chunk._data = _dataOffset;
+    if(chunk._header._length > 0)
+        chunk._data = _dataOffset;
     else
-        Chunk._data = NULL; // No data for this chunk
+        chunk._data = NULL; // No data for this chunk
 
-    _dataOffset += Chunk._header._length;
+    _dataOffset += chunk._header._length;
 
     return true;
 }
 
 //=================================================================================================
 // Get file's header
-bool MidiFile::GetFileHeader(CHUNK_INFO& Chunk, Song* pSong) {
-    FILE_HEADER*	pHeader = NULL;	// File header
+bool MidiFile::GetFileHeader(ChunkInfo& chunk, Song* song) {
+    FileHeader*	header = NULL;	// File header
 
     // Check the header size
-    if(Chunk._header._length != 6) { // The header chunk must be 6 bytes long
+    if(chunk._header._length != 6) { // The header chunk must be 6 bytes long
+        Serial.printf("ERROR: MIDI file header is not 6 bytes long: %d\n", chunk._header._length);
         return false;
     }
 
-    pHeader = (FILE_HEADER*)Chunk._data;
+    header = (FileHeader*)chunk._data;
 
     // MIDI format.
     // 0 - one track for all notes
     // 1 - one MIDI track per song track. The first track contains all parameters for the song.
     // 2 - many tracks, but not played simultaneously. May be used to store patterns.
-    Reverse2Bytes((char*)&pHeader->_format);
-    _format = pHeader->_format;
+    Reverse2Bytes((char*)&header->_format);
+    _format = header->_format;
 
     // Number of tracks
-    Reverse2Bytes((char*)&pHeader->_tracks);
-    _tracks = pHeader->_tracks;
+    Reverse2Bytes((char*)&header->_tracks);
+    _tracks = header->_tracks;
 
     // Time division.
     // If positive, it's a number of ticks per quarter note (beat).
-    Reverse2Bytes((char*)&pHeader->_division);
-    _timeDivision = pHeader->_division;
+    Reverse2Bytes((char*)&header->_division);
+    _timeDivision = header->_division;
+
+    Serial.printf("File header: format=%d, tracks=%d, timeDivision=%d\n", _format, _tracks, _timeDivision);
 
     return true;
 }
 
 //=================================================================================================
 // Reads one track
-bool MidiFile::GetTrack(CHUNK_INFO& Chunk, Song* pSong, Track* track) {
+bool MidiFile::GetTrack(ChunkInfo& chunk, Song* song, Track* track) {
     int		dwProcessed = 0;	// Bytes processed
     int			size = 0;			// Field size
     int			nBytes = 0;			// Bytes in the data
     int		nTime = 0;			// Event's time (offset)
     int		nTrackTime = 0;     // Event's time (absolute)
-    unsigned char		nEvent = 0;			// Event ID
-    unsigned char		nPrevEvent = 0;		// Previous event
-    double		dEventTime = 0.0;	// Event's relative time, in seconds
-    double		dTrackTime = 0.0;	// Current track time, in seconds
+    uint8_t		nEvent = 0;			// Event ID
+    uint8_t		nPrevEvent = 0;		// Previous event
+    float		dEventTime = 0.0;	// Event's relative time, in seconds
+    float		dTrackTime = 0.0;	// Current track time, in seconds
     char*		pEventData = NULL;	// Event data
     int		dwEventLength = 0;	// Event's data length
     String	sString;			// General string
@@ -245,10 +222,10 @@ bool MidiFile::GetTrack(CHUNK_INFO& Chunk, Song* pSong, Track* track) {
     ResetNotes(); // Clear all started notes
 
     // Process all events in the track
-    while(dwProcessed < Chunk._header._length) {
+    while(dwProcessed < chunk._header._length) {
         // Get the time
-        size = Min(4, Chunk._header._length - dwProcessed);
-        GetVarLen(Chunk._data + dwProcessed, size, nTime, nBytes);
+        size = Min(4, chunk._header._length - dwProcessed);
+        GetVarLen(chunk._data + dwProcessed, size, nTime, nBytes);
         dwProcessed += nBytes;
 
         // Update track time.
@@ -258,36 +235,36 @@ bool MidiFile::GetTrack(CHUNK_INFO& Chunk, Song* pSong, Track* track) {
         dTrackTime = GetTimeDiff((int)nTrackTime);
 
         // Add event time to the report
-        sString.Format("Event diff: %04d, %7.3f sec, beat=%7.3f, TrackTime=%7.3f", nTime, dEventTime, pSong->_beatTime, dTrackTime);
+        sString.Format("Event diff: %04d, %7.3f sec, beat=%7.3f, TrackTime=%7.3f", nTime, dEventTime, song->_beatTime, dTrackTime);
         //Log((const char*)sString);
         _report += sString;
 
         // If reading a repeated song, stop reading after the end of the real song
-        if(pSong->_dSongTime != NO_DOUBLE) {
-            if(dTrackTime > pSong->_dSongTime + 0.01)
+        if(song->_dSongTime != NO_DOUBLE) {
+            if(dTrackTime > song->_dSongTime + 0.01)
                 break;
         }
 
         // Get the event ID
-        nEvent = *(unsigned char*)(Chunk._data + dwProcessed);
-        dwEventLength = Chunk._header._length - dwProcessed;
+        nEvent = *(uint8_t*)(chunk._data + dwProcessed);
+        dwEventLength = chunk._header._length - dwProcessed;
         dwProcessed += 1;
 
         // Process the event
         if(nEvent == MIDI_META) { // Meta event
-            pEventData = Chunk._data + dwProcessed;
-            if(!GetMetaEvent(pEventData, dwEventLength, nBytes, dTrackTime, pSong, track))
+            pEventData = chunk._data + dwProcessed;
+            if(!GetMetaEvent(pEventData, dwEventLength, nBytes, dTrackTime, song, track))
                 return false;
 
             dwProcessed += nBytes;
         } else if(nEvent == MIDI_SYSTEM) { // System event
-            pEventData = Chunk._data + dwProcessed;
+            pEventData = chunk._data + dwProcessed;
             if(!GetSystemEvent(pEventData, dwEventLength, nBytes))
                 return false;
 
             dwProcessed += nBytes;
         } else if(nEvent >= 0x80 && nEvent <= 0xEF) { // MIDI event
-            pEventData = Chunk._data + dwProcessed;
+            pEventData = chunk._data + dwProcessed;
             if(!GetMidiEvent(nEvent, pEventData, dwEventLength, nBytes, dTrackTime, track))
                 return false;
 
@@ -295,7 +272,7 @@ bool MidiFile::GetTrack(CHUNK_INFO& Chunk, Song* pSong, Track* track) {
             nPrevEvent = nEvent;
         } else if(nEvent < 0x80) { // Running status
             dwProcessed--; // Go back to the event data, there was no event ID
-            pEventData = Chunk._data + dwProcessed;
+            pEventData = chunk._data + dwProcessed;
             if(!GetMidiEvent(nPrevEvent, pEventData, dwEventLength, nBytes, dTrackTime, track))
                 return false;
 
@@ -312,7 +289,7 @@ bool MidiFile::GetTrack(CHUNK_INFO& Chunk, Song* pSong, Track* track) {
         for(i = 0; i < size; i++) {
             note = &_notes[i];
             if(note->_nState == Note::STATE_START) // This note was started
-                AddNote(note, pSong->_dSongTime, track);
+                AddNote(note, song->_dSongTime, track);
         }
     }
 
@@ -328,8 +305,8 @@ bool MidiFile::GetTrack(CHUNK_INFO& Chunk, Song* pSong, Track* track) {
 
 //=================================================================================================
 // Get meta event
-bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, double dTrackTime, Song* pSong, Track* track) {
-    unsigned char		nType = 0;			// Event type
+bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, float dTrackTime, Song* song, Track* track) {
+    uint8_t		nType = 0;			// Event type
     int			nBytes = 0;			// Bytes in the variable lenght data
     int		length = 0;		// Data length
     String	sName;				// Event name
@@ -341,7 +318,7 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, double dT
     nProcessed = 0;
 
     // Get the meta event type
-    nType = *(unsigned char*)data;
+    nType = *(uint8_t*)data;
     nProcessed += 1;
 
     // Get data length
@@ -362,7 +339,7 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, double dT
 
             // For MIDI format 1, song's text is stored in the first track
             if(_format == 1 && track->_trackNumber == 1)
-                pSong->_sText = track->_sText;
+                song->_sText = track->_sText;
 
             // Add to the report
             sString.Format("Text '%s'", (const char*)track->_sText);
@@ -377,7 +354,7 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, double dT
 
             // For MIDI format 1, song's text is stored in the first track
             if(_format == 1 && track->_trackNumber == 1)
-                pSong->_sCopyright = track->_sCopyright;
+                song->_sCopyright = track->_sCopyright;
 
             // Add to the report
             sString.Format("Copyright '%s'", (const char*)track->_sCopyright);
@@ -392,7 +369,7 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, double dT
 
             // For MIDI format 1, song name is stored in the first track
             if(_format == 1 && track->_trackNumber == 1)
-                pSong->_name = track->_name;
+                song->_name = track->_name;
 
             // Add to the report
             sString.Format("Track '%s'", (const char*)track->_name);
@@ -419,7 +396,7 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, double dT
         case META_MARKER: // Marker text: length, text
             sName = "Marker";
             sMarker.Copy(pMetaData, length);
-            GetMarker((const char*)sMarker, dTrackTime, pSong, track);
+            GetMarker((const char*)sMarker, dTrackTime, song, track);
 
             // Add to the report
             sString.Format("Marker '%s'", (const char*)sMarker);
@@ -444,9 +421,9 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, double dT
             sName = "Tempo";
             memcpy((char*)(&dwData) + 1, pMetaData, 3);
             Reverse4Bytes((char*)&dwData);
-            pSong->_dTempo = (double)60 * 1000 * 1000 / dwData; // Tempo is microseconds per minute, divided by microseconds per beat (tempo)
-            pSong->_beatTime = (double)dwData / (1000.0 * 1000.0); // Quarter note time in seconds
-            _beatTime = GetBeatTime(pSong->_beatTime);
+            song->_dTempo = (float)60 * 1000 * 1000 / dwData; // Tempo is microseconds per minute, divided by microseconds per beat (tempo)
+            song->_beatTime = (float)dwData / (1000.0 * 1000.0); // Quarter note time in seconds
+            _beatTime = GetBeatTime(song->_beatTime);
             break;
 
         case META_OFFSET: // SMPTE offset
@@ -455,16 +432,16 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, double dT
 
         case META_TIME_SIGNATURE: // Time signature: 4 bytes
             sName = "Time signature";
-            pSong->_measureBeats = (int)pMetaData[0]; // Numerator
-            pSong->_beatNotes = (int)pow(2.0f, (int)pMetaData[1]); // Denominator: power of 2
+            song->_measureBeats = (int)pMetaData[0]; // Numerator
+            song->_beatNotes = (int)pow(2.0f, (int)pMetaData[1]); // Denominator: power of 2
             //pMetaData[2]); // Metronome
             //pMetaData[3]); // 32-nd's
             break;
 
         case META_KEY_SIGNATURE: // Key signature
             sName = "Key signature";
-            pSong->_key = (KEY_SIGNATURE)pMetaData[0]; // Key (1 byte)
-            pSong->_nScale = (SCALE)pMetaData[1]; // Scale (1 byte)
+            song->_key = (KEY_SIGNATURE)pMetaData[0]; // Key (1 byte)
+            song->_nScale = (SCALE)pMetaData[1]; // Scale (1 byte)
             break;
 
         case META_SPECIFIC: // Sequencer specific event
@@ -511,11 +488,11 @@ bool MidiFile::GetSystemEvent(char* data, int dataSize, int& nProcessed) {
 }
 
 //=================================================================================================
-bool MidiFile::GetMidiEvent(unsigned char nEvent, char* data, int dataSize, int& nProcessed, double dTrackTime, Track* track) {
-    unsigned char		nParam1 = 0;	// Event parameter 1
-    unsigned char		nParam2 = 0;	// Event parameter 2
-    unsigned char		nType = 0;		// Event type
-    unsigned char		nChannel = 0;	// Event channel
+bool MidiFile::GetMidiEvent(uint8_t nEvent, char* data, int dataSize, int& nProcessed, float dTrackTime, Track* track) {
+    uint8_t		nParam1 = 0;	// Event parameter 1
+    uint8_t		nParam2 = 0;	// Event parameter 2
+    uint8_t		nType = 0;		// Event type
+    uint8_t		nChannel = 0;	// Event channel
     int			nBytes = 0;		// Bytes processed in this call
     String	sString;		// General string
 
@@ -545,10 +522,10 @@ bool MidiFile::GetMidiEvent(unsigned char nEvent, char* data, int dataSize, int&
             break;
 
         case MIDI_NOTE_AFTER: // Note aftertouch
-            nParam1 = *(unsigned char*)(data + nProcessed); // Note
+            nParam1 = *(uint8_t*)(data + nProcessed); // Note
             nProcessed++;
 
-            nParam2 = *(unsigned char*)(data + nProcessed); // Value
+            nParam2 = *(uint8_t*)(data + nProcessed); // Value
             nProcessed++;
 
             // Add to the report
@@ -573,7 +550,7 @@ bool MidiFile::GetMidiEvent(unsigned char nEvent, char* data, int dataSize, int&
             break;
 
         case MIDI_CHANNEL_AFTER: // Channel aftertouch
-            nParam1 = *(unsigned char*)(data + nProcessed); // Value
+            nParam1 = *(uint8_t*)(data + nProcessed); // Value
             nProcessed++;
 
             // Add to the report
@@ -584,10 +561,10 @@ bool MidiFile::GetMidiEvent(unsigned char nEvent, char* data, int dataSize, int&
             break;
 
         case MIDI_BEND: // Pitch bend
-            nParam1 = *(unsigned char*)(data + nProcessed); // Value (low byte)
+            nParam1 = *(uint8_t*)(data + nProcessed); // Value (low byte)
             nProcessed++;
 
-            nParam2 = *(unsigned char*)(data + nProcessed); // Value (high byte)
+            nParam2 = *(uint8_t*)(data + nProcessed); // Value (high byte)
             nProcessed++;
 
             // Add to the report
@@ -606,10 +583,10 @@ bool MidiFile::GetMidiEvent(unsigned char nEvent, char* data, int dataSize, int&
 }
 
 //=================================================================================================
-bool MidiFile::GetNote(int nChannel, bool bNoteOn, char* data, int dataSize, int& nProcessed, double dTrackTime, Track* track) {
+bool MidiFile::GetNote(int nChannel, bool bNoteOn, char* data, int dataSize, int& nProcessed, float dTrackTime, Track* track) {
     Note		Note;			    // Note to save
     int			nNote = 0;		    // MIDI note
-    unsigned char		nVelocity = 0;	    // Velocity
+    uint8_t		nVelocity = 0;	    // Velocity
     String	sString;		    // General string
 
     // Check data size
@@ -619,14 +596,14 @@ bool MidiFile::GetNote(int nChannel, bool bNoteOn, char* data, int dataSize, int
     }
 
     // MIDI note number
-    nNote = (int)(unsigned char)data[0];
+    nNote = (int)(uint8_t)data[0];
     if((nNote < 0 || nNote > 200) && nNote != CHORD_MIDI_NOTE && nNote != FINGER_MIDI_NOTE) {
         _error.Format("Bad MIDI note: %d", nNote);
         return false;
     }
 
     // Velocity (0-127)
-    nVelocity = (unsigned char)data[1];
+    nVelocity = (uint8_t)data[1];
     if(nVelocity > 127) {
         _error.Format("Bad note velocity: %d", nVelocity);
         return false;
@@ -647,7 +624,7 @@ bool MidiFile::GetNote(int nChannel, bool bNoteOn, char* data, int dataSize, int
     // Start a new note, if the velocity is not zero.
     // If the velocity is zero, it's the end of note and the note has been already saved.
     if(nVelocity > 0) { // New note
-        //_notes[nNote]._volume = (double)nVelocity / 127; // Linear conversion
+        //_notes[nNote]._volume = (float)nVelocity / 127; // Linear conversion
         _notes[nNote]._volume = MidiToVolume(nVelocity); // Logarithmic
 
         _notes[nNote]._start = dTrackTime;
@@ -672,7 +649,7 @@ bool MidiFile::GetNote(int nChannel, bool bNoteOn, char* data, int dataSize, int
 }
 
 //=================================================================================================
-bool MidiFile::AddNote(Note* note, double dTrackTime, Track* track) {
+bool MidiFile::AddNote(Note* note, float dTrackTime, Track* track) {
     THING       nInstrument = PERCUSSION;    // Instrument type
     String sInstrument;        // Instrument name
 
@@ -696,7 +673,7 @@ bool MidiFile::AddNote(Note* note, double dTrackTime, Track* track) {
 
 //=================================================================================================
 // Get MIDI program (instrument or patch)
-bool MidiFile::GetProgram(int nChannel, char* data, int dataSize, int& nProcessed, double dTrackTime, Track* track) {
+bool MidiFile::GetProgram(int nChannel, char* data, int dataSize, int& nProcessed, float dTrackTime, Track* track) {
     THING		nInstrument = PERCUSSION;	// Instrument ID for this program
     int			nProgram = 0;	// Program number. 0-127 in the file, but 1-128 in the specifications
     String	sProgramName;	// Program name
@@ -709,7 +686,7 @@ bool MidiFile::GetProgram(int nChannel, char* data, int dataSize, int& nProcesse
     }
 
     // MIDI program number
-    nProgram = (int)(unsigned char)data[0];
+    nProgram = (int)(uint8_t)data[0];
     if(nProgram < 0 || nProgram > 127) {
         _error.Format("Bad program number: %d", nProgram);
         return false;
@@ -741,12 +718,12 @@ bool MidiFile::GetProgram(int nChannel, char* data, int dataSize, int& nProcesse
 
 //=================================================================================================
 // Get MIDI control code
-bool MidiFile::GetControl(int nChannel, char* data, int dataSize, int& nProcessed, double dTrackTime, Track* track) {
-    double		fHalf = 127.0f / 2.0f;	// Half of the value range
+bool MidiFile::GetControl(int nChannel, char* data, int dataSize, int& nProcessed, float dTrackTime, Track* track) {
+    float		fHalf = 127.0f / 2.0f;	// Half of the value range
     String	sControlName;	// Control name
     int			nControl = 0;	// Control type
     int			nValue = 0;		// Control value, 0-127
-    double		fValue = 0.0f;	// Control value, 0.0 - 1.0
+    float		fValue = 0.0f;	// Control value, 0.0 - 1.0
     String	sString;		// General string
 
     // Check data size
@@ -756,24 +733,24 @@ bool MidiFile::GetControl(int nChannel, char* data, int dataSize, int& nProcesse
     }
 
     // Control type (0 - 127)
-    nControl = (int)(unsigned char)data[0];
+    nControl = (int)(uint8_t)data[0];
 
     // Control value (0 - 127)
-    nValue = (int)(unsigned char)data[1];
+    nValue = (int)(uint8_t)data[1];
 
     // Get control's info
     if(!GetControlInfo(nControl, sControlName))
         return false;
 
     // Process the control
-    fValue = (double)nValue / 127;
+    fValue = (float)nValue / 127;
     switch(nControl) {
         case CONTROL_VOLUME: // Volume
             track->_volume = fValue;
             break;
 
         case CONTROL_PAN: // Pan
-            track->_pan = ((double)nValue - fHalf) / fHalf; // Pan is from -1.0 to 1.0
+            track->_pan = ((float)nValue - fHalf) / fHalf; // Pan is from -1.0 to 1.0
             break;
 
         case CONTROL_TAB_STRING: // Guitar tab - string number
@@ -785,7 +762,7 @@ bool MidiFile::GetControl(int nChannel, char* data, int dataSize, int& nProcesse
             break;
 
         case CONTROL_TAB_FINGER: // Guitar tab - finger number
-            _note._Tab._nFinger = (unsigned char)nValue;
+            _note._Tab._nFinger = (uint8_t)nValue;
             break;
 
         case CONTROL_TAB_MODE: // Guitar tab - playing mode
@@ -823,14 +800,14 @@ bool MidiFile::ResetNotes() {
 
     return true;
 }
-*/
+
 //=================================================================================================
 // Saves a variable length number
 // dataSize - (in) size of data array
 // nBytes - (out) number of bytes saved into data
 bool MidiFile::PutVarLen(int nValue, char* data, int dataSize, int& nBytes) {
     int	Temp = 0;		// Buffer for reversed data
-    bool	bDone = false;	// Whether done processing
+    bool	done = false;	// Whether done processing
 
     nBytes = 0;
 
@@ -844,12 +821,12 @@ bool MidiFile::PutVarLen(int nValue, char* data, int dataSize, int& nBytes) {
     }
 
     // Reverse and save the bytes
-    while(!bDone) {
+    while(!done) {
         data[nBytes] = (char)Temp; // Save the current byte
         if(data[nBytes] & 0x80) // This is not the last byte
             Temp >>= 8; // Go to the next byte
         else
-            bDone = true;
+            done = true;
 
         nBytes++;
     }
@@ -861,12 +838,12 @@ bool MidiFile::PutVarLen(int nValue, char* data, int dataSize, int& nBytes) {
 
     return true;
 }
-/*
+
 //=================================================================================================
 // Gets a variable length number
 bool MidiFile::GetVarLen(char* data, int dataSize, int& nValue, int& nProcessed) {
     int		i = 0;		// Data index
-    unsigned char	nData = 0;	// Current byte
+    uint8_t	nData = 0;	// Current byte
 
     nProcessed = 0;
 
@@ -897,41 +874,9 @@ bool MidiFile::GetVarLen(char* data, int dataSize, int& nValue, int& nProcessed)
 }
 
 //=================================================================================================
-bool MidiFile::Test() {
-    char	Data[4] = { 0x00, 0x00, 0x00, 0x00 };
-    int	nValue = 159;
-    int		dataSize = 4;
-    int		nBytes = 0;
-    unsigned char    nVolume;
-    double   fVolume;
-
-    // 82 82 00 -> 33024
-    // 81 1F -> 159
-    // 81 80 00 -> 0x4000
-
-    nVolume = VolumeToMidi(0.2f);
-    nVolume = VolumeToMidi(0.5f);
-    nVolume = VolumeToMidi(0.9f);
-
-    //PutVarLen(nValue, (char*)&Data, dataSize, nBytes);
-    for(fVolume = 0.0f; fVolume <= 1.01f; fVolume += 0.1f) {
-        nVolume = VolumeToMidi(fVolume);
-        Output("%0.2f -> %3d\n", fVolume, nVolume);
-    }
-
-    Output("=============\n");
-    for(nVolume = 0; nVolume <= 127; nVolume += 3) {
-        fVolume = MidiToVolume(nVolume);
-        Output("%0.2f <- %3d\n", fVolume, nVolume);
-    }
-
-    return true;
-}
-*/
-//=================================================================================================
-unsigned char MidiFile::VolumeToMidi(double fVolume) {
-    unsigned char    nVelocity;
-    double   fLog;
+uint8_t MidiFile::VolumeToMidi(float fVolume) {
+    uint8_t    nVelocity;
+    float   fLog;
 
     if(fVolume < 0.01f)
         return 0;
@@ -940,15 +885,15 @@ unsigned char MidiFile::VolumeToMidi(double fVolume) {
         return 127;
 
     fLog = 1.0f + log10(fVolume) * _volumeRate;
-    nVelocity = (unsigned char)(fLog * 127.0f + 0.5f);
+    nVelocity = (uint8_t)(fLog * 127.0f + 0.5f);
 
     return nVelocity;
 }
-/*
+
 //=================================================================================================
-double MidiFile::MidiToVolume(unsigned char nVelocity) {
-    double   fVelocity;
-    double   fVolume;
+float MidiFile::MidiToVolume(uint8_t nVelocity) {
+    float   fVelocity;
+    float   fVolume;
 
     if(nVelocity == 0)
         return 0.0f;
@@ -956,9 +901,9 @@ double MidiFile::MidiToVolume(unsigned char nVelocity) {
     if(nVelocity >= 127)
         return 1.0f;
 
-    fVelocity = (double)nVelocity / 127.0f;
+    fVelocity = (float)nVelocity / 127.0f;
     fVelocity = (fVelocity - 1.0f) / _volumeRate;
-    fVolume = (double)(pow(10.0f, fVelocity));
+    fVolume = (float)(pow(10.0f, fVelocity));
 
     return fVolume;
 }
@@ -1494,7 +1439,7 @@ bool MidiFile::GetProgramInfo(int nProgram, String& sName, THING& nInstrument) {
 
     return true;
 }
-*/
+
 //=================================================================================================
 // Get MIDI control(ler) info by it's number
 bool MidiFile::GetControlInfo(int nControl, String& sName) {
@@ -1888,1396 +1833,10 @@ bool MidiFile::GetControlInfo(int nControl, String& sName) {
 
     return true;
 }
-/*
-//=================================================================================================
-// Saves a lesson into MIDI file
-bool MidiFile::SaveData(char*& data, int& dwDataSize, Song* pSong) {
-    bool	bRet = true;	// Return value
-
-    #ifndef _DEBUG
-    __try {
-    #endif
-
-        Log("========== Lesson '%s': save ===============");
-        //pSong->Show("MidiFile::SaveData");
-
-        _data = NULL;
-        _dataSize = 0;
-
-        // Set some parameters
-        _format = 1;
-        _tracks = pSong->GetNumberOfTracks();
-        _timeDivision = 1000;//960;
-        _beatTime = GetBeatTime(pSong->_beatTime);
-
-        // Save the header
-        if(!SaveHeader(pSong)) {
-            bRet = false;
-            goto Exit;
-        }
-
-        // Save song's info in the first track
-        if(!SaveSongInfo(pSong)) {
-            bRet = false;
-            goto Exit;
-        }
-
-        // Save all tracks
-        if(!SaveAllTracks(pSong)) {
-            bRet = false;
-            goto Exit;
-        }
-
-    #ifndef _DEBUG
-    } __except(::ExceptionFilter(GetExceptionInformation())) {
-        return false;
-    }
-    #endif
-
-Exit:
-    data = _data;
-    dwDataSize = _dataOffset - _data;
-
-    Log("========== Lesson: end of save ===============");
-    return bRet;
-}
-*/
-//=================================================================================================
-// Saves a song into MIDI file
-bool MidiFile::SaveData(const char* pFile, Song* pSong) {
-    bool	bRet = true;	// Return value
-    int     dataSize;
-    int ret;
-
-    Log("========== MIDI file '%s': save ===============", pFile);
-    //pSong->Show("MidiFile::SaveData");
-
-    // Open the file for writing
-    ret = Open(pFile, false, true); // A new file for writing
-    if(ret)
-        return false;
-
-    _data = NULL;
-    _dataSize = 0;
-
-    // Set some parameters
-    _format = 1;
-    _tracks = (int)pSong->_tracks.size();
-    _timeDivision = 1000;//960;
-    _beatTime = GetBeatTime(pSong->_beatTime);
-
-    // Save the header
-    if(!SaveHeader(pSong)) {
-        bRet = false;
-        goto Exit;
-    }
-
-    // Save song's info in the first track
-    if(!SaveSongInfo(pSong)) {
-        bRet = false;
-        goto Exit;
-    }
-
-    // Save all tracks
-    if(!SaveAllTracks(pSong)) {
-        bRet = false;
-        goto Exit;
-    }
-
-    // Write the file
-    dataSize = (int)(_dataOffset - _data);
-    if(!Write(_data, dataSize)) {
-        bRet = false;
-        goto Exit;
-    }
-
-Exit:
-    Close();
-
-    free(_data);
-    _data = NULL;
-
-    Log("========== MIDI file: end of save ===============");
-    return bRet;
-}
-
-//=================================================================================================
-// Saves MIDI file header
-bool MidiFile::SaveHeader(Song* pSong) {
-    CHUNK_HEADER	ChunkHeader;	// Chunk header
-    FILE_HEADER		FileHeader;		// File header
-
-    // Set chunk ID
-    memcpy(ChunkHeader._id, ID_FILE_HEADER, sizeof(ID_FILE_HEADER));
-
-    // Set chunk length
-    ChunkHeader._length = sizeof(FILE_HEADER);
-    Reverse4Bytes((char*)&ChunkHeader._length); // Length is stored in reversed byte order
-
-    // Save the chunk header
-    if(!AddData(&ChunkHeader, sizeof(ChunkHeader)))
-        return false;
-
-    // MIDI format
-    FileHeader._format = _format;
-    Reverse2Bytes((char*)&FileHeader._format);
-
-    // Number of tracks
-    FileHeader._tracks = _tracks + 1; // The first track is for song info;
-    Reverse2Bytes((char*)&FileHeader._tracks);
-
-    // Time division
-    FileHeader._division = _timeDivision;
-    Reverse2Bytes((char*)&FileHeader._division);
-
-    // Save the file header
-    if(!AddData(&FileHeader, sizeof(FileHeader)))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Saves song info in the track
-bool MidiFile::SaveSongInfo(Song* pSong) {
-    unsigned char		szBuffer[64];	// Conversion buffer
-    Buffer		sTrackData;		// Track's data
-    int		dwData = 0;		// Converted data
-
-    // Name
-    if(pSong->_name.Length()) {
-        if(!SaveMetaEvent(0, META_TRACK_NAME, 0, (const char*)pSong->_name, pSong->_name.Length(), sTrackData))
-            return false;
-    }
-
-    // Copyright
-    if(pSong->_copyright.Length()) {
-        if(!SaveMetaEvent(0, META_COPYRIGHT, 0, (const char*)pSong->_copyright, pSong->_copyright.Length(),
-                          sTrackData))
-            return false;
-    }
-
-    // Text
-    if(pSong->_text.Length()) {
-        if(!SaveMetaEvent(0, META_TEXT, 0, (const char*)pSong->_text, pSong->_text.Length(), sTrackData))
-            return false;
-    }
-
-    // Time signature: 4 bytes
-    szBuffer[0] = (unsigned char)pSong->_measureBeats; // Numerator
-    szBuffer[1] = (unsigned char)(log((double)pSong->_beatNote) / log(2.0f)); // Denominator: power of 2
-    szBuffer[2] = 0; // Metronome
-    szBuffer[3] = 0; // 32-nd's
-    if(!SaveMetaEvent(0, META_TIME_SIGNATURE, 0, (const char*)szBuffer, 4, sTrackData))
-        return false;
-
-    // Key signature
-    szBuffer[0] = (unsigned char)pSong->_key; // Key (1 byte)
-    szBuffer[1] = (unsigned char)pSong->_scaleType; // Scale (1 byte)
-    if(!SaveMetaEvent(0, META_KEY_SIGNATURE, 0, (const char*)szBuffer, 2, sTrackData))
-        return false;
-
-    // Tempo: 3 bytes, microseconds per quarter note
-    dwData = (int)(pSong->_beatTime * (1000.0 * 1000.0) + 0.5);
-    Reverse4Bytes((char*)&dwData);
-    if(!SaveMetaEvent(0, META_TEMPO, 0, (const char*)&dwData + 1, 3, sTrackData))
-        return false;
-
-    // Add 'end of track' event
-    if(!SaveMetaEvent(0, META_END, 0, NULL, 0, sTrackData))
-        return false;
-
-    // Save song info in a track
-    if(!SaveTrack((const char*)sTrackData, sTrackData.Length()))
-        return false;
-
-    return true;
-}
-/*
-//=================================================================================================
-// Saves info of all song parts
-bool MidiFile::SaveParts(Song* pSong, Buffer& sTrackData) {
-    int         nIndex;
-    SongPart*  pPart;
-
-    pSong->_SongParts.MoveToFirst(nIndex);
-    while(pSong->_SongParts.GetNext(nIndex, pPart)) {
-        if(!SavePartInfo(0, pPart, sTrackData))
-            return false;
-    }
-
-    return true;
-}
-*/
-//=================================================================================================
-// Saves all song's tracks
-bool MidiFile::SaveAllTracks(Song* pSong) {
-    int			channel = 0;		// Track counter
-    Track*		track = NULL;	// Current track
-    Buffer		sTrackData;		// Track's data
-    TRACKS_ITER iter;
-
-    for(iter = pSong->_tracks.begin(); iter != pSong->_tracks.end(); iter++) {
-        track = &(*iter);
-
-        sTrackData.Reset();
-
-        // Set MIDI channel for drum set
-        if(track->_instrument == PERCUSSION)
-            track->_channel = DRUM_CHANNEL;
-        else
-            track->_channel = channel;
-
-        // Put track's info
-        track->_trackNumber = channel;
-        if(!SaveTrackInfo(track, sTrackData))
-            return false;
-
-        // Put track's notes
-        if(!SaveTrackNotes(track, sTrackData))
-            return false;
-
-        // Save the track
-        if(!SaveTrack((const char*)sTrackData, sTrackData.Length()))
-            return false;
-
-        channel++;
-    }
-
-    return true;
-}
-
-//=================================================================================================
-// Saves track's info
-bool MidiFile::SaveTrackInfo(Track* track, Buffer& sTrackData) {
-    double	    fHalf = 127.0f / 2.0f;	// Half of the value range
-    unsigned char	    cValue = 0;	    // Control value
-    int         nValue;
-    String	sString;		// General string
-
-    // Add to the report
-    sString.Format("Save track %d '%s' (%s) -------------",
-                   track->_trackNumber, (const char*)track->_trackName, (const char*)track->_instrumentName);
-    Log((const char*)sString);
-    _report += sString;
-
-    // Name
-    if(track->_trackName.Length()) {
-        if(!SaveMetaEvent(0, META_TRACK_NAME, track->_channel, (const char*)track->_trackName, track->_trackName.Length(), sTrackData))
-            return false;
-    }
-
-    // Instrument name
-    if(track->_instrumentName.Length()) {
-        if(!SaveMetaEvent(0, META_INSTRUMENT, track->_channel, (const char*)track->_instrumentName, track->_instrumentName.Length(), sTrackData))
-            return false;
-    }
-
-    // Instrument type
-    nValue = GetProgram(track->_instrument);
-    if(nValue != PROGRAM_NONE) {
-        if(!SaveEvent(0, MIDI_PROGRAM, track->_channel, (const char*)&nValue, 1, sTrackData))
-            return false;
-    }
-
-    // Volume
-    nValue = (int)(127.0f * track->_volume + 0.5f);
-    if(nValue < 0)
-        nValue = 0;
-
-    if(nValue > 127)
-        nValue = 127;
-
-    cValue = (unsigned char)nValue;
-    if(!SaveControlEvent(0, track->_channel, CONTROL_VOLUME, cValue, sTrackData))
-        return false;
-
-    // Pan
-    nValue = (int)(fHalf + track->_pan * fHalf + 0.5f);
-    if(nValue < 0)
-        nValue = 0;
-
-    if(nValue > 127)
-        nValue = 127;
-
-    cValue = (unsigned char)nValue;
-    if(!SaveControlEvent(0, track->_channel, CONTROL_PAN, cValue, sTrackData))
-        return false;
-
-    // Reset all controllers
-    cValue = 0;
-    if(!SaveControlEvent(0, track->_channel, CONTROL_RESET, cValue, sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Saves track notes
-bool MidiFile::SaveTrackNotes(Track* track, Buffer& sTrackData) {
-    Note*		note = NULL;		// Current note
-    Note		Note;				// Current note
-    double		dPrevTime = 0.0;	// Last note's time
-    int		    nTimeDiff;	        // Time difference
-    NOTES	events;				// List of notes as on/off events
-    NOTES_ITER noteIter;
-
-    //track->Show();
-
-    // Make a list of all note starts and stops
-    for(noteIter = track->_notes.begin(); noteIter != track->_notes.end(); noteIter++) {
-        note = &(*noteIter);
-
-        // Save note's start
-        events.push_back(*note); // Sorted by start time
-
-        // Save note's end
-        Note = *note;
-        Note._volume = 0.0; // 'Note off' signal
-        Note._start += Note._duration; // Time of the event - note's end
-        events.push_back(Note); // Sorted by start time
-    }
-
-    std::sort(events.begin(), events.end(), SortNoteTime); // Sort events by start time
-
-    // Save all note starts and stops
-    for(noteIter = events.begin(); noteIter != events.end(); noteIter++) {
-        note = &(*noteIter);
-        nTimeDiff = GetTimeDiff(note->_start - dPrevTime);
-
-        // Save note
-        if(!SaveNote(nTimeDiff, true, track->_channel, true, note->_midiNote, note->_volume, sTrackData))
-            return false;
-
-        dPrevTime = note->_start;
-    }
-
-    // Add a silent note to the end of track. This will prevent MIDI players from cutting the end of track.
-    if(!SaveNote(0, true, track->_channel, true, 0, 0.0, sTrackData))
-        return false;
-
-    if(!SaveNote(GetTimeDiff(0.5), true, track->_channel, true, 0, 0.0, sTrackData))
-        return false;
-
-    // Add 'end of track' event
-    if(!SaveMetaEvent(0, META_END, 0, NULL, 0, sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Rounds the beat time to the nearest time division
-double MidiFile::GetBeatTime(double dTime) {
-    double dBeatTime;
-
-    if(_timeDivision == 0) {
-        return false;
-    }
-
-    dBeatTime = (double)((int)(dTime * _timeDivision + 0.5)) / _timeDivision;
-
-    return dBeatTime;
-}
-
-//=================================================================================================
-int MidiFile::GetTimeDiff(double dTimeDiff) {
-    if(dTimeDiff == 0.0)
-        return 0;
-
-    if(_beatTime == 0.0) {
-        return 0;
-    }
-
-    return (int)((dTimeDiff / _beatTime) * _timeDivision + 0.5);
-}
-
-//=================================================================================================
-double MidiFile::GetTimeDiff(int nTimeDiff) {
-    if(nTimeDiff == 0)
-        return 0.0;
-
-    if(_beatTime == 0.0) {
-        return 0;
-    }
-
-    return _beatTime * ((double)nTimeDiff / _timeDivision);
-}
-
-//=================================================================================================
-// Saves one track
-bool MidiFile::SaveTrack(const char* pTrackData, int nTrackLength) {
-    CHUNK_HEADER	ChunkHeader;	// Chunk header
-
-    // Set chunk ID
-    memcpy(ChunkHeader._id, ID_TRACK_HEADER, sizeof(ID_TRACK_HEADER));
-
-    // Set chunk length
-    ChunkHeader._length = nTrackLength;
-    Reverse4Bytes((char*)&ChunkHeader._length); // Length is stored in reversed byte order
-
-    // Save the chunk header
-    if(!AddData(&ChunkHeader, sizeof(ChunkHeader)))
-        return false;
-
-    // Save track's data
-    if(!AddData((void*)pTrackData, nTrackLength))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Saves meta event
-bool MidiFile::SaveMetaEvent(int nTimeDiff, META_EVENT nMetaEvent, int nChannel, const char* pEventData, int nEventDataSize,
-                              Buffer& sTrackData) {
-    unsigned char		szBuffer[64];	// Conversion buffer
-    int			nBytes = 0;		// Bytes saved in the conversion
-    Buffer		sEventData;		// Converted event data
-    String	sString;		// General string
-    String	sData;
-
-    // Meta event type
-    sEventData.Add((const char*)(unsigned char*)&nMetaEvent, 1);
-
-    // Data length
-    if(PutVarLen(nEventDataSize, (char*)szBuffer, sizeof(szBuffer), nBytes))
-        sEventData.Add((const char*)szBuffer, nBytes);
-    else
-        return false;
-
-    // Data
-    if(pEventData && nEventDataSize)
-        sEventData.Add(pEventData, nEventDataSize);
-
-    // Save as event
-    if(!SaveEvent(nTimeDiff, MIDI_META, nChannel, (const char*)sEventData, sEventData.Length(), sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Saves control event
-bool MidiFile::SaveControlEvent(int nTimeDiff, int nChannel, unsigned char nType, unsigned char nValue, Buffer& sTrackData) {
-    String	sControlName;	// Control name
-    String	sString;		// General string
-    unsigned char	    szBuffer[8];	// Event data
-
-    // Get control's info
-    if(!GetControlInfo(nType, sControlName))
-        return false;
-
-    // Add to the report
-    sString.Format("Control %3d, '%s' = %d, channel=%d", nType, (const char*)sControlName, nValue, nChannel);
-    //Log((const char*)sString);
-    _report += sString;
-
-    // Control data
-    szBuffer[0] = nType;
-    szBuffer[1] = nValue;
-
-    // Save the event
-    if(!SaveEvent(nTimeDiff, MIDI_CONTROL, nChannel, (const char*)szBuffer, 2, sTrackData))
-        return false;
-
-    return true;
-}
-/*
-//=================================================================================================
-// Saves a marker note
-bool MidiFile::SaveMarker(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
-    switch(note->_nState) {
-        case Note::STATE_CHORD_MARK:
-            if(!SaveChord(nTimeDiff, note, track, sTrackData))
-                return false;
-
-            break;
-
-        case Note::STATE_PART_MARK:
-            if(!SaveSongPart(nTimeDiff, note, track, sTrackData))
-                return false;
-
-            break;
-
-        case Note::STATE_MEASURE_MARK:
-            if(!SaveMeasure(nTimeDiff, note, track, sTrackData))
-                return false;
-
-            break;
-
-        default:
-            return false;
-    }
-
-    return true;
-}
-
-//=================================================================================================
-// Saves note's chord info using MIDI control events
-bool MidiFile::SaveChord(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
-    String sData;  // Data to be saved
-    String sValue;
-    String sPair;
-    String sString;
-
-    sData = MARKER_CHORD;
-
-    // Root MIDI note
-    sPair.Format("%s%d|", MARKER_FIELD_MIDI_NOTE, note->_ChordInfo._nRoot);
-    sData += sPair;
-
-    // Root # or b
-    if(!NoteManager::NoteTypeToString(note->_ChordInfo._Modifiers._Pitch, sValue))
-        return false;
-
-    sPair.Format("%s%s|", MARKER_FIELD_PITCH, (const char*)sValue);
-    sData += sPair;
-
-    // Chord type
-    if(!NoteManager::ChordTypeToString(note->_ChordInfo._nType, sValue))
-        return false;
-
-    sPair.Format("%s%s|", MARKER_FIELD_CHORD_TYPE, (const char*)sValue);
-    sData += sPair;
-
-    // Chord group
-    if(!NoteManager::GetChordGroupName(note->_ChordInfo._nGroup, sValue))
-        return false;
-
-    sPair.Format("%s%s|", MARKER_FIELD_CHORD_GROUP, (const char*)sValue);
-    sData += sPair;
-
-    // Chord number in the scale
-    sPair.Format("%s%d|", MARKER_FIELD_NUMBER, note->_ChordInfo._nNumber);
-    sData += sPair;
-
-    // Scale
-    if(!NoteManager::GetScaleName(note->_ChordInfo._nScale, sValue))
-        return false;
-
-    sPair.Format("%s%s|", MARKER_FIELD_SCALE, (const char*)sValue);
-    sData += sPair;
-
-    // Scale root note
-    sPair.Format("%s%d|", MARKER_FIELD_SCALE_ROOT, note->_ChordInfo._nScaleRoot);
-    sData += sPair;
-
-    // Add to the report
-    sString.Format("Chord: %s", (const char*)sData);
-    //Log((const char*)sString);
-    _report += sString;
-
-    // Save the data
-    if(!SaveMetaEvent(nTimeDiff, META_MARKER, track->_channel, (const char*)sData, sData.Length(), sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Gets chord data
-bool MidiFile::GetChord(const char* pMarker, double dTrackTime, Song* pSong, Track* track) {
-    char*		pField = NULL;	// Current date field
-    char*		pNextToken = NULL;	// Next token
-    String	sCopy;	// String copy
-    const char* pValue;
-    CChord      Chord;
-    CChord*     pChord;
-    Note       Note;
-    String sString;
-
-    sCopy = pMarker;
-    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
-    while(pField) {
-        if(!strncmp(pField, MARKER_FIELD_MIDI_NOTE, lstrlen(MARKER_FIELD_MIDI_NOTE))) { // Root MIDI note
-            pValue = pField + lstrlen(MARKER_FIELD_MIDI_NOTE);
-            Chord._RootNote._ChordInfo._nRoot = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_PITCH, lstrlen(MARKER_FIELD_PITCH))) { // Root # or b
-            pValue = pField + lstrlen(MARKER_FIELD_PITCH);
-            if(!NoteManager::StringToNoteType(pValue, Chord._RootNote._Modifiers._Pitch))
-                return false;
-        } else if(!strncmp(pField, MARKER_FIELD_CHORD_TYPE, lstrlen(MARKER_FIELD_CHORD_TYPE))) { // Chord type
-            pValue = pField + lstrlen(MARKER_FIELD_CHORD_TYPE);
-            if(!NoteManager::StringToChordType(pValue, Chord._RootNote._ChordInfo._nType))
-                return false;
-        } else if(!strncmp(pField, MARKER_FIELD_REPEAT, lstrlen(MARKER_FIELD_REPEAT))) { // Number of times to repeat
-            pValue = pField + lstrlen(MARKER_FIELD_REPEAT);
-            Chord._nRepeat = 1; //atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_CHORD_GROUP, lstrlen(MARKER_FIELD_CHORD_GROUP))) { // Chord group
-            pValue = pField + lstrlen(MARKER_FIELD_CHORD_GROUP);
-            if(!NoteManager::GetChordGroup(pValue, Chord._RootNote._ChordInfo._nGroup))
-                return false;
-        } else if(!strncmp(pField, MARKER_FIELD_NUMBER, lstrlen(MARKER_FIELD_NUMBER))) { // Chord number in the scale
-            pValue = pField + lstrlen(MARKER_FIELD_NUMBER);
-            Chord._RootNote._ChordInfo._nNumber = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_SCALE, lstrlen(MARKER_FIELD_SCALE))) { // Scale
-            pValue = pField + lstrlen(MARKER_FIELD_SCALE);
-            if(!NoteManager::GetScaleID(pValue, Chord._RootNote._ChordInfo._nScale))
-                return false;
-        } else if(!strncmp(pField, MARKER_FIELD_SCALE_ROOT, lstrlen(MARKER_FIELD_SCALE_ROOT))) { // Scale root note
-            pValue = pField + lstrlen(MARKER_FIELD_SCALE_ROOT);
-            Chord._RootNote._ChordInfo._nScaleRoot = atoi(pValue);
-        } else { // Unknown
-            return false;
-        }
-
-        pField = strtok_s(NULL, "|", &pNextToken);
-    }
-
-    // Make the mark note
-    Note._start = dTrackTime;
-    Note._volume = 0.0f;
-    Note._duration = 0.0f;
-    Note._nState = Note::STATE_CHORD_MARK;
-    Note._ChordInfo = Chord._RootNote._ChordInfo;
-    Note._nSource = Note::SOURCE_FILE;
-
-    track->AddNote(Note);
-
-    // Add to the report
-    sString.Format("%6.2f  Chord: %d", dTrackTime, Chord._RootNote._ChordInfo._nRoot);
-    //Log((const char*)sString);
-    _report += sString;
-
-    return true;
-}
-
-//=================================================================================================
-// Saves mix data
-bool MidiFile::SaveMix(int nTimeDiff, CMix* pMix, Buffer& sTrackData) {
-    MIX_MAP_ITER    Iter;	    // Map iterator
-    MIX_INFO*       pMixInfo;   // Mix info
-    String sData;  // Data to be saved
-    String sValue;
-    String sPair;
-    String sString;
-
-    sData = MARKER_MIX;
-
-    for(Iter = pMix->_Mixes.begin(); Iter != pMix->_Mixes.end(); Iter++) {
-        pMixInfo = &Iter->second;
-
-        // Instrument
-        if(ThingToString(pMixInfo->_instrument, sString)) {
-            sPair.Format("%s%s|", MARKER_FIELD_INSTRUMENT, (const char*)sString);
-            sData += sPair;
-        } else {
-            return false;
-        }
-
-        // Volume
-        sPair.Format("%s%0.2f|", MARKER_FIELD_VOLUME, pMixInfo->_volume);
-        sData += sPair;
-
-        // Pan
-        sPair.Format("%s%0.2f|", MARKER_FIELD_PAN, pMixInfo->_pan);
-        sData += sPair;
-    }
-
-    // Add to the report
-    sString.Format("Mix: %s", (const char*)sData);
-    //Log((const char*)sString);
-    _report += sString;
-
-    // Save the data
-    if(!SaveMetaEvent(nTimeDiff, META_MARKER, 0, (const char*)sData, sData.Length(), sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Gets mix data
-bool MidiFile::GetMix(const char* pMarker, Song* pSong) {
-    MIX_MAP_INS_PAIR	Pair;	    // Insert pair
-    MIX_INFO    MixInfo;    // Mix info
-    char*		pField = NULL;	// Current date field
-    char*		pNextToken = NULL;	// Next token
-    String	sCopy;	    // String copy
-    const char* pValue;
-    THING       nInstrument;        // Source instrument
-    THING       nToInstrument;      // Mapped instrument
-
-    sCopy = pMarker;
-    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
-    while(pField) {
-        if(!strncmp(pField, MARKER_FIELD_INSTRUMENT, lstrlen(MARKER_FIELD_INSTRUMENT))) { // Instrument
-            // Save the previous intrument
-            if(MixInfo._instrument != 0) {
-                // Insert the info
-                Pair = pSong->_Mix._Mixes.insert(MIX_MAP_PAIR(MixInfo._instrument, MixInfo));
-                if(!Pair.second) { // Can't insert
-                    _error.Format("Can't insert into mix map");
-                    return false;
-                }
-            }
-
-            pValue = pField + lstrlen(MARKER_FIELD_INSTRUMENT);
-            if(!StringToThing(pValue, nInstrument)) {
-                return false;
-            }
-
-            MapThings(nInstrument, nToInstrument);
-            MixInfo._instrument = nToInstrument;
-        } else if(!strncmp(pField, MARKER_FIELD_VOLUME, lstrlen(MARKER_FIELD_VOLUME))) { // Volume
-            pValue = pField + lstrlen(MARKER_FIELD_VOLUME);
-            MixInfo._volume = (double)atof(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_PAN, lstrlen(MARKER_FIELD_PAN))) { // Pan
-            pValue = pField + lstrlen(MARKER_FIELD_PAN);
-            MixInfo._pan = (double)atof(pValue);
-        } else { // Unknown
-            return false;
-        }
-
-        pField = strtok_s(NULL, "|", &pNextToken);
-    }
-
-    // Save the last intrument
-    if(MixInfo._instrument != 0) {
-        // Insert the info
-        Pair = pSong->_Mix._Mixes.insert(MIX_MAP_PAIR(MixInfo._instrument, MixInfo));
-        if(!Pair.second) { // Can't insert
-            _error.Format("Can't insert into mix map");
-            return false;
-        }
-    }
-
-    return true;
-}
-
-//=================================================================================================
-// Saves song info
-bool MidiFile::SaveSongInfo(Song* pSong, Buffer& sTrackData) {
-    String sData;  // Data to be saved
-    String sValue;
-    String sPair;
-    String sString;
-
-    sData = MARKER_SONG_INFO;
-
-    // Description
-    sPair.Format("%s%s|", MARKER_FIELD_DESCR, (const char*)pSong->_sDescription);
-    sData += sPair;
-
-    // Repeat
-    sPair.Format("%s%d|", MARKER_FIELD_REPEAT, pSong->_nRepeat);
-    sData += sPair;
-
-    // Song length (without repetition)
-    if(pSong->_dSongTime != NO_DOUBLE) {
-        sPair.Format("%s%0.3f|", MARKER_FIELD_SONG_LENGTH, pSong->_dSongTime);
-        sData += sPair;
-    }
-
-    // Add to the report
-    sString.Format("Song info: %s", (const char*)sData);
-    Log((const char*)sString);
-    _report += sString;
-
-    // Save the data
-    if(!SaveMetaEvent(0, META_MARKER, 0, (const char*)sData, sData.Length(), sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Gets song info
-bool MidiFile::GetSongInfo(const char* pMarker, double dTrackTime, Song* pSong, Track* track) {
-    char*		pField = NULL;	// Current date field
-    char*		pNextToken = NULL;	// Next token
-    String	sCopy;	// String copy
-    const char* pValue;
-
-    sCopy = pMarker;
-    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
-    while(pField) {
-        if(!strncmp(pField, MARKER_FIELD_DESCR, lstrlen(MARKER_FIELD_DESCR))) { // Description
-            pValue = pField + lstrlen(MARKER_FIELD_DESCR);
-            pSong->_sDescription = pValue;
-        } else if(!strncmp(pField, MARKER_FIELD_REPEAT, lstrlen(MARKER_FIELD_REPEAT))) { // Repeat
-            pValue = pField + lstrlen(MARKER_FIELD_REPEAT);
-            pSong->_nRepeat = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_SONG_LENGTH, lstrlen(MARKER_FIELD_SONG_LENGTH))) { // Song length
-            pValue = pField + lstrlen(MARKER_FIELD_SONG_LENGTH);
-            pSong->_dSongTime = atof(pValue);
-        } else { // Unknown
-            return false;
-        }
-
-        pField = strtok_s(NULL, "|", &pNextToken);
-    }
-
-    return true;
-}
-
-//=================================================================================================
-// Saves full info of one song part
-bool MidiFile::SavePartInfo(int nTimeDiff, SongPart* pPart, Buffer& sTrackData) {
-    String sData;  // Data to be saved
-    String sValue;
-    String sPair;
-    String sString;
-
-    sData = MARKER_SONG_PART_INFO;
-
-    // Name
-    sPair.Format("%s%s|", MARKER_FIELD_NAME, (const char*)pPart->_name);
-    sData += sPair;
-
-    // Description
-    sPair.Format("%s%s|", MARKER_FIELD_DESCR, (const char*)pPart->_sDescription);
-    sData += sPair;
-
-    // Repeat
-    sPair.Format("%s%d|", MARKER_FIELD_REPEAT, pPart->_nRepeat);
-    sData += sPair;
-
-    // Groove sytle
-    sPair.Format("%s%s|", MARKER_FIELD_STYLE, (const char*)pPart->_sGrooveStyle);
-    sData += sPair;
-
-    // Groove name
-    sPair.Format("%s%s|", MARKER_FIELD_GROOVE_NAME, (const char*)pPart->_sGrooveName);
-    sData += sPair;
-
-    // Groove file
-    sPair.Format("%s%s|", MARKER_FIELD_GROOVE_FILE, (const char*)pPart->_sGrooveFile);
-    sData += sPair;
-
-    // Groove length
-    sPair.Format("%s%0.3f|", MARKER_FIELD_GROOVE_LENGTH, pPart->_dGrooveLength);
-    sData += sPair;
-
-    // Part length
-    sPair.Format("%s%0.3f|", MARKER_FIELD_PART_LENGTH, pPart->_Part._dSongTime);
-    sData += sPair;
-
-    // Scale
-    if(!NoteManager::GetScaleName(pPart->_Part._nScale, sValue))
-        return false;
-
-    sPair.Format("%s%s|", MARKER_FIELD_SCALE, (const char*)sValue);
-    sData += sPair;
-
-    // Scale root note
-    sPair.Format("%s%d|", MARKER_FIELD_SCALE_ROOT, pPart->_Part._nScaleRoot);
-    sData += sPair;
-
-    // Tempo
-    sPair.Format("%s%0.2f|", MARKER_FIELD_TEMPO, pPart->_Part._dTempo);
-    sData += sPair;
-
-    // Beat time
-    sPair.Format("%s%0.3f|", MARKER_FIELD_BEAT_TIME, pPart->_Part._beatTime);
-    sData += sPair;
-
-    // Measures
-    sPair.Format("%s%d|", MARKER_FIELD_MEASURES, pPart->_Part._measures);
-    sData += sPair;
-
-    // Beat notes
-    sPair.Format("%s%d|", MARKER_FIELD_BEAT_NOTES, pPart->_Part._beatNotes);
-    sData += sPair;
-
-    // Measure beats
-    sPair.Format("%s%d|", MARKER_FIELD_MEASURE_BEATS, pPart->_Part._measureBeats);
-    sData += sPair;
-
-    // Add to the report
-    sString.Format("Song part info: %s", (const char*)sData);
-    Log((const char*)sString);
-    _report += sString;
-
-    // Save the data
-    if(!SaveMetaEvent(nTimeDiff, META_MARKER, 0, (const char*)sData, sData.Length(), sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Gets song part info
-bool MidiFile::GetPartInfo(const char* pMarker, double dTrackTime, Song* pSong, Track* track) {
-    char*		pField = NULL;	// Current date field
-    char*		pNextToken = NULL;	// Next token
-    String	sCopy;	// String copy
-    const char* pValue;
-    SongPart   Part;
-
-    sCopy = pMarker;
-    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
-    while(pField) {
-        if(!strncmp(pField, MARKER_FIELD_NAME, lstrlen(MARKER_FIELD_NAME))) { // Part's name
-            pValue = pField + lstrlen(MARKER_FIELD_NAME);
-            Part._name = pValue;
-        } else if(!strncmp(pField, MARKER_FIELD_DESCR, lstrlen(MARKER_FIELD_DESCR))) { // Description
-            pValue = pField + lstrlen(MARKER_FIELD_DESCR);
-            Part._sDescription = pValue;
-        } else if(!strncmp(pField, MARKER_FIELD_REPEAT, lstrlen(MARKER_FIELD_REPEAT))) { // Repeat
-            pValue = pField + lstrlen(MARKER_FIELD_REPEAT);
-            Part._nRepeat = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_STYLE, lstrlen(MARKER_FIELD_STYLE))) { // Groove sytle
-            pValue = pField + lstrlen(MARKER_FIELD_STYLE);
-            Part._sGrooveStyle = pValue;
-        } else if(!strncmp(pField, MARKER_FIELD_GROOVE_NAME, lstrlen(MARKER_FIELD_GROOVE_NAME))) { // Groove name
-            pValue = pField + lstrlen(MARKER_FIELD_GROOVE_NAME);
-            Part._sGrooveName = pValue;
-        } else if(!strncmp(pField, MARKER_FIELD_GROOVE_FILE, lstrlen(MARKER_FIELD_GROOVE_FILE))) { // Groove file
-            pValue = pField + lstrlen(MARKER_FIELD_GROOVE_FILE);
-            Part._sGrooveFile = pValue;
-        } else if(!strncmp(pField, MARKER_FIELD_GROOVE_LENGTH, lstrlen(MARKER_FIELD_GROOVE_LENGTH))) { // Groove length
-            pValue = pField + lstrlen(MARKER_FIELD_GROOVE_LENGTH);
-            Part._dGrooveLength = atof(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_PART_LENGTH, lstrlen(MARKER_FIELD_PART_LENGTH))) { // Part length
-            pValue = pField + lstrlen(MARKER_FIELD_PART_LENGTH);
-            Part._Part._dSongTime = atof(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_SCALE, lstrlen(MARKER_FIELD_SCALE))) { // Scale
-            pValue = pField + lstrlen(MARKER_FIELD_SCALE);
-            if(!NoteManager::GetScaleID(pValue, Part._Part._nScale))
-                return false;
-        } else if(!strncmp(pField, MARKER_FIELD_SCALE_ROOT, lstrlen(MARKER_FIELD_SCALE_ROOT))) { // Scale root note
-            pValue = pField + lstrlen(MARKER_FIELD_SCALE_ROOT);
-            Part._Part._nScaleRoot = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_TEMPO, lstrlen(MARKER_FIELD_TEMPO))) { // Tempo
-            pValue = pField + lstrlen(MARKER_FIELD_TEMPO);
-            Part._Part._dTempo = atof(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_BEAT_TIME, lstrlen(MARKER_FIELD_BEAT_TIME))) { // Beat time
-            pValue = pField + lstrlen(MARKER_FIELD_BEAT_TIME);
-            Part._Part._beatTime = atof(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_MEASURES, lstrlen(MARKER_FIELD_MEASURES))) { // Measures
-            pValue = pField + lstrlen(MARKER_FIELD_MEASURES);
-            Part._Part._measures = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_BEAT_NOTES, lstrlen(MARKER_FIELD_BEAT_NOTES))) { // Beat notes
-            pValue = pField + lstrlen(MARKER_FIELD_BEAT_NOTES);
-            Part._Part._beatNotes = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_MEASURE_BEATS, lstrlen(MARKER_FIELD_MEASURE_BEATS))) { // Measure beats
-            pValue = pField + lstrlen(MARKER_FIELD_MEASURE_BEATS);
-            Part._Part._measureBeats = atoi(pValue);
-        } else { // Unknown
-            return false;
-        }
-
-        pField = strtok_s(NULL, "|", &pNextToken);
-    }
-
-    // Save the part
-    if(!pSong->AddSongPart(&Part))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Saves note info
-bool MidiFile::SaveNoteInfo(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
-    String sData;  // Data to be saved
-    String sValue;
-    String sPair;
-    String sString;
-
-    sData = MARKER_NOTE_INFO;
-
-    // Interval
-    if(note->_nInterval != 0) {
-        sPair.Format("%s%d|", MARKER_FIELD_INTERVAL, note->_nInterval);
-        sData += sPair;
-    }
-
-    // String
-    if(note->_Tab._nString != NO_INT && note->_Tab._nString != 0) {
-        sPair.Format("%s%d|", MARKER_FIELD_STRING, note->_Tab._nString);
-        sData += sPair;
-    }
-
-    // Fret
-    if(note->_Tab._nFret != NO_INT) {
-        sPair.Format("%s%d|", MARKER_FIELD_FRET, note->_Tab._nFret);
-        sData += sPair;
-    }
-
-    // Finger
-    if(note->_Tab._nFinger != NO_INT) {
-        sPair.Format("%s%d|", MARKER_FIELD_FINGER, note->_Tab._nFinger);
-        sData += sPair;
-    }
-
-    // Mode
-    if(note->_Tab._nMode != Note::TAB_INFO::MODE_NONE) {
-        sPair.Format("%s%d|", MARKER_FIELD_MODE, note->_Tab._nMode);
-        sData += sPair;
-    }
-
-    // Add to the report
-    sString.Format("Note info: %s", (const char*)sData);
-    //Log((const char*)sString);
-    _report += sString;
-
-    // Save the data
-    if(!SaveMetaEvent(nTimeDiff, META_MARKER, track->_channel, (const char*)sData, sData.Length(), sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Gets note info
-bool MidiFile::GetNoteInfo(const char* pMarker, double dTrackTime, Song* pSong, Track* track) {
-    char*		pField = NULL;	// Current date field
-    char*		pNextToken = NULL;	// Next token
-    String	sCopy;	// String copy
-    const char* pValue;
-
-    sCopy = pMarker;
-    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
-    while(pField) {
-        if(!strncmp(pField, MARKER_FIELD_INTERVAL, lstrlen(MARKER_FIELD_INTERVAL))) { // Interval
-            pValue = pField + lstrlen(MARKER_FIELD_INTERVAL);
-            _note._nInterval = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_STRING, lstrlen(MARKER_FIELD_STRING))) { // Tab - string
-            pValue = pField + lstrlen(MARKER_FIELD_STRING);
-            _note._Tab._nString = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_FRET, lstrlen(MARKER_FIELD_FRET))) { // Tab - fret
-            pValue = pField + lstrlen(MARKER_FIELD_FRET);
-            _note._Tab._nFret = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_FINGER, lstrlen(MARKER_FIELD_FINGER))) { // Tab - finger
-            pValue = pField + lstrlen(MARKER_FIELD_FINGER);
-            _note._Tab._nFinger = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_MODE, lstrlen(MARKER_FIELD_MODE))) { // Tab - mode
-            pValue = pField + lstrlen(MARKER_FIELD_MODE);
-            _note._Tab._nMode = atoi(pValue);
-        } else { // Unknown
-            return false;
-        }
-
-        pField = strtok_s(NULL, "|", &pNextToken);
-    }
-
-    return true;
-}
-
-//=================================================================================================
-// Saves song part's name to mark the start of new part
-bool MidiFile::SaveSongPart(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
-    String sData;  // Data to be saved
-    String sValue;
-    String sPair;
-    String sString;
-
-    sData = MARKER_SONG_PART;
-
-    // Part's name
-    sPair.Format("%s%s|", MARKER_FIELD_NAME, (const char*)note->_sSongPart);
-    sData += sPair;
-
-    // Add to the report
-    sString.Format("Song part: %s", (const char*)sData);
-    Log((const char*)sString);
-    _report += sString;
-
-    // Save the data
-    if(!SaveMetaEvent(nTimeDiff, META_MARKER, track->_channel, (const char*)sData, sData.Length(), sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Gets song part name
-bool MidiFile::GetSongPart(const char* pMarker, double dTrackTime, Song* pSong, Track* track) {
-    char*		pField = NULL;	// Current date field
-    char*		pNextToken = NULL;	// Next token
-    String	sCopy;	// String copy
-    const char* pValue;
-    Note       Note;
-    String sString;
-
-    sCopy = pMarker;
-    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
-    while(pField) {
-        if(!strncmp(pField, MARKER_FIELD_NAME, lstrlen(MARKER_FIELD_NAME))) { // Part's name
-            pValue = pField + lstrlen(MARKER_FIELD_NAME);
-            Note._sSongPart = pValue;
-        } else { // Unknown
-            return false;
-        }
-
-        pField = strtok_s(NULL, "|", &pNextToken);
-    }
-
-    // Make the mark note
-    Note._start = dTrackTime;
-    Note._volume = 0.0f;
-    Note._duration = 0.0f;
-    Note._nState = Note::STATE_PART_MARK;
-    Note._nSource = Note::SOURCE_FILE;
-
-    track->AddNote(Note);
-
-    // Add to the report
-    sString.Format("%6.2f  Song part: %s", dTrackTime, (const char*)Note._sSongPart);
-    Log((const char*)sString);
-    _report += sString;
-
-    return true;
-}
-
-//=================================================================================================
-// Saves measure numbers using MIDI control events
-bool MidiFile::SaveMeasure(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
-    String sData;  // Data to be saved
-    String sValue;
-    String sPair;
-    String sString;
-
-    sData = MARKER_MEASURE;
-
-    // Part measure
-    sPair.Format("%s%d|", MARKER_FIELD_PART_MEASURE, note->_nPartMeasure);
-    sData += sPair;
-
-    // Song measure
-    sPair.Format("%s%d|", MARKER_FIELD_SONG_MEASURE, note->_nSongMeasure);
-    sData += sPair;
-
-    // Add to the report
-    sString.Format("Measure: %s", (const char*)sData);
-    //Log((const char*)sString);
-    _report += sString;
-
-    // Save the data
-    if(!SaveMetaEvent(nTimeDiff, META_MARKER, track->_channel, (const char*)sData, sData.Length(), sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Gets measure numbers
-bool MidiFile::GetMeasure(const char* pMarker, double dTrackTime, Song* pSong, Track* track) {
-    char*		pField = NULL;	// Current date field
-    char*		pNextToken = NULL;	// Next token
-    String	sCopy;	// String copy
-    const char* pValue;
-    Note       Note;
-    String sString;
-
-    sCopy = pMarker;
-    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
-    while(pField) {
-        if(!strncmp(pField, MARKER_FIELD_PART_MEASURE, lstrlen(MARKER_FIELD_PART_MEASURE))) { // Part measure
-            pValue = pField + lstrlen(MARKER_FIELD_PART_MEASURE);
-            Note._nPartMeasure = atoi(pValue);
-        } else if(!strncmp(pField, MARKER_FIELD_SONG_MEASURE, lstrlen(MARKER_FIELD_SONG_MEASURE))) { // Song measure
-            pValue = pField + lstrlen(MARKER_FIELD_SONG_MEASURE);
-            Note._nSongMeasure = atoi(pValue);
-        } else { // Unknown
-            return false;
-        }
-
-        pField = strtok_s(NULL, "|", &pNextToken);
-    }
-
-    // Make the mark note
-    Note._start = dTrackTime;
-    Note._volume = 0.0f;
-    Note._duration = 0.0f;
-    Note._nState = Note::STATE_MEASURE_MARK;
-    Note._nSource = Note::SOURCE_FILE;
-
-    track->AddNote(Note);
-
-    // Add to the report
-    sString.Format("%6.2f  Measure: %d/%d", dTrackTime, Note._nPartMeasure, Note._nSongMeasure);
-    //Log((const char*)sString);
-    _report += sString;
-
-    return true;
-}
-
-//=================================================================================================
-// Gets marker data: chord info, measure mark, song part's name, etc.
-// Format: <MarkerType>Field=Value|Field=Value
-bool MidiFile::GetMarker(const char* pMarker, double dTrackTime, Song* pSong, Track* track) {
-    if(!strncmp(pMarker, MARKER_CHORD, lstrlen(MARKER_CHORD))) { // Chord
-        if(!GetChord(pMarker + lstrlen(MARKER_CHORD), dTrackTime, pSong, track))
-            return false;
-    } else if(!strncmp(pMarker, MARKER_SONG_PART, lstrlen(MARKER_SONG_PART))) { // Song part
-        if(!GetSongPart(pMarker + lstrlen(MARKER_SONG_PART), dTrackTime, pSong, track))
-            return false;
-    } else if(!strncmp(pMarker, MARKER_SONG_PART_INFO, lstrlen(MARKER_SONG_PART_INFO))) { // Song part info
-        if(!GetPartInfo(pMarker + lstrlen(MARKER_SONG_PART_INFO), dTrackTime, pSong, track))
-            return false;
-    } else if(!strncmp(pMarker, MARKER_NOTE_INFO, lstrlen(MARKER_NOTE_INFO))) { // Note info
-        if(!GetNoteInfo(pMarker + lstrlen(MARKER_NOTE_INFO), dTrackTime, pSong, track))
-            return false;
-    } else if(!strncmp(pMarker, MARKER_SONG_INFO, lstrlen(MARKER_SONG_INFO))) { // Song part info
-        if(!GetSongInfo(pMarker + lstrlen(MARKER_SONG_INFO), dTrackTime, pSong, track))
-            return false;
-    } else if(!strncmp(pMarker, MARKER_MEASURE, lstrlen(MARKER_MEASURE))) { // Measure number
-        if(!GetMeasure(pMarker + lstrlen(MARKER_MEASURE), dTrackTime, pSong, track))
-            return false;
-    } else if(!strncmp(pMarker, MARKER_MIX, lstrlen(MARKER_MIX))) { // Mix
-        if(!GetMix(pMarker + lstrlen(MARKER_MIX), pSong))
-            return false;
-    }
-
-    return true;
-}
-
-//=================================================================================================
-// Saves note's tab info using MIDI control events
-bool MidiFile::SaveTab(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
-    // String
-    if(note->_Tab._nString != NO_INT) {
-        if(!SaveControlEvent(nTimeDiff, track->_channel, CONTROL_TAB_STRING, note->_Tab._nString, sTrackData))
-            return false;
-    }
-
-    // Fret
-    if(note->_Tab._nFret != NO_INT) {
-        if(!SaveControlEvent(nTimeDiff, track->_channel, CONTROL_TAB_FRET, note->_Tab._nFret, sTrackData))
-            return false;
-    }
-
-    // Finger
-    if(note->_Tab._nFinger != NO_INT) {
-        if(!SaveControlEvent(nTimeDiff, track->_channel, CONTROL_TAB_FINGER, note->_Tab._nFinger, sTrackData))
-            return false;
-    }
-
-    // Mode
-    if(note->_Tab._nMode != Note::TAB_INFO::MODE_NONE) {
-        if(!SaveControlEvent(nTimeDiff, track->_channel, CONTROL_TAB_MODE, note->_Tab._nMode, sTrackData))
-            return false;
-    }
-
-    return true;
-}
-*/
-//=================================================================================================
-// Saves control event
-// bEvent - whether to save event ID or keep the 'running status'
-bool MidiFile::SaveNote(int nTimeDiff, bool bEvent, int nChannel, bool bOn, int nNote, double fVolume, Buffer& sTrackData) {
-    unsigned char	    szBuffer[8];	// Event data
-    String	sString;		// General string
-
-    // Note data
-    szBuffer[0] = nNote;
-
-    // Velocity (volume). Looks like it's common not to use 'note off' event, but use 'note on' with velocity set to 0.
-    if(bOn) { // Start of the note
-        //szBuffer[1] = (unsigned char)(127.0f * fVolume + 0.5f); // Linear conversion
-        szBuffer[1] = VolumeToMidi(fVolume); // Logarithmic
-    } else // End of the note
-        szBuffer[1] = 0;
-
-    sString.Format("%7.3f sec: Save note %d, volume %0.2f, velocity %d", GetTimeDiff(nTimeDiff), nNote, fVolume, szBuffer[1]);
-    Log((const char*)sString);
-
-    // Save the event
-    if(!SaveEvent(nTimeDiff, bEvent ? MIDI_NOTE_ON : MIDI_NONE, nChannel, (const char*)szBuffer, 2, sTrackData))
-        return false;
-
-    return true;
-}
-
-//=================================================================================================
-// Saves a MIDI (note, system or meta) event
-bool MidiFile::SaveEvent(int nTimeDiff, MIDI_EVENT nEvent, int nChannel, const char* pEventData, int nEventDataSize, Buffer& sTrackData) {
-    unsigned char	    szBuffer[64];	// Conversion buffer
-    double      dTimeDiff;		// Event time
-    int		    nBytes = 0;		// Bytes saved in the conversion
-    unsigned char	    nEventID = 0;	// Event ID and channel (4 bits and 4 bits)
-    String	sString;		// General string
-
-    // Event time (incremental) ----------
-    if(PutVarLen(nTimeDiff, (char*)szBuffer, sizeof(szBuffer), nBytes))
-        sTrackData.Add((const char*)szBuffer, nBytes);
-    else
-        return false;
-
-    // Add event time to the report
-    dTimeDiff = GetTimeDiff((int)nTimeDiff);
-    sString.Format("Event diff: %04d, %7.3f sec, beat=%7.3f", nTimeDiff, dTimeDiff, _beatTime);
-    //Log((const char*)sString);
-    _report += sString;
-
-    // Event ID and channel ----------
-    if(nEvent != MIDI_NONE) { // Note a MIDI note event, no channel
-        if(nEvent >= MIDI_SYSTEM) { // Note a MIDI note event, no channel
-            nEventID = (unsigned char)nEvent;
-        } else { // Set the channel
-            // 4 bits for event type, 4 bits for channel number
-            nEventID = ((unsigned char)nEvent) & 0xF0; // Event type
-            nEventID += ((unsigned char)nChannel) & 0x0F; // Channel number;
-        }
-
-        sTrackData.Add((const char*)(unsigned char*)&nEventID, 1);
-    }
-
-    // Event data ----------
-    sTrackData.Add(pEventData, nEventDataSize);
-
-    return true;
-}
-
-//=================================================================================================
-// Gets MIDI program number for an instrument (thing) type
-unsigned char MidiFile::GetProgram(INSTRUMENT instrument) {
-    switch(instrument) {
-        case ELECTRIC_BASS_FINGER:
-            return PROGRAM_FINGER_BASS;
-        case ELECTRIC_GUITAR_CLEAN:
-            return PROGRAM_CLEAN_GUITAR;
-        case OVERDRIVEN_GUITAR:
-            return PROGRAM_OVERDRIVEN_GUITAR;
-        case DISTORTION_GUITAR:
-            return PROGRAM_DISTORTION_GUITAR;
-        case PERCUSSION:
-            return PROGRAM_DRUM_SET;
-        default:
-            return PROGRAM_NONE;
-    }
-}
-
-//=================================================================================================
-// Logs a message
-bool MidiFile::Log(const char* pFormat, const char* pMessage) {
-
-    return true;
-}
-
-//=================================================================================================
-// Adds data to the buffer
-bool MidiFile::AddData(void* data, int size) {
-    int increment = 1024 * 100;
-    int dataSize;
-
-    // Check the buffer size
-    dataSize = (int)(_dataOffset - _data);
-    if(dataSize + size > (int)_dataSize) {
-        _dataSize += Max(increment, size);
-        _data = (char*)realloc(_data, _dataSize); // +1 is for zero-terminator
-        if(!_data) {
-            _error.Format("Can't allocate %d bytes", _dataSize);
-            return false;
-        }
-
-        _dataOffset = _data + dataSize;
-    }
-
-    // Add the data
-    memcpy(_dataOffset, data, size);
-    _dataOffset += size;
-
-    return true;
-}
 
 //=================================================================================================
 // Gets MIDI note number for a drum set instrument (thing) type
-unsigned char MidiFile::GetMidiDrumNote(INSTRUMENT instrument) {
+uint8_t MidiFile::GetMidiDrumNote(INSTRUMENT instrument) {
     switch(instrument) {
         case DRUM_BASS_DRUM_2:
             return 35; // Bass Drum 2
@@ -3598,5 +2157,1352 @@ bool MidiFile::GetDrumInfo(int nNote, String& sName, INSTRUMENT& nInstrument) {
 
     return true;
 }
+/*
+//=================================================================================================
+// Saves a song into MIDI file
+bool MidiFile::SaveData(char*& data, int& dwDataSize, Song* song) {
+    bool	bRet = true;	// Return value
 
-} // namespace QuantoGraph
+    #ifndef _DEBUG
+    __try {
+    #endif
+
+        Log("========== Lesson '%s': save ===============");
+        //song->Show("MidiFile::SaveData");
+
+        _data = NULL;
+        _dataSize = 0;
+
+        // Set some parameters
+        _format = 1;
+        _tracks = song->GetNumberOfTracks();
+        _timeDivision = 1000;//960;
+        _beatTime = GetBeatTime(song->_beatTime);
+
+        // Save the header
+        if(!SaveHeader(song)) {
+            bRet = false;
+            goto Exit;
+        }
+
+        // Save song's info in the first track
+        if(!SaveSongInfo(song)) {
+            bRet = false;
+            goto Exit;
+        }
+
+        // Save all tracks
+        if(!SaveAllTracks(song)) {
+            bRet = false;
+            goto Exit;
+        }
+
+    #ifndef _DEBUG
+    } __except(::ExceptionFilter(GetExceptionInformation())) {
+        return false;
+    }
+    #endif
+
+Exit:
+    data = _data;
+    dwDataSize = _dataOffset - _data;
+
+    Log("========== Lesson: end of save ===============");
+    return bRet;
+}
+
+//=================================================================================================
+// Saves a song into MIDI file
+bool MidiFile::SaveData(const char* pFile, Song* song) {
+    bool	bRet = true;	// Return value
+    int     dataSize;
+    int ret;
+
+    Log("========== MIDI file '%s': save ===============", pFile);
+    //song->Show("MidiFile::SaveData");
+
+    // Open the file for writing
+    ret = Open(pFile, false, true); // A new file for writing
+    if(ret)
+        return false;
+
+    _data = NULL;
+    _dataSize = 0;
+
+    // Set some parameters
+    _format = 1;
+    _tracks = (int)song->_tracks.size();
+    _timeDivision = 1000;//960;
+    _beatTime = GetBeatTime(song->_beatTime);
+
+    // Save the header
+    if(!SaveHeader(song)) {
+        bRet = false;
+        goto Exit;
+    }
+
+    // Save song's info in the first track
+    if(!SaveSongInfo(song)) {
+        bRet = false;
+        goto Exit;
+    }
+
+    // Save all tracks
+    if(!SaveAllTracks(song)) {
+        bRet = false;
+        goto Exit;
+    }
+
+    // Write the file
+    dataSize = (int)(_dataOffset - _data);
+    if(!Write(_data, dataSize)) {
+        bRet = false;
+        goto Exit;
+    }
+
+Exit:
+    Close();
+
+    free(_data);
+    _data = NULL;
+
+    Log("========== MIDI file: end of save ===============");
+    return bRet;
+}
+
+//=================================================================================================
+// Saves MIDI file header
+bool MidiFile::SaveHeader(Song* song) {
+    ChunkHeader	ChunkHeader;	// chunk header
+    FileHeader		FileHeader;		// File header
+
+    // Set chunk ID
+    memcpy(ChunkHeader._id, ID_FILE_HEADER, sizeof(ID_FILE_HEADER));
+
+    // Set chunk length
+    ChunkHeader._length = sizeof(FileHeader);
+    Reverse4Bytes((char*)&ChunkHeader._length); // Length is stored in reversed byte order
+
+    // Save the chunk header
+    if(!AddData(&ChunkHeader, sizeof(ChunkHeader)))
+        return false;
+
+    // MIDI format
+    FileHeader._format = _format;
+    Reverse2Bytes((char*)&FileHeader._format);
+
+    // Number of tracks
+    FileHeader._tracks = _tracks + 1; // The first track is for song info;
+    Reverse2Bytes((char*)&FileHeader._tracks);
+
+    // Time division
+    FileHeader._division = _timeDivision;
+    Reverse2Bytes((char*)&FileHeader._division);
+
+    // Save the file header
+    if(!AddData(&FileHeader, sizeof(FileHeader)))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves song info in the track
+bool MidiFile::SaveSongInfo(Song* song) {
+    uint8_t		szBuffer[64];	// Conversion buffer
+    Buffer		sTrackData;		// Track's data
+    int		dwData = 0;		// Converted data
+
+    // Name
+    if(song->_name.Length()) {
+        if(!SaveMetaEvent(0, META_TRACK_NAME, 0, (const char*)song->_name, song->_name.Length(), sTrackData))
+            return false;
+    }
+
+    // Copyright
+    if(song->_copyright.Length()) {
+        if(!SaveMetaEvent(0, META_COPYRIGHT, 0, (const char*)song->_copyright, song->_copyright.Length(),
+                          sTrackData))
+            return false;
+    }
+
+    // Text
+    if(song->_text.Length()) {
+        if(!SaveMetaEvent(0, META_TEXT, 0, (const char*)song->_text, song->_text.Length(), sTrackData))
+            return false;
+    }
+
+    // Time signature: 4 bytes
+    szBuffer[0] = (uint8_t)song->_measureBeats; // Numerator
+    szBuffer[1] = (uint8_t)(log((float)song->_beatNote) / log(2.0f)); // Denominator: power of 2
+    szBuffer[2] = 0; // Metronome
+    szBuffer[3] = 0; // 32-nd's
+    if(!SaveMetaEvent(0, META_TIME_SIGNATURE, 0, (const char*)szBuffer, 4, sTrackData))
+        return false;
+
+    // Key signature
+    szBuffer[0] = (uint8_t)song->_key; // Key (1 byte)
+    szBuffer[1] = (uint8_t)song->_scaleType; // Scale (1 byte)
+    if(!SaveMetaEvent(0, META_KEY_SIGNATURE, 0, (const char*)szBuffer, 2, sTrackData))
+        return false;
+
+    // Tempo: 3 bytes, microseconds per quarter note
+    dwData = (int)(song->_beatTime * (1000.0 * 1000.0) + 0.5);
+    Reverse4Bytes((char*)&dwData);
+    if(!SaveMetaEvent(0, META_TEMPO, 0, (const char*)&dwData + 1, 3, sTrackData))
+        return false;
+
+    // Add 'end of track' event
+    if(!SaveMetaEvent(0, META_END, 0, NULL, 0, sTrackData))
+        return false;
+
+    // Save song info in a track
+    if(!SaveTrack((const char*)sTrackData, sTrackData.Length()))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves info of all song parts
+bool MidiFile::SaveParts(Song* song, Buffer& sTrackData) {
+    int         nIndex;
+    SongPart*  pPart;
+
+    song->_SongParts.MoveToFirst(nIndex);
+    while(song->_SongParts.GetNext(nIndex, pPart)) {
+        if(!SavePartInfo(0, pPart, sTrackData))
+            return false;
+    }
+
+    return true;
+}
+
+//=================================================================================================
+// Saves all song's tracks
+bool MidiFile::SaveAllTracks(Song* song) {
+    int			channel = 0;		// Track counter
+    Track*		track = NULL;	// Current track
+    Buffer		sTrackData;		// Track's data
+    TRACKS_ITER iter;
+
+    for(iter = song->_tracks.begin(); iter != song->_tracks.end(); iter++) {
+        track = &(*iter);
+
+        sTrackData.Reset();
+
+        // Set MIDI channel for drum set
+        if(track->_instrument == PERCUSSION)
+            track->_channel = DRUM_CHANNEL;
+        else
+            track->_channel = channel;
+
+        // Put track's info
+        track->_trackNumber = channel;
+        if(!SaveTrackInfo(track, sTrackData))
+            return false;
+
+        // Put track's notes
+        if(!SaveTrackNotes(track, sTrackData))
+            return false;
+
+        // Save the track
+        if(!SaveTrack((const char*)sTrackData, sTrackData.Length()))
+            return false;
+
+        channel++;
+    }
+
+    return true;
+}
+
+//=================================================================================================
+// Saves track's info
+bool MidiFile::SaveTrackInfo(Track* track, Buffer& sTrackData) {
+    float	    fHalf = 127.0f / 2.0f;	// Half of the value range
+    uint8_t	    cValue = 0;	    // Control value
+    int         nValue;
+    String	sString;		// General string
+
+    // Add to the report
+    sString.Format("Save track %d '%s' (%s) -------------",
+                   track->_trackNumber, (const char*)track->_trackName, (const char*)track->_instrumentName);
+    Log((const char*)sString);
+    _report += sString;
+
+    // Name
+    if(track->_trackName.Length()) {
+        if(!SaveMetaEvent(0, META_TRACK_NAME, track->_channel, (const char*)track->_trackName, track->_trackName.Length(), sTrackData))
+            return false;
+    }
+
+    // Instrument name
+    if(track->_instrumentName.Length()) {
+        if(!SaveMetaEvent(0, META_INSTRUMENT, track->_channel, (const char*)track->_instrumentName, track->_instrumentName.Length(), sTrackData))
+            return false;
+    }
+
+    // Instrument type
+    nValue = GetProgram(track->_instrument);
+    if(nValue != PROGRAM_NONE) {
+        if(!SaveEvent(0, MIDI_PROGRAM, track->_channel, (const char*)&nValue, 1, sTrackData))
+            return false;
+    }
+
+    // Volume
+    nValue = (int)(127.0f * track->_volume + 0.5f);
+    if(nValue < 0)
+        nValue = 0;
+
+    if(nValue > 127)
+        nValue = 127;
+
+    cValue = (uint8_t)nValue;
+    if(!SaveControlEvent(0, track->_channel, CONTROL_VOLUME, cValue, sTrackData))
+        return false;
+
+    // Pan
+    nValue = (int)(fHalf + track->_pan * fHalf + 0.5f);
+    if(nValue < 0)
+        nValue = 0;
+
+    if(nValue > 127)
+        nValue = 127;
+
+    cValue = (uint8_t)nValue;
+    if(!SaveControlEvent(0, track->_channel, CONTROL_PAN, cValue, sTrackData))
+        return false;
+
+    // Reset all controllers
+    cValue = 0;
+    if(!SaveControlEvent(0, track->_channel, CONTROL_RESET, cValue, sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves track notes
+bool MidiFile::SaveTrackNotes(Track* track, Buffer& sTrackData) {
+    Note*		note = NULL;		// Current note
+    Note		Note;				// Current note
+    float		dPrevTime = 0.0;	// Last note's time
+    int		    nTimeDiff;	        // Time difference
+    NOTES	events;				// List of notes as on/off events
+    NOTES_ITER noteIter;
+
+    //track->Show();
+
+    // Make a list of all note starts and stops
+    for(noteIter = track->_notes.begin(); noteIter != track->_notes.end(); noteIter++) {
+        note = &(*noteIter);
+
+        // Save note's start
+        events.push_back(*note); // Sorted by start time
+
+        // Save note's end
+        Note = *note;
+        Note._volume = 0.0; // 'Note off' signal
+        Note._start += Note._duration; // Time of the event - note's end
+        events.push_back(Note); // Sorted by start time
+    }
+
+    std::sort(events.begin(), events.end(), SortNoteTime); // Sort events by start time
+
+    // Save all note starts and stops
+    for(noteIter = events.begin(); noteIter != events.end(); noteIter++) {
+        note = &(*noteIter);
+        nTimeDiff = GetTimeDiff(note->_start - dPrevTime);
+
+        // Save note
+        if(!SaveNote(nTimeDiff, true, track->_channel, true, note->_midiNote, note->_volume, sTrackData))
+            return false;
+
+        dPrevTime = note->_start;
+    }
+
+    // Add a silent note to the end of track. This will prevent MIDI players from cutting the end of track.
+    if(!SaveNote(0, true, track->_channel, true, 0, 0.0, sTrackData))
+        return false;
+
+    if(!SaveNote(GetTimeDiff(0.5), true, track->_channel, true, 0, 0.0, sTrackData))
+        return false;
+
+    // Add 'end of track' event
+    if(!SaveMetaEvent(0, META_END, 0, NULL, 0, sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves one track
+bool MidiFile::SaveTrack(const char* pTrackData, int nTrackLength) {
+    ChunkHeader	ChunkHeader;	// chunk header
+
+    // Set chunk ID
+    memcpy(ChunkHeader._id, ID_TRACK_HEADER, sizeof(ID_TRACK_HEADER));
+
+    // Set chunk length
+    ChunkHeader._length = nTrackLength;
+    Reverse4Bytes((char*)&ChunkHeader._length); // Length is stored in reversed byte order
+
+    // Save the chunk header
+    if(!AddData(&ChunkHeader, sizeof(ChunkHeader)))
+        return false;
+
+    // Save track's data
+    if(!AddData((void*)pTrackData, nTrackLength))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves meta event
+bool MidiFile::SaveMetaEvent(int nTimeDiff, META_EVENT nMetaEvent, int nChannel, const char* pEventData, int nEventDataSize,
+                              Buffer& sTrackData) {
+    uint8_t		szBuffer[64];	// Conversion buffer
+    int			nBytes = 0;		// Bytes saved in the conversion
+    Buffer		sEventData;		// Converted event data
+    String	sString;		// General string
+    String	sData;
+
+    // Meta event type
+    sEventData.Add((const char*)(uint8_t*)&nMetaEvent, 1);
+
+    // Data length
+    if(PutVarLen(nEventDataSize, (char*)szBuffer, sizeof(szBuffer), nBytes))
+        sEventData.Add((const char*)szBuffer, nBytes);
+    else
+        return false;
+
+    // Data
+    if(pEventData && nEventDataSize)
+        sEventData.Add(pEventData, nEventDataSize);
+
+    // Save as event
+    if(!SaveEvent(nTimeDiff, MIDI_META, nChannel, (const char*)sEventData, sEventData.Length(), sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves control event
+bool MidiFile::SaveControlEvent(int nTimeDiff, int nChannel, uint8_t nType, uint8_t nValue, Buffer& sTrackData) {
+    String	sControlName;	// Control name
+    String	sString;		// General string
+    uint8_t	    szBuffer[8];	// Event data
+
+    // Get control's info
+    if(!GetControlInfo(nType, sControlName))
+        return false;
+
+    // Add to the report
+    sString.Format("Control %3d, '%s' = %d, channel=%d", nType, (const char*)sControlName, nValue, nChannel);
+    //Log((const char*)sString);
+    _report += sString;
+
+    // Control data
+    szBuffer[0] = nType;
+    szBuffer[1] = nValue;
+
+    // Save the event
+    if(!SaveEvent(nTimeDiff, MIDI_CONTROL, nChannel, (const char*)szBuffer, 2, sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves a marker note
+bool MidiFile::SaveMarker(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+    switch(note->_nState) {
+        case Note::STATE_CHORD_MARK:
+            if(!SaveChord(nTimeDiff, note, track, sTrackData))
+                return false;
+
+            break;
+
+        case Note::STATE_PART_MARK:
+            if(!SaveSongPart(nTimeDiff, note, track, sTrackData))
+                return false;
+
+            break;
+
+        case Note::STATE_MEASURE_MARK:
+            if(!SaveMeasure(nTimeDiff, note, track, sTrackData))
+                return false;
+
+            break;
+
+        default:
+            return false;
+    }
+
+    return true;
+}
+
+//=================================================================================================
+// Saves note's chord info using MIDI control events
+bool MidiFile::SaveChord(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+    String sData;  // Data to be saved
+    String sValue;
+    String sPair;
+    String sString;
+
+    sData = MARKER_CHORD;
+
+    // Root MIDI note
+    sPair.Format("%s%d|", MARKER_FIELD_MIDI_NOTE, note->_ChordInfo._nRoot);
+    sData += sPair;
+
+    // Root # or b
+    if(!NoteManager::NoteTypeToString(note->_ChordInfo._Modifiers._Pitch, sValue))
+        return false;
+
+    sPair.Format("%s%s|", MARKER_FIELD_PITCH, (const char*)sValue);
+    sData += sPair;
+
+    // Chord type
+    if(!NoteManager::ChordTypeToString(note->_ChordInfo._nType, sValue))
+        return false;
+
+    sPair.Format("%s%s|", MARKER_FIELD_CHORD_TYPE, (const char*)sValue);
+    sData += sPair;
+
+    // Chord group
+    if(!NoteManager::GetChordGroupName(note->_ChordInfo._nGroup, sValue))
+        return false;
+
+    sPair.Format("%s%s|", MARKER_FIELD_CHORD_GROUP, (const char*)sValue);
+    sData += sPair;
+
+    // Chord number in the scale
+    sPair.Format("%s%d|", MARKER_FIELD_NUMBER, note->_ChordInfo._nNumber);
+    sData += sPair;
+
+    // Scale
+    if(!NoteManager::GetScaleName(note->_ChordInfo._nScale, sValue))
+        return false;
+
+    sPair.Format("%s%s|", MARKER_FIELD_SCALE, (const char*)sValue);
+    sData += sPair;
+
+    // Scale root note
+    sPair.Format("%s%d|", MARKER_FIELD_SCALE_ROOT, note->_ChordInfo._nScaleRoot);
+    sData += sPair;
+
+    // Add to the report
+    sString.Format("Chord: %s", (const char*)sData);
+    //Log((const char*)sString);
+    _report += sString;
+
+    // Save the data
+    if(!SaveMetaEvent(nTimeDiff, META_MARKER, track->_channel, (const char*)sData, sData.Length(), sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Gets chord data
+bool MidiFile::GetChord(const char* pMarker, float dTrackTime, Song* song, Track* track) {
+    char*		pField = NULL;	// Current date field
+    char*		pNextToken = NULL;	// Next token
+    String	sCopy;	// String copy
+    const char* pValue;
+    CChord      Chord;
+    CChord*     pChord;
+    Note       Note;
+    String sString;
+
+    sCopy = pMarker;
+    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
+    while(pField) {
+        if(!strncmp(pField, MARKER_FIELD_MIDI_NOTE, strlen(MARKER_FIELD_MIDI_NOTE))) { // Root MIDI note
+            pValue = pField + strlen(MARKER_FIELD_MIDI_NOTE);
+            Chord._RootNote._ChordInfo._nRoot = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_PITCH, strlen(MARKER_FIELD_PITCH))) { // Root # or b
+            pValue = pField + strlen(MARKER_FIELD_PITCH);
+            if(!NoteManager::StringToNoteType(pValue, Chord._RootNote._Modifiers._Pitch))
+                return false;
+        } else if(!strncmp(pField, MARKER_FIELD_CHORD_TYPE, strlen(MARKER_FIELD_CHORD_TYPE))) { // Chord type
+            pValue = pField + strlen(MARKER_FIELD_CHORD_TYPE);
+            if(!NoteManager::StringToChordType(pValue, Chord._RootNote._ChordInfo._nType))
+                return false;
+        } else if(!strncmp(pField, MARKER_FIELD_REPEAT, strlen(MARKER_FIELD_REPEAT))) { // Number of times to repeat
+            pValue = pField + strlen(MARKER_FIELD_REPEAT);
+            Chord._nRepeat = 1; //atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_CHORD_GROUP, strlen(MARKER_FIELD_CHORD_GROUP))) { // Chord group
+            pValue = pField + strlen(MARKER_FIELD_CHORD_GROUP);
+            if(!NoteManager::GetChordGroup(pValue, Chord._RootNote._ChordInfo._nGroup))
+                return false;
+        } else if(!strncmp(pField, MARKER_FIELD_NUMBER, strlen(MARKER_FIELD_NUMBER))) { // Chord number in the scale
+            pValue = pField + strlen(MARKER_FIELD_NUMBER);
+            Chord._RootNote._ChordInfo._nNumber = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_SCALE, strlen(MARKER_FIELD_SCALE))) { // Scale
+            pValue = pField + strlen(MARKER_FIELD_SCALE);
+            if(!NoteManager::GetScaleID(pValue, Chord._RootNote._ChordInfo._nScale))
+                return false;
+        } else if(!strncmp(pField, MARKER_FIELD_SCALE_ROOT, strlen(MARKER_FIELD_SCALE_ROOT))) { // Scale root note
+            pValue = pField + strlen(MARKER_FIELD_SCALE_ROOT);
+            Chord._RootNote._ChordInfo._nScaleRoot = atoi(pValue);
+        } else { // Unknown
+            return false;
+        }
+
+        pField = strtok_s(NULL, "|", &pNextToken);
+    }
+
+    // Make the mark note
+    Note._start = dTrackTime;
+    Note._volume = 0.0f;
+    Note._duration = 0.0f;
+    Note._nState = Note::STATE_CHORD_MARK;
+    Note._ChordInfo = Chord._RootNote._ChordInfo;
+    Note._nSource = Note::SOURCE_FILE;
+
+    track->AddNote(Note);
+
+    // Add to the report
+    sString.Format("%6.2f  Chord: %d", dTrackTime, Chord._RootNote._ChordInfo._nRoot);
+    //Log((const char*)sString);
+    _report += sString;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves mix data
+bool MidiFile::SaveMix(int nTimeDiff, CMix* pMix, Buffer& sTrackData) {
+    MIX_MAP_ITER    Iter;	    // Map iterator
+    MIX_INFO*       pMixInfo;   // Mix info
+    String sData;  // Data to be saved
+    String sValue;
+    String sPair;
+    String sString;
+
+    sData = MARKER_MIX;
+
+    for(Iter = pMix->_Mixes.begin(); Iter != pMix->_Mixes.end(); Iter++) {
+        pMixInfo = &Iter->second;
+
+        // Instrument
+        if(ThingToString(pMixInfo->_instrument, sString)) {
+            sPair.Format("%s%s|", MARKER_FIELD_INSTRUMENT, (const char*)sString);
+            sData += sPair;
+        } else {
+            return false;
+        }
+
+        // Volume
+        sPair.Format("%s%0.2f|", MARKER_FIELD_VOLUME, pMixInfo->_volume);
+        sData += sPair;
+
+        // Pan
+        sPair.Format("%s%0.2f|", MARKER_FIELD_PAN, pMixInfo->_pan);
+        sData += sPair;
+    }
+
+    // Add to the report
+    sString.Format("Mix: %s", (const char*)sData);
+    //Log((const char*)sString);
+    _report += sString;
+
+    // Save the data
+    if(!SaveMetaEvent(nTimeDiff, META_MARKER, 0, (const char*)sData, sData.Length(), sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Gets mix data
+bool MidiFile::GetMix(const char* pMarker, Song* song) {
+    MIX_MAP_INS_PAIR	Pair;	    // Insert pair
+    MIX_INFO    MixInfo;    // Mix info
+    char*		pField = NULL;	// Current date field
+    char*		pNextToken = NULL;	// Next token
+    String	sCopy;	    // String copy
+    const char* pValue;
+    THING       nInstrument;        // Source instrument
+    THING       nToInstrument;      // Mapped instrument
+
+    sCopy = pMarker;
+    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
+    while(pField) {
+        if(!strncmp(pField, MARKER_FIELD_INSTRUMENT, strlen(MARKER_FIELD_INSTRUMENT))) { // Instrument
+            // Save the previous intrument
+            if(MixInfo._instrument != 0) {
+                // Insert the info
+                Pair = song->_Mix._Mixes.insert(MIX_MAP_PAIR(MixInfo._instrument, MixInfo));
+                if(!Pair.second) { // Can't insert
+                    _error.Format("Can't insert into mix map");
+                    return false;
+                }
+            }
+
+            pValue = pField + strlen(MARKER_FIELD_INSTRUMENT);
+            if(!StringToThing(pValue, nInstrument)) {
+                return false;
+            }
+
+            MapThings(nInstrument, nToInstrument);
+            MixInfo._instrument = nToInstrument;
+        } else if(!strncmp(pField, MARKER_FIELD_VOLUME, strlen(MARKER_FIELD_VOLUME))) { // Volume
+            pValue = pField + strlen(MARKER_FIELD_VOLUME);
+            MixInfo._volume = (float)atof(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_PAN, strlen(MARKER_FIELD_PAN))) { // Pan
+            pValue = pField + strlen(MARKER_FIELD_PAN);
+            MixInfo._pan = (float)atof(pValue);
+        } else { // Unknown
+            return false;
+        }
+
+        pField = strtok_s(NULL, "|", &pNextToken);
+    }
+
+    // Save the last intrument
+    if(MixInfo._instrument != 0) {
+        // Insert the info
+        Pair = song->_Mix._Mixes.insert(MIX_MAP_PAIR(MixInfo._instrument, MixInfo));
+        if(!Pair.second) { // Can't insert
+            _error.Format("Can't insert into mix map");
+            return false;
+        }
+    }
+
+    return true;
+}
+
+//=================================================================================================
+// Saves song info
+bool MidiFile::SaveSongInfo(Song* song, Buffer& sTrackData) {
+    String sData;  // Data to be saved
+    String sValue;
+    String sPair;
+    String sString;
+
+    sData = MARKER_SONG_INFO;
+
+    // Description
+    sPair.Format("%s%s|", MARKER_FIELD_DESCR, (const char*)song->_sDescription);
+    sData += sPair;
+
+    // Repeat
+    sPair.Format("%s%d|", MARKER_FIELD_REPEAT, song->_nRepeat);
+    sData += sPair;
+
+    // Song length (without repetition)
+    if(song->_dSongTime != NO_DOUBLE) {
+        sPair.Format("%s%0.3f|", MARKER_FIELD_SONG_LENGTH, song->_dSongTime);
+        sData += sPair;
+    }
+
+    // Add to the report
+    sString.Format("Song info: %s", (const char*)sData);
+    Log((const char*)sString);
+    _report += sString;
+
+    // Save the data
+    if(!SaveMetaEvent(0, META_MARKER, 0, (const char*)sData, sData.Length(), sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Gets song info
+bool MidiFile::GetSongInfo(const char* pMarker, float dTrackTime, Song* song, Track* track) {
+    char*		pField = NULL;	// Current date field
+    char*		pNextToken = NULL;	// Next token
+    String	sCopy;	// String copy
+    const char* pValue;
+
+    sCopy = pMarker;
+    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
+    while(pField) {
+        if(!strncmp(pField, MARKER_FIELD_DESCR, strlen(MARKER_FIELD_DESCR))) { // Description
+            pValue = pField + strlen(MARKER_FIELD_DESCR);
+            song->_sDescription = pValue;
+        } else if(!strncmp(pField, MARKER_FIELD_REPEAT, strlen(MARKER_FIELD_REPEAT))) { // Repeat
+            pValue = pField + strlen(MARKER_FIELD_REPEAT);
+            song->_nRepeat = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_SONG_LENGTH, strlen(MARKER_FIELD_SONG_LENGTH))) { // Song length
+            pValue = pField + strlen(MARKER_FIELD_SONG_LENGTH);
+            song->_dSongTime = atof(pValue);
+        } else { // Unknown
+            return false;
+        }
+
+        pField = strtok_s(NULL, "|", &pNextToken);
+    }
+
+    return true;
+}
+
+//=================================================================================================
+// Saves full info of one song part
+bool MidiFile::SavePartInfo(int nTimeDiff, SongPart* pPart, Buffer& sTrackData) {
+    String sData;  // Data to be saved
+    String sValue;
+    String sPair;
+    String sString;
+
+    sData = MARKER_SONG_PART_INFO;
+
+    // Name
+    sPair.Format("%s%s|", MARKER_FIELD_NAME, (const char*)pPart->_name);
+    sData += sPair;
+
+    // Description
+    sPair.Format("%s%s|", MARKER_FIELD_DESCR, (const char*)pPart->_sDescription);
+    sData += sPair;
+
+    // Repeat
+    sPair.Format("%s%d|", MARKER_FIELD_REPEAT, pPart->_nRepeat);
+    sData += sPair;
+
+    // Groove sytle
+    sPair.Format("%s%s|", MARKER_FIELD_STYLE, (const char*)pPart->_sGrooveStyle);
+    sData += sPair;
+
+    // Groove name
+    sPair.Format("%s%s|", MARKER_FIELD_GROOVE_NAME, (const char*)pPart->_sGrooveName);
+    sData += sPair;
+
+    // Groove file
+    sPair.Format("%s%s|", MARKER_FIELD_GROOVE_FILE, (const char*)pPart->_sGrooveFile);
+    sData += sPair;
+
+    // Groove length
+    sPair.Format("%s%0.3f|", MARKER_FIELD_GROOVE_LENGTH, pPart->_dGrooveLength);
+    sData += sPair;
+
+    // Part length
+    sPair.Format("%s%0.3f|", MARKER_FIELD_PART_LENGTH, pPart->_Part._dSongTime);
+    sData += sPair;
+
+    // Scale
+    if(!NoteManager::GetScaleName(pPart->_Part._nScale, sValue))
+        return false;
+
+    sPair.Format("%s%s|", MARKER_FIELD_SCALE, (const char*)sValue);
+    sData += sPair;
+
+    // Scale root note
+    sPair.Format("%s%d|", MARKER_FIELD_SCALE_ROOT, pPart->_Part._nScaleRoot);
+    sData += sPair;
+
+    // Tempo
+    sPair.Format("%s%0.2f|", MARKER_FIELD_TEMPO, pPart->_Part._dTempo);
+    sData += sPair;
+
+    // Beat time
+    sPair.Format("%s%0.3f|", MARKER_FIELD_BEAT_TIME, pPart->_Part._beatTime);
+    sData += sPair;
+
+    // Measures
+    sPair.Format("%s%d|", MARKER_FIELD_MEASURES, pPart->_Part._measures);
+    sData += sPair;
+
+    // Beat notes
+    sPair.Format("%s%d|", MARKER_FIELD_BEAT_NOTES, pPart->_Part._beatNotes);
+    sData += sPair;
+
+    // Measure beats
+    sPair.Format("%s%d|", MARKER_FIELD_MEASURE_BEATS, pPart->_Part._measureBeats);
+    sData += sPair;
+
+    // Add to the report
+    sString.Format("Song part info: %s", (const char*)sData);
+    Log((const char*)sString);
+    _report += sString;
+
+    // Save the data
+    if(!SaveMetaEvent(nTimeDiff, META_MARKER, 0, (const char*)sData, sData.Length(), sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Gets song part info
+bool MidiFile::GetPartInfo(const char* pMarker, float dTrackTime, Song* song, Track* track) {
+    char*		pField = NULL;	// Current date field
+    char*		pNextToken = NULL;	// Next token
+    String	sCopy;	// String copy
+    const char* pValue;
+    SongPart   Part;
+
+    sCopy = pMarker;
+    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
+    while(pField) {
+        if(!strncmp(pField, MARKER_FIELD_NAME, strlen(MARKER_FIELD_NAME))) { // Part's name
+            pValue = pField + strlen(MARKER_FIELD_NAME);
+            Part._name = pValue;
+        } else if(!strncmp(pField, MARKER_FIELD_DESCR, strlen(MARKER_FIELD_DESCR))) { // Description
+            pValue = pField + strlen(MARKER_FIELD_DESCR);
+            Part._sDescription = pValue;
+        } else if(!strncmp(pField, MARKER_FIELD_REPEAT, strlen(MARKER_FIELD_REPEAT))) { // Repeat
+            pValue = pField + strlen(MARKER_FIELD_REPEAT);
+            Part._nRepeat = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_STYLE, strlen(MARKER_FIELD_STYLE))) { // Groove sytle
+            pValue = pField + strlen(MARKER_FIELD_STYLE);
+            Part._sGrooveStyle = pValue;
+        } else if(!strncmp(pField, MARKER_FIELD_GROOVE_NAME, strlen(MARKER_FIELD_GROOVE_NAME))) { // Groove name
+            pValue = pField + strlen(MARKER_FIELD_GROOVE_NAME);
+            Part._sGrooveName = pValue;
+        } else if(!strncmp(pField, MARKER_FIELD_GROOVE_FILE, strlen(MARKER_FIELD_GROOVE_FILE))) { // Groove file
+            pValue = pField + strlen(MARKER_FIELD_GROOVE_FILE);
+            Part._sGrooveFile = pValue;
+        } else if(!strncmp(pField, MARKER_FIELD_GROOVE_LENGTH, strlen(MARKER_FIELD_GROOVE_LENGTH))) { // Groove length
+            pValue = pField + strlen(MARKER_FIELD_GROOVE_LENGTH);
+            Part._dGrooveLength = atof(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_PART_LENGTH, strlen(MARKER_FIELD_PART_LENGTH))) { // Part length
+            pValue = pField + strlen(MARKER_FIELD_PART_LENGTH);
+            Part._Part._dSongTime = atof(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_SCALE, strlen(MARKER_FIELD_SCALE))) { // Scale
+            pValue = pField + strlen(MARKER_FIELD_SCALE);
+            if(!NoteManager::GetScaleID(pValue, Part._Part._nScale))
+                return false;
+        } else if(!strncmp(pField, MARKER_FIELD_SCALE_ROOT, strlen(MARKER_FIELD_SCALE_ROOT))) { // Scale root note
+            pValue = pField + strlen(MARKER_FIELD_SCALE_ROOT);
+            Part._Part._nScaleRoot = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_TEMPO, strlen(MARKER_FIELD_TEMPO))) { // Tempo
+            pValue = pField + strlen(MARKER_FIELD_TEMPO);
+            Part._Part._dTempo = atof(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_BEAT_TIME, strlen(MARKER_FIELD_BEAT_TIME))) { // Beat time
+            pValue = pField + strlen(MARKER_FIELD_BEAT_TIME);
+            Part._Part._beatTime = atof(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_MEASURES, strlen(MARKER_FIELD_MEASURES))) { // Measures
+            pValue = pField + strlen(MARKER_FIELD_MEASURES);
+            Part._Part._measures = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_BEAT_NOTES, strlen(MARKER_FIELD_BEAT_NOTES))) { // Beat notes
+            pValue = pField + strlen(MARKER_FIELD_BEAT_NOTES);
+            Part._Part._beatNotes = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_MEASURE_BEATS, strlen(MARKER_FIELD_MEASURE_BEATS))) { // Measure beats
+            pValue = pField + strlen(MARKER_FIELD_MEASURE_BEATS);
+            Part._Part._measureBeats = atoi(pValue);
+        } else { // Unknown
+            return false;
+        }
+
+        pField = strtok_s(NULL, "|", &pNextToken);
+    }
+
+    // Save the part
+    if(!song->AddSongPart(&Part))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves note info
+bool MidiFile::SaveNoteInfo(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+    String sData;  // Data to be saved
+    String sValue;
+    String sPair;
+    String sString;
+
+    sData = MARKER_NOTE_INFO;
+
+    // Interval
+    if(note->_nInterval != 0) {
+        sPair.Format("%s%d|", MARKER_FIELD_INTERVAL, note->_nInterval);
+        sData += sPair;
+    }
+
+    // String
+    if(note->_Tab._nString != NO_INT && note->_Tab._nString != 0) {
+        sPair.Format("%s%d|", MARKER_FIELD_STRING, note->_Tab._nString);
+        sData += sPair;
+    }
+
+    // Fret
+    if(note->_Tab._nFret != NO_INT) {
+        sPair.Format("%s%d|", MARKER_FIELD_FRET, note->_Tab._nFret);
+        sData += sPair;
+    }
+
+    // Finger
+    if(note->_Tab._nFinger != NO_INT) {
+        sPair.Format("%s%d|", MARKER_FIELD_FINGER, note->_Tab._nFinger);
+        sData += sPair;
+    }
+
+    // Mode
+    if(note->_Tab._nMode != Note::TAB_INFO::MODE_NONE) {
+        sPair.Format("%s%d|", MARKER_FIELD_MODE, note->_Tab._nMode);
+        sData += sPair;
+    }
+
+    // Add to the report
+    sString.Format("Note info: %s", (const char*)sData);
+    //Log((const char*)sString);
+    _report += sString;
+
+    // Save the data
+    if(!SaveMetaEvent(nTimeDiff, META_MARKER, track->_channel, (const char*)sData, sData.Length(), sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Gets note info
+bool MidiFile::GetNoteInfo(const char* pMarker, float dTrackTime, Song* song, Track* track) {
+    char*		pField = NULL;	// Current date field
+    char*		pNextToken = NULL;	// Next token
+    String	sCopy;	// String copy
+    const char* pValue;
+
+    sCopy = pMarker;
+    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
+    while(pField) {
+        if(!strncmp(pField, MARKER_FIELD_INTERVAL, strlen(MARKER_FIELD_INTERVAL))) { // Interval
+            pValue = pField + strlen(MARKER_FIELD_INTERVAL);
+            _note._nInterval = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_STRING, strlen(MARKER_FIELD_STRING))) { // Tab - string
+            pValue = pField + strlen(MARKER_FIELD_STRING);
+            _note._Tab._nString = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_FRET, strlen(MARKER_FIELD_FRET))) { // Tab - fret
+            pValue = pField + strlen(MARKER_FIELD_FRET);
+            _note._Tab._nFret = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_FINGER, strlen(MARKER_FIELD_FINGER))) { // Tab - finger
+            pValue = pField + strlen(MARKER_FIELD_FINGER);
+            _note._Tab._nFinger = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_MODE, strlen(MARKER_FIELD_MODE))) { // Tab - mode
+            pValue = pField + strlen(MARKER_FIELD_MODE);
+            _note._Tab._nMode = atoi(pValue);
+        } else { // Unknown
+            return false;
+        }
+
+        pField = strtok_s(NULL, "|", &pNextToken);
+    }
+
+    return true;
+}
+
+//=================================================================================================
+// Saves song part's name to mark the start of new part
+bool MidiFile::SaveSongPart(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+    String sData;  // Data to be saved
+    String sValue;
+    String sPair;
+    String sString;
+
+    sData = MARKER_SONG_PART;
+
+    // Part's name
+    sPair.Format("%s%s|", MARKER_FIELD_NAME, (const char*)note->_sSongPart);
+    sData += sPair;
+
+    // Add to the report
+    sString.Format("Song part: %s", (const char*)sData);
+    Log((const char*)sString);
+    _report += sString;
+
+    // Save the data
+    if(!SaveMetaEvent(nTimeDiff, META_MARKER, track->_channel, (const char*)sData, sData.Length(), sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Gets song part name
+bool MidiFile::GetSongPart(const char* pMarker, float dTrackTime, Song* song, Track* track) {
+    char*		pField = NULL;	// Current date field
+    char*		pNextToken = NULL;	// Next token
+    String	sCopy;	// String copy
+    const char* pValue;
+    Note       Note;
+    String sString;
+
+    sCopy = pMarker;
+    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
+    while(pField) {
+        if(!strncmp(pField, MARKER_FIELD_NAME, strlen(MARKER_FIELD_NAME))) { // Part's name
+            pValue = pField + strlen(MARKER_FIELD_NAME);
+            Note._sSongPart = pValue;
+        } else { // Unknown
+            return false;
+        }
+
+        pField = strtok_s(NULL, "|", &pNextToken);
+    }
+
+    // Make the mark note
+    Note._start = dTrackTime;
+    Note._volume = 0.0f;
+    Note._duration = 0.0f;
+    Note._nState = Note::STATE_PART_MARK;
+    Note._nSource = Note::SOURCE_FILE;
+
+    track->AddNote(Note);
+
+    // Add to the report
+    sString.Format("%6.2f  Song part: %s", dTrackTime, (const char*)Note._sSongPart);
+    Log((const char*)sString);
+    _report += sString;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves measure numbers using MIDI control events
+bool MidiFile::SaveMeasure(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+    String sData;  // Data to be saved
+    String sValue;
+    String sPair;
+    String sString;
+
+    sData = MARKER_MEASURE;
+
+    // Part measure
+    sPair.Format("%s%d|", MARKER_FIELD_PART_MEASURE, note->_nPartMeasure);
+    sData += sPair;
+
+    // Song measure
+    sPair.Format("%s%d|", MARKER_FIELD_SONG_MEASURE, note->_nSongMeasure);
+    sData += sPair;
+
+    // Add to the report
+    sString.Format("Measure: %s", (const char*)sData);
+    //Log((const char*)sString);
+    _report += sString;
+
+    // Save the data
+    if(!SaveMetaEvent(nTimeDiff, META_MARKER, track->_channel, (const char*)sData, sData.Length(), sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Gets measure numbers
+bool MidiFile::GetMeasure(const char* pMarker, float dTrackTime, Song* song, Track* track) {
+    char*		pField = NULL;	// Current date field
+    char*		pNextToken = NULL;	// Next token
+    String	sCopy;	// String copy
+    const char* pValue;
+    Note       Note;
+    String sString;
+
+    sCopy = pMarker;
+    pField = strtok_s((char*)(const char*)sCopy, "|", &pNextToken);
+    while(pField) {
+        if(!strncmp(pField, MARKER_FIELD_PART_MEASURE, strlen(MARKER_FIELD_PART_MEASURE))) { // Part measure
+            pValue = pField + strlen(MARKER_FIELD_PART_MEASURE);
+            Note._nPartMeasure = atoi(pValue);
+        } else if(!strncmp(pField, MARKER_FIELD_SONG_MEASURE, strlen(MARKER_FIELD_SONG_MEASURE))) { // Song measure
+            pValue = pField + strlen(MARKER_FIELD_SONG_MEASURE);
+            Note._nSongMeasure = atoi(pValue);
+        } else { // Unknown
+            return false;
+        }
+
+        pField = strtok_s(NULL, "|", &pNextToken);
+    }
+
+    // Make the mark note
+    Note._start = dTrackTime;
+    Note._volume = 0.0f;
+    Note._duration = 0.0f;
+    Note._nState = Note::STATE_MEASURE_MARK;
+    Note._nSource = Note::SOURCE_FILE;
+
+    track->AddNote(Note);
+
+    // Add to the report
+    sString.Format("%6.2f  Measure: %d/%d", dTrackTime, Note._nPartMeasure, Note._nSongMeasure);
+    //Log((const char*)sString);
+    _report += sString;
+
+    return true;
+}
+
+//=================================================================================================
+// Gets marker data: chord info, measure mark, song part's name, etc.
+// Format: <MarkerType>Field=Value|Field=Value
+bool MidiFile::GetMarker(const char* pMarker, float dTrackTime, Song* song, Track* track) {
+    if(!strncmp(pMarker, MARKER_CHORD, strlen(MARKER_CHORD))) { // Chord
+        if(!GetChord(pMarker + strlen(MARKER_CHORD), dTrackTime, song, track))
+            return false;
+    } else if(!strncmp(pMarker, MARKER_SONG_PART, strlen(MARKER_SONG_PART))) { // Song part
+        if(!GetSongPart(pMarker + strlen(MARKER_SONG_PART), dTrackTime, song, track))
+            return false;
+    } else if(!strncmp(pMarker, MARKER_SONG_PART_INFO, strlen(MARKER_SONG_PART_INFO))) { // Song part info
+        if(!GetPartInfo(pMarker + strlen(MARKER_SONG_PART_INFO), dTrackTime, song, track))
+            return false;
+    } else if(!strncmp(pMarker, MARKER_NOTE_INFO, strlen(MARKER_NOTE_INFO))) { // Note info
+        if(!GetNoteInfo(pMarker + strlen(MARKER_NOTE_INFO), dTrackTime, song, track))
+            return false;
+    } else if(!strncmp(pMarker, MARKER_SONG_INFO, strlen(MARKER_SONG_INFO))) { // Song part info
+        if(!GetSongInfo(pMarker + strlen(MARKER_SONG_INFO), dTrackTime, song, track))
+            return false;
+    } else if(!strncmp(pMarker, MARKER_MEASURE, strlen(MARKER_MEASURE))) { // Measure number
+        if(!GetMeasure(pMarker + strlen(MARKER_MEASURE), dTrackTime, song, track))
+            return false;
+    } else if(!strncmp(pMarker, MARKER_MIX, strlen(MARKER_MIX))) { // Mix
+        if(!GetMix(pMarker + strlen(MARKER_MIX), song))
+            return false;
+    }
+
+    return true;
+}
+
+//=================================================================================================
+// Saves note's tab info using MIDI control events
+bool MidiFile::SaveTab(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+    // String
+    if(note->_Tab._nString != NO_INT) {
+        if(!SaveControlEvent(nTimeDiff, track->_channel, CONTROL_TAB_STRING, note->_Tab._nString, sTrackData))
+            return false;
+    }
+
+    // Fret
+    if(note->_Tab._nFret != NO_INT) {
+        if(!SaveControlEvent(nTimeDiff, track->_channel, CONTROL_TAB_FRET, note->_Tab._nFret, sTrackData))
+            return false;
+    }
+
+    // Finger
+    if(note->_Tab._nFinger != NO_INT) {
+        if(!SaveControlEvent(nTimeDiff, track->_channel, CONTROL_TAB_FINGER, note->_Tab._nFinger, sTrackData))
+            return false;
+    }
+
+    // Mode
+    if(note->_Tab._nMode != Note::TAB_INFO::MODE_NONE) {
+        if(!SaveControlEvent(nTimeDiff, track->_channel, CONTROL_TAB_MODE, note->_Tab._nMode, sTrackData))
+            return false;
+    }
+
+    return true;
+}
+
+//=================================================================================================
+// Saves control event
+// bEvent - whether to save event ID or keep the 'running status'
+bool MidiFile::SaveNote(int nTimeDiff, bool bEvent, int nChannel, bool bOn, int nNote, float fVolume, Buffer& sTrackData) {
+    uint8_t	    szBuffer[8];	// Event data
+    String	sString;		// General string
+
+    // Note data
+    szBuffer[0] = nNote;
+
+    // Velocity (volume). Looks like it's common not to use 'note off' event, but use 'note on' with velocity set to 0.
+    if(bOn) { // Start of the note
+        //szBuffer[1] = (uint8_t)(127.0f * fVolume + 0.5f); // Linear conversion
+        szBuffer[1] = VolumeToMidi(fVolume); // Logarithmic
+    } else // End of the note
+        szBuffer[1] = 0;
+
+    sString.Format("%7.3f sec: Save note %d, volume %0.2f, velocity %d", GetTimeDiff(nTimeDiff), nNote, fVolume, szBuffer[1]);
+    Log((const char*)sString);
+
+    // Save the event
+    if(!SaveEvent(nTimeDiff, bEvent ? MIDI_NOTE_ON : MIDI_NONE, nChannel, (const char*)szBuffer, 2, sTrackData))
+        return false;
+
+    return true;
+}
+
+//=================================================================================================
+// Saves a MIDI (note, system or meta) event
+bool MidiFile::SaveEvent(int nTimeDiff, MIDI_EVENT nEvent, int nChannel, const char* pEventData, int nEventDataSize, Buffer& sTrackData) {
+    uint8_t	    szBuffer[64];	// Conversion buffer
+    float      dTimeDiff;		// Event time
+    int		    nBytes = 0;		// Bytes saved in the conversion
+    uint8_t	    nEventID = 0;	// Event ID and channel (4 bits and 4 bits)
+    String	sString;		// General string
+
+    // Event time (incremental) ----------
+    if(PutVarLen(nTimeDiff, (char*)szBuffer, sizeof(szBuffer), nBytes))
+        sTrackData.Add((const char*)szBuffer, nBytes);
+    else
+        return false;
+
+    // Add event time to the report
+    dTimeDiff = GetTimeDiff((int)nTimeDiff);
+    sString.Format("Event diff: %04d, %7.3f sec, beat=%7.3f", nTimeDiff, dTimeDiff, _beatTime);
+    //Log((const char*)sString);
+    _report += sString;
+
+    // Event ID and channel ----------
+    if(nEvent != MIDI_NONE) { // Note a MIDI note event, no channel
+        if(nEvent >= MIDI_SYSTEM) { // Note a MIDI note event, no channel
+            nEventID = (uint8_t)nEvent;
+        } else { // Set the channel
+            // 4 bits for event type, 4 bits for channel number
+            nEventID = ((uint8_t)nEvent) & 0xF0; // Event type
+            nEventID += ((uint8_t)nChannel) & 0x0F; // Channel number;
+        }
+
+        sTrackData.Add((const char*)(uint8_t*)&nEventID, 1);
+    }
+
+    // Event data ----------
+    sTrackData.Add(pEventData, nEventDataSize);
+
+    return true;
+}
+
+//=================================================================================================
+// Gets MIDI program number for an instrument (thing) type
+uint8_t MidiFile::GetProgram(INSTRUMENT instrument) {
+    switch(instrument) {
+        case ELECTRIC_BASS_FINGER:
+            return PROGRAM_FINGER_BASS;
+        case ELECTRIC_GUITAR_CLEAN:
+            return PROGRAM_CLEAN_GUITAR;
+        case OVERDRIVEN_GUITAR:
+            return PROGRAM_OVERDRIVEN_GUITAR;
+        case DISTORTION_GUITAR:
+            return PROGRAM_DISTORTION_GUITAR;
+        case PERCUSSION:
+            return PROGRAM_DRUM_SET;
+        default:
+            return PROGRAM_NONE;
+    }
+}
+
+//=================================================================================================
+// Logs a message
+bool MidiFile::Log(const char* pFormat, const char* pMessage) {
+
+    return true;
+}
+
+//=================================================================================================
+// Adds data to the buffer
+bool MidiFile::AddData(void* data, int size) {
+    int increment = 1024 * 100;
+    int dataSize;
+
+    // Check the buffer size
+    dataSize = (int)(_dataOffset - _data);
+    if(dataSize + size > (int)_dataSize) {
+        _dataSize += Max(increment, size);
+        _data = (char*)realloc(_data, _dataSize); // +1 is for zero-terminator
+        if(!_data) {
+            _error.Format("Can't allocate %d bytes", _dataSize);
+            return false;
+        }
+
+        _dataOffset = _data + dataSize;
+    }
+
+    // Add the data
+    memcpy(_dataOffset, data, size);
+    _dataOffset += size;
+
+    return true;
+}
+*/

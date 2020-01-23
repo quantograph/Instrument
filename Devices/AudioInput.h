@@ -1,8 +1,7 @@
 #ifndef AudioInput_h
 #define AudioInput_h
 
-#include "Effects.h"
-
+class Effects;
 class AudioBoard;
 
 class AudioInput {

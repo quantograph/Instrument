@@ -3,7 +3,16 @@
 
 #include <Arduino.h>
 
-#include "./Misc.h"
+#include "./Music/Misc.h"
+#include "./Music/MidiFile.h"
+#include "./Music/Note.h"
+#include "./Music/Track.h"
+#include "./Music/Song.h"
+#include "./Music/Fingers.h"
+#include "./Music/Staff.h"
+#include "./Music/Keys.h"
+#include "./Music/Effects.h"
+#include "./Music/Synth.h"
 
 #include "./Devices/AudioBoard.h"
 #include "./Devices/AudioInput.h"
@@ -16,9 +25,6 @@
 //#include "./Devices/Motion.h"
 #include "./Devices/SdCard.h"
 #include "./Devices/TouchScreen.h"
-
-//#include "./Music/MidiFile.h"
-#include "./Music/MusicDef.h"
 
 #include "./Sound/bassoon_samples.h"
 #include "./Sound/clarinet_samples.h"

@@ -1,12 +1,15 @@
-#include "MidiInput.h"
 #include "AudioBoard.h"
-#include <USBHost_t36.h>
+#include "../Music/Synth.h"
+#include "MidiInput.h"
 
+Synth* MidiInput::_synth{nullptr};
 USBHost _usbHost;
 MIDIDevice _midiDevice(_usbHost);
 
-void MidiInput::Init() {
-  Serial.begin(115200);
+void MidiInput::Init(Synth* synth) {
+    Serial.begin(115200);
+    
+    _synth = synth;
 
   // Wait 1.5 seconds before turning on USB Host.  If connected USB devices
   // use too much power, Teensy at least completes USB enumeration, which
@@ -38,6 +41,8 @@ void MidiInput::Init() {
   // This generic System Real Time handler is only used if the
   // more specific ones are not set.
   _midiDevice.setHandleRealTimeSystem(myRealTimeSystem);
+
+  Serial.println("MidiInput::Init");
 }
 
 void MidiInput::Process() {
@@ -60,7 +65,7 @@ void MidiInput::myNoteOn(byte channel, byte note, byte velocity) {
   Serial.print(", velocity=");
   Serial.println(velocity, DEC);*/
 
-  //g_synth.NoteOn(note, velocity);
+  _synth->NoteOn(note, velocity);
 }
 
 void MidiInput::myNoteOff(byte channel, byte note, byte velocity) {
@@ -71,7 +76,7 @@ void MidiInput::myNoteOff(byte channel, byte note, byte velocity) {
   Serial.print(", velocity=");
   Serial.println(velocity, DEC);*/
 
-  //g_synth.NoteOff(note);
+  _synth->NoteOff(note);
 }
 
 void MidiInput::myAfterTouchPoly(byte channel, byte note, byte velocity) {

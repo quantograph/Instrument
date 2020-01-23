@@ -1,6 +1,10 @@
 #ifndef MUSIC_MUSIC_DEF_H
 #define MUSIC_MUSIC_DEF_H
 
+#include <vector>
+#include <list>
+#include <Arduino.h>
+
 // Global definitions ---------------------------------------------------------
 
 // Colors ----------

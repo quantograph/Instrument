@@ -8,6 +8,7 @@ public:
     SdCard();
     void Init();
     void Test();
+    bool ReadFile(const char* path, char*& data, uint32_t& dataSize);
     void PrintDirectory(File dir, int numTabs);
 };
 
