@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <list>
 #include <vector>
+#include <float.h>
 
 void Reverse2Bytes(char* data);
 void Reverse4Bytes(char* data);
@@ -14,6 +15,122 @@ extern const char* _drumNames[];
 
 #define NO_INT INT32_MAX
 #define NO_MIDI_NOTE 255
+#define	NO_FLOAT FLT_MAX
+
+// "No value" definitions
+/*#define	NO_DWORD	ULONG_MAX
+#define	NO_DOUBLE	DBL_MAX
+#define	NO_WORD		USHRT_MAX
+#define	NO_USHORT	USHRT_MAX
+#define	NO_SHORT	SHRT_MAX
+#define	NO_INT		INT_MAX
+#define	NO_UINT		UINT_MAX
+#define	NO_FLOAT	FLT_MAX
+#define	NO_COLOR	Gdiplus::Color(0, 0, 0, 0);*/
+
+#define	FINGER_MIDI_NOTE    253	    // MIDI note for 'finger' row
+#define	CHORD_MIDI_NOTE     254	    // MIDI note for 'chord' row
+#define	NO_MIDI_NOTE 	    255	    // MIDI note is not set. All good notes are from 0 to 127
+#define	MAX_NOTES		    256	    // Maximum number of MIDI notes
+#define	MAX_MIDI_NOTE       131     // Maximum MIDI note with a frequency
+#define BASS_ROOT           36      // Root note for bass chords
+#define BASS_MIN            28      // Lowest bass note
+#define MIDDLE_C            60      // Middle C note
+#define GUITAR_ROOT         48      // Root note for guitar chords
+#define GUITAR_MIN          40      // Lowest guitar note
+#define FINGER_TIP_RADIUS   0.6f    // Radius of the finger tip
+#define MAX_STRINGS         7       // Maximum number of strings on a guitar
+#define MAX_FRETS           22      // Maximum number of frets on a guitar
+#define MAX_SOUND_FRET      18      // Maxumum fret with the loaded sound
+#define MAX_FINGERS         3       // Maximum number fingers within the same fret on different strings (for 'A' chord)
+#define TENOR_SAX_START_NOTE (60 - 16) // MIDI note number for the lowest of tenor saxophone notes (fingering 17 is note 60)
+#define ALTO_SAX_START_NOTE (TENOR_SAX_START_NOTE + 7) // MIDI note number for the lowest of alto saxophone notes
+
+// Key signature
+enum KEY_SIGNATURE {
+    KEY_7FLATS	= -7,	// 7 flats
+    KEY_6FLATS	= -6,	// 6 flats
+    KEY_5FLATS	= -5,	// 5 flats
+    KEY_4FLATS	= -4,	// 4 flats
+    KEY_3FLATS	= -3,	// 3 flats
+    KEY_2FLATS	= -2,	// 2 flats
+    KEY_1FLAT	= -1,	// 1 flat
+    KEY_NONE	= 0,	// Not set
+    KEY_1SHARP	= 1,	// 1 sharps
+    KEY_2SHARPS	= 2,	// 2 sharps
+    KEY_3SHARPS	= 3,	// 3 sharps
+    KEY_4SHARPS	= 4,	// 4 sharps
+    KEY_5SHARPS	= 5,	// 5 sharps
+    KEY_6SHARPS	= 6,	// 6 sharps
+    KEY_7SHARPS	= 7,	// 7 sharps
+};
+
+// Scale type ----------
+enum SCALE {
+    SCALE_NONE, // Not set
+    // ############ NOTE! Don't insert, only append ###########
+    // ===== Major and minor scales (30)
+    // No flats, no sharps
+    SCALE_C_MAJOR,
+    SCALE_A_MINOR,
+    // Sharps
+    SCALE_G_MAJOR, // 1#
+    SCALE_E_MINOR, // 1#
+    SCALE_D_MAJOR, // 2#
+    SCALE_B_MINOR, // 2#
+    SCALE_A_MAJOR, // 3#
+    SCALE_Fs_MINOR, // 3#
+    SCALE_E_MAJOR, // 4#
+    SCALE_Cs_MINOR, // 4#
+    SCALE_B_MAJOR, // 5#
+    SCALE_Gs_MINOR, // 5#
+    SCALE_Fs_MAJOR, // 6#
+    SCALE_Ds_MINOR, // 6#
+    SCALE_Cs_MAJOR, // 7#
+    SCALE_As_MINOR, // 7#
+    // Flats
+    SCALE_F_MAJOR, // 1b
+    SCALE_D_MINOR, // 1b
+    SCALE_Bb_MAJOR, // 2b
+    SCALE_G_MINOR, // 2b
+    SCALE_Eb_MAJOR, // 3b
+    SCALE_C_MINOR, // 3b
+    SCALE_Ab_MAJOR, // 4b
+    SCALE_F_MINOR, // 4b
+    SCALE_Db_MAJOR, // 5b
+    SCALE_Bb_MINOR, // 5b
+    SCALE_Gb_MAJOR, // 6b
+    SCALE_Eb_MINOR, // 6b
+    SCALE_Cb_MAJOR, // 7b
+    SCALE_Ab_MINOR, // 7b
+    // ===== Modes
+    SCALE_IONIAN, // Ionian mode of the major scale, starts at it's 1 step
+    SCALE_DORIAN, // Dorian mode of the major scale, starts at it's 2 step
+    SCALE_PHRYGIAN, // Phrygian mode of the major scale, starts at it's 3 step
+    SCALE_LYDIAN, // Lydian mode of the major scale, starts at it's 4 step
+    SCALE_MIXOLYDIAN, // Mixolydian mode of the major scale, starts at it's 5 step
+    SCALE_AEOLIAN, // Aeolian mode of the major scale, starts at it's 6 step
+    SCALE_LOCRIAN, // Locrian mode of the major scale, starts at it's 7 step
+    // ===== Normal scales
+    SCALE_MAJOR, // Diatonic major
+    SCALE_NAT_MINOR, // Natural minor
+    SCALE_HARM_MINOR, // Harmonic minor
+    SCALE_MEL_MINOR, // Melodic minor (ascending)
+    SCALE_MEL_MINOR_DESC, // Melodic minor (descending)
+    // ===== Exotic scales
+    SCALE_ENIGM, // Enigmatic
+    SCALE_NEAP, // Neapolitanian
+    SCALE_NEAP_MIN, // Neapolitanian minor
+    SCALE_HUNG_MIN, // Hungarian minor
+    // ===== Others
+    SCALE_PENT_MAJOR, // Pentatonic major
+    SCALE_PENT_MINOR, // Pentatonic minor
+    SCALE_BEBOP, // Bebop
+    SCALE_BLUES, // Blues
+    SCALE_DIM, // Diminished
+    SCALE_CHROMATIC // Chromatic
+    // ############ NOTE! Don't insert, only append ###########
+};
 
 // MIDI instruments
 //  1-8    Piano                     65-72  Reed
@@ -155,8 +272,8 @@ enum INSTRUMENT {
 };
 
 // MIDI notes for drums
-#define DRUM_BASS_DRUM_2    35 // Acoustic Bass Drum
-#define DRUM_BASS_DRUM_1    36 // Bass Drum 1
+#define DRUM_BASS_DRUM    35 // Acoustic Bass Drum
+//#define DRUM_BASS_DRUM    36 // Bass Drum 1
 //#define DRUM_SIDE_STICK     37 // Side Stick
 #define DRUM_SNARE          38 // Acoustic Snare
 // 39 Hand Clap

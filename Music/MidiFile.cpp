@@ -1,3 +1,4 @@
+#include <limits>
 #include "Misc.h"
 #include "Note.h"
 #include "Track.h"
@@ -23,13 +24,13 @@ float MidiFile::GetBeatTime(float dTime) {
         return false;
     }
 
-    dBeatTime = (float)((int)(dTime * _timeDivision + 0.5)) / _timeDivision;
+    dBeatTime = (float)((int32_t)(dTime * _timeDivision + 0.5)) / _timeDivision;
 
     return dBeatTime;
 }
 
 //=================================================================================================
-uint16_t MidiFile::GetTimeDiff(float dTimeDiff) {
+int32_t MidiFile::GetTimeDiff(float dTimeDiff) {
     if(dTimeDiff == 0.0)
         return 0;
 
@@ -37,11 +38,11 @@ uint16_t MidiFile::GetTimeDiff(float dTimeDiff) {
         return 0;
     }
 
-    return (int)((dTimeDiff / _beatTime) * _timeDivision + 0.5);
+    return (int32_t)((dTimeDiff / _beatTime) * _timeDivision + 0.5);
 }
 
 //=================================================================================================
-float MidiFile::GetTimeDiff(int nTimeDiff) {
+float MidiFile::GetTimeDiff(int32_t nTimeDiff) {
     if(nTimeDiff == 0)
         return 0.0;
 
@@ -78,8 +79,8 @@ bool MidiFile::Read(char* data, uint32_t size, Song* song) {
 bool MidiFile::GetChunks(Song* song) {
     ChunkInfo chunk;			// chunk info
     bool done = false;	// Whether done reading
-    uint16_t fileTrack = 1;	// Track number in the file
-    uint16_t saveTrack = 1;	// Track number to be saved
+    uint32_t fileTrack = 1;	// Track number in the file
+    uint32_t saveTrack = 1;	// Track number to be saved
     Track* track;    // Current track info
 
     // Read all chunks
@@ -95,19 +96,24 @@ bool MidiFile::GetChunks(Song* song) {
 
         // Check for file header
         if(!strncmp(chunk._header._id, ID_FILE_HEADER, strlen(ID_FILE_HEADER))) { // File header
-            if(!GetFileHeader(chunk, song))
+            if(!GetFileHeader(chunk, song)) {
+                Serial.printf("ERROR: GetFileHeader\n");
                 return false;
+            }
         } else if(!strncmp(chunk._header._id, ID_TRACK_HEADER, strlen(ID_TRACK_HEADER))) { // Track
             // Get track's data
             track = new Track();
             track->_trackNumber = fileTrack;
-            if(!GetTrack(chunk, song, track))
+            if(!GetTrack(chunk, song, track)) {
+                Serial.printf("ERROR: GetTrack\n");
                 return false;
+            }
 
             // Save this track into the song
             if(_format == 1 && fileTrack == 1) {
                 // Don't save first track if MIDI file format is 1. It only has song's data, no track notes.
             } else {
+                track->sortNotes();
                 song->_tracks.push_back(track);
                 saveTrack++;
             }
@@ -124,7 +130,7 @@ bool MidiFile::GetChunks(Song* song) {
 //=================================================================================================
 // Gets the next chunk from the file
 bool MidiFile::NextChunk(ChunkInfo& chunk, bool& done) {
-    Serial.printf(">>>>> NextChunk\n");
+    //Serial.printf(">>>>> NextChunk\n");
     done = false;	// Whether done processing
 
     // Read the chunk header
@@ -157,6 +163,12 @@ bool MidiFile::NextChunk(ChunkInfo& chunk, bool& done) {
         chunk._data = NULL; // No data for this chunk
 
     _dataOffset += chunk._header._length;
+
+    // Show chunk info
+    char id[5];
+    memcpy(id, chunk._header._id, 4);
+    id[4] = 0;
+    Serial.printf("Chunk '%s', size=%d\n", id, chunk._header._length);
 
     return true;
 }
@@ -198,52 +210,48 @@ bool MidiFile::GetFileHeader(ChunkInfo& chunk, Song* song) {
 //=================================================================================================
 // Reads one track
 bool MidiFile::GetTrack(ChunkInfo& chunk, Song* song, Track* track) {
-    int		dwProcessed = 0;	// Bytes processed
-    int			size = 0;			// Field size
-    int			nBytes = 0;			// Bytes in the data
-    int		nTime = 0;			// Event's time (offset)
-    int		nTrackTime = 0;     // Event's time (absolute)
-    uint8_t		nEvent = 0;			// Event ID
-    uint8_t		nPrevEvent = 0;		// Previous event
-    float		dEventTime = 0.0;	// Event's relative time, in seconds
-    float		dTrackTime = 0.0;	// Current track time, in seconds
-    char*		pEventData = NULL;	// Event data
-    int		dwEventLength = 0;	// Event's data length
-    String	sString;			// General string
-    int         nIndex = 0;         // List index
-    Note*      note = NULL;       // Current note
-    int	        i = 0;		        // Loop counter
+    uint32_t dwProcessed = 0;	// Bytes processed
+    uint32_t size = 0;			// Field size
+    uint32_t nBytes = 0; // Bytes in the data
+    int32_t nTime = 0; // Event's time (offset)
+    int32_t nTrackTime = 0; // Event's time (absolute)
+    uint8_t nEvent = 0; // Event ID
+    uint8_t nPrevEvent = 0; // Previous event
+    //float dEventTime = 0.0;	// Event's relative time, in seconds
+    float dTrackTime = 0.0;	// Current track time, in seconds
+    char* pEventData = NULL;	// Event data
+    uint32_t dwEventLength = 0;	// Event's data length
+    //uint32_t index = 0;         // List index
+    Note* note = nullptr;       // Current note
+    uint32_t i = 0;		        // Loop counter
 
     // Add to the report
-    sString.Format("Track %d >>>>>>>>>>>>>>>>>>>>>>>>>>", track->_trackNumber);
-    Log((const char*)sString);
-    _report += sString;
+    Serial.printf("Track %d >>>>>>>>>>>>>>>>>>>>>>>>>>\n", track->_trackNumber);
 
     ResetNotes(); // Clear all started notes
 
     // Process all events in the track
     while(dwProcessed < chunk._header._length) {
         // Get the time
-        size = Min(4, chunk._header._length - dwProcessed);
+        size = std::min((uint32_t)4, chunk._header._length - dwProcessed);
         GetVarLen(chunk._data + dwProcessed, size, nTime, nBytes);
         dwProcessed += nBytes;
 
         // Update track time.
         // Event time is relative to the time of the last event.
         nTrackTime += nTime;
-        dEventTime = GetTimeDiff((int)nTime);
-        dTrackTime = GetTimeDiff((int)nTrackTime);
+        //dEventTime = GetTimeDiff(nTime);
+        dTrackTime = GetTimeDiff(nTrackTime);
 
-        // Add event time to the report
-        sString.Format("Event diff: %04d, %7.3f sec, beat=%7.3f, TrackTime=%7.3f", nTime, dEventTime, song->_beatTime, dTrackTime);
-        //Log((const char*)sString);
-        _report += sString;
+        //Serial.printf("Event diff: %04d, %7.3f sec, beat=%7.3f, TrackTime=%7.3f\n", nTime, dEventTime, song->_beatTime, dTrackTime);
 
         // If reading a repeated song, stop reading after the end of the real song
-        if(song->_dSongTime != NO_DOUBLE) {
-            if(dTrackTime > song->_dSongTime + 0.01)
+        /*if(song->_dSongTime != NO_FLOAT) {
+            if(dTrackTime > song->_dSongTime + 0.01) {
+                Serial.printf("End of track time\n");
                 break;
-        }
+            }
+        }*/
 
         // Get the event ID
         nEvent = *(uint8_t*)(chunk._data + dwProcessed);
@@ -253,32 +261,41 @@ bool MidiFile::GetTrack(ChunkInfo& chunk, Song* song, Track* track) {
         // Process the event
         if(nEvent == MIDI_META) { // Meta event
             pEventData = chunk._data + dwProcessed;
-            if(!GetMetaEvent(pEventData, dwEventLength, nBytes, dTrackTime, song, track))
+            if(!GetMetaEvent(pEventData, dwEventLength, nBytes, dTrackTime, song, track)) {
+                Serial.printf("ERROR: GetMetaEvent\n");
                 return false;
+            }
 
             dwProcessed += nBytes;
         } else if(nEvent == MIDI_SYSTEM) { // System event
             pEventData = chunk._data + dwProcessed;
-            if(!GetSystemEvent(pEventData, dwEventLength, nBytes))
+            if(!GetSystemEvent(pEventData, dwEventLength, nBytes)) {
+                Serial.printf("ERROR: GetSystemEvent\n");
                 return false;
+            }
 
             dwProcessed += nBytes;
         } else if(nEvent >= 0x80 && nEvent <= 0xEF) { // MIDI event
             pEventData = chunk._data + dwProcessed;
-            if(!GetMidiEvent(nEvent, pEventData, dwEventLength, nBytes, dTrackTime, track))
+            if(!GetMidiEvent(nEvent, pEventData, dwEventLength, nBytes, dTrackTime, track)) {
+                Serial.printf("ERROR: GetMidiEvent\n");
                 return false;
+            }
 
             dwProcessed += nBytes;
             nPrevEvent = nEvent;
         } else if(nEvent < 0x80) { // Running status
             dwProcessed--; // Go back to the event data, there was no event ID
             pEventData = chunk._data + dwProcessed;
-            if(!GetMidiEvent(nPrevEvent, pEventData, dwEventLength, nBytes, dTrackTime, track))
+            if(!GetMidiEvent(nPrevEvent, pEventData, dwEventLength, nBytes, dTrackTime, track)) {
+                Serial.printf("ERROR: GetMidiEvent, running status\n");
                 return false;
+            }
 
             dwProcessed += nBytes;
         } else { // Unknown event
             // If we don't know the event, we don't know it's length and can't skip it.
+            Serial.printf("ERROR: Unknown event\n");
             return false;
         }
     }
@@ -288,30 +305,36 @@ bool MidiFile::GetTrack(ChunkInfo& chunk, Song* song, Track* track) {
         size = sizeof(_notes) / sizeof(Note);
         for(i = 0; i < size; i++) {
             note = &_notes[i];
-            if(note->_nState == Note::STATE_START) // This note was started
+            if(note->_state == Note::STATE_START) // This note was started
                 AddNote(note, song->_dSongTime, track);
         }
     }
 
     // If there is a silent note at the end of the track, remove it.
     // It was added in MidiFile::SaveTrackNotes to make MIDI players not to cut off the end of songs.
-    if(track->_notes.GetLast(nIndex, note)) {
+    /*if(track->_notes.GetLast(index, note)) {
         if(note->_volume == 0.0f && !note->IsMarker())
-            track->_notes.Delete(nIndex);
-    }
+            track->_notes.Delete(index);
+    }*/
+
+    // Make sure all data was processed
+    if(dwProcessed != chunk._header._length)
+        Serial.printf("ERROR: processed %d track bytes out of %d\n", dwProcessed, chunk._header._length);
+    else
+        Serial.printf("Processed %d track bytes\n", dwProcessed);
 
     return true;
 }
 
 //=================================================================================================
 // Get meta event
-bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, float dTrackTime, Song* song, Track* track) {
+bool MidiFile::GetMetaEvent(char* data, uint32_t dataSize, uint32_t& nProcessed, float dTrackTime, Song* song, Track* track) {
     uint8_t		nType = 0;			// Event type
-    int			nBytes = 0;			// Bytes in the variable lenght data
-    int		length = 0;		// Data length
+    uint32_t nBytes = 0;			// Bytes in the variable lenght data
+    int32_t		length = 0;		// Data length
     String	sName;				// Event name
     char*		pMetaData = NULL;	// Data of the meta event
-    int		dwData = 0;			// Data buffer for 4 bytes
+    int32_t		dwData = 0;			// Data buffer for 4 bytes
     String	sString;			// General string
     String	sMarker;			// Marker string
 
@@ -335,58 +358,41 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, float dTr
 
         case META_TEXT: // Text event: length, text
             sName = "Text";
-            track->_sText.Copy(pMetaData, length);
+            /*track->_sText.Copy(pMetaData, length);
 
             // For MIDI format 1, song's text is stored in the first track
             if(_format == 1 && track->_trackNumber == 1)
                 song->_sText = track->_sText;
 
-            // Add to the report
-            sString.Format("Text '%s'", (const char*)track->_sText);
-            //Log((const char*)sString);
-            _report += sString;
-
+            Serial.printf("Text '%s'\n", (const char*)track->_sText);*/
             break;
 
         case META_COPYRIGHT: // Copyright notice: length, text
             sName = "Copyright";
-            track->_sCopyright.Copy(pMetaData, length);
+            /*track->_sCopyright.Copy(pMetaData, length);
 
             // For MIDI format 1, song's text is stored in the first track
             if(_format == 1 && track->_trackNumber == 1)
                 song->_sCopyright = track->_sCopyright;
 
-            // Add to the report
-            sString.Format("Copyright '%s'", (const char*)track->_sCopyright);
-            //Log((const char*)sString);
-            _report += sString;
-
+            Serial.printf("Copyright '%s'\n", (const char*)track->_sCopyright);*/
             break;
 
         case META_TRACK_NAME: // Sequence or track name: length, text
             sName = "Track name";
-            track->_name.Copy(pMetaData, length);
+            track->_name.copy(pMetaData, length);
 
             // For MIDI format 1, song name is stored in the first track
             if(_format == 1 && track->_trackNumber == 1)
                 song->_name = track->_name;
 
-            // Add to the report
-            sString.Format("Track '%s'", (const char*)track->_name);
-            Log((const char*)sString);
-            _report += sString;
-
+            Serial.printf("Track '%s'\n", track->_name.c_str());
             break;
 
         case META_INSTRUMENT: // Instrument name: length, text
             sName = "Instrument";
-            track->_sInstrument.Copy(pMetaData, length);
-
-            // Add to the report
-            sString.Format("Instrument '%s'", (const char*)track->_sInstrument);
-            Log((const char*)sString);
-            _report += sString;
-
+            track->_instrumentName.copy(pMetaData, length);
+            Serial.printf("Instrument '%s'\n", track->_instrumentName.c_str());
             break;
 
         case META_LYRICS: // Lyric text: length, text
@@ -395,14 +401,9 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, float dTr
 
         case META_MARKER: // Marker text: length, text
             sName = "Marker";
-            sMarker.Copy(pMetaData, length);
-            GetMarker((const char*)sMarker, dTrackTime, song, track);
-
-            // Add to the report
-            sString.Format("Marker '%s'", (const char*)sMarker);
-            //Log((const char*)sString);
-            _report += sString;
-
+            sMarker.copy(pMetaData, length);
+            //GetMarker(sMarker, dTrackTime, song, track);
+            Serial.printf("Marker '%s'\n", sMarker.c_str());
             break;
 
         case META_CUE: // Cue point: length, text
@@ -432,8 +433,8 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, float dTr
 
         case META_TIME_SIGNATURE: // Time signature: 4 bytes
             sName = "Time signature";
-            song->_measureBeats = (int)pMetaData[0]; // Numerator
-            song->_beatNotes = (int)pow(2.0f, (int)pMetaData[1]); // Denominator: power of 2
+            song->_measureBeats = (int32_t)pMetaData[0]; // Numerator
+            song->_beatNotes = (int32_t)pow(2.0f, (int32_t)pMetaData[1]); // Denominator: power of 2
             //pMetaData[2]); // Metronome
             //pMetaData[3]); // 32-nd's
             break;
@@ -441,7 +442,7 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, float dTr
         case META_KEY_SIGNATURE: // Key signature
             sName = "Key signature";
             song->_key = (KEY_SIGNATURE)pMetaData[0]; // Key (1 byte)
-            song->_nScale = (SCALE)pMetaData[1]; // Scale (1 byte)
+            song->_scaleType = (SCALE)pMetaData[1]; // Scale (1 byte)
             break;
 
         case META_SPECIFIC: // Sequencer specific event
@@ -455,18 +456,15 @@ bool MidiFile::GetMetaEvent(char* data, int dataSize, int& nProcessed, float dTr
 
     nProcessed += length;
 
-    // Add to the report
-    sString.Format("Meta: %02X - %s, %d bytes", nType, (const char*)sName, length);
-    //Log((const char*)sString);
-    _report += sString;
+    Serial.printf("Meta: %02X - %s, %d bytes\n", nType, sName.c_str(), length);
 
     return true;
 }
 
 //=================================================================================================
-bool MidiFile::GetSystemEvent(char* data, int dataSize, int& nProcessed) {
-    int			nBytes = 0;		// Bytes in the data
-    int		length = 0;	// Data length
+bool MidiFile::GetSystemEvent(char* data, uint32_t dataSize, uint32_t& nProcessed) {
+    uint32_t			nBytes = 0;		// Bytes in the data
+    int32_t		length = 0;	// Data length
     String	sString;		// General string
 
     nProcessed = 0;
@@ -479,21 +477,18 @@ bool MidiFile::GetSystemEvent(char* data, int dataSize, int& nProcessed) {
 
     nProcessed += length;
 
-    // Add to the report
-    sString.Format("System: ");
-    //Log((const char*)sString);
-    _report += sString;
+    Serial.printf("System: \n");
 
     return true;
 }
 
 //=================================================================================================
-bool MidiFile::GetMidiEvent(uint8_t nEvent, char* data, int dataSize, int& nProcessed, float dTrackTime, Track* track) {
+bool MidiFile::GetMidiEvent(uint8_t nEvent, char* data, uint32_t dataSize, uint32_t& nProcessed, float dTrackTime, Track* track) {
     uint8_t		nParam1 = 0;	// Event parameter 1
     uint8_t		nParam2 = 0;	// Event parameter 2
     uint8_t		nType = 0;		// Event type
     uint8_t		nChannel = 0;	// Event channel
-    int			nBytes = 0;		// Bytes processed in this call
+    uint32_t			nBytes = 0;		// Bytes processed in this call
     String	sString;		// General string
 
     nProcessed = 0;
@@ -508,15 +503,19 @@ bool MidiFile::GetMidiEvent(uint8_t nEvent, char* data, int dataSize, int& nProc
     // 4 left bits specify
     switch(nType) {
         case MIDI_NOTE_OFF: // Note Off
-            if(!GetNote(nChannel, false, data, dataSize, nBytes, dTrackTime, track)) // Note off
+            if(!GetNote(nChannel, false, data, dataSize, nBytes, dTrackTime, track)) { // Note off
+                Serial.printf("ERROR: MIDI_NOTE_OFF\n");
                 return false;
+            }
 
             nProcessed += nBytes;
             break;
 
         case MIDI_NOTE_ON: // Note on
-            if(!GetNote(nChannel, true, data, dataSize, nBytes, dTrackTime, track)) // Note on
+            if(!GetNote(nChannel, true, data, dataSize, nBytes, dTrackTime, track)) { // Note on
+                Serial.printf("ERROR: MIDI_NOTE_ON\n");
                 return false;
+            }
 
             nProcessed += nBytes;
             break;
@@ -524,27 +523,25 @@ bool MidiFile::GetMidiEvent(uint8_t nEvent, char* data, int dataSize, int& nProc
         case MIDI_NOTE_AFTER: // Note aftertouch
             nParam1 = *(uint8_t*)(data + nProcessed); // Note
             nProcessed++;
-
             nParam2 = *(uint8_t*)(data + nProcessed); // Value
             nProcessed++;
-
-            // Add to the report
-            sString.Format("Note %d aftertouch %d", nParam1, nParam2);
-            //Log((const char*)sString);
-            _report += sString;
-
+            Serial.printf("Note %d aftertouch %d\n", nParam1, nParam2);
             break;
 
         case MIDI_CONTROL: // Control change
-            if(!GetControl(nChannel, data, dataSize, nBytes, dTrackTime, track))
+            if(!GetControl(nChannel, data, dataSize, nBytes, dTrackTime, track)) {
+                Serial.printf("ERROR: MIDI_CONTROL\n");
                 return false;
+            }
 
             nProcessed += nBytes;
             break;
 
         case MIDI_PROGRAM: // Program change
-            if(!GetProgram(nChannel, data, dataSize, nBytes, dTrackTime, track))
+            if(!GetProgram(nChannel, data, dataSize, nBytes, dTrackTime, track)) {
+                Serial.printf("ERROR: MIDI_PROGRAM\n");
                 return false;
+            }
 
             nProcessed += nBytes;
             break;
@@ -552,12 +549,8 @@ bool MidiFile::GetMidiEvent(uint8_t nEvent, char* data, int dataSize, int& nProc
         case MIDI_CHANNEL_AFTER: // Channel aftertouch
             nParam1 = *(uint8_t*)(data + nProcessed); // Value
             nProcessed++;
-
-            // Add to the report
-            sString.Format("Channel aftertouch %d", nParam1);
-            //Log((const char*)sString);
+            Serial.printf("Channel aftertouch %d\n", nParam1);
             _report += sString;
-
             break;
 
         case MIDI_BEND: // Pitch bend
@@ -567,15 +560,11 @@ bool MidiFile::GetMidiEvent(uint8_t nEvent, char* data, int dataSize, int& nProc
             nParam2 = *(uint8_t*)(data + nProcessed); // Value (high byte)
             nProcessed++;
 
-            // Add to the report
-            sString.Format("Pitch bend %d, %d", nParam1, nParam2);
-            //Log((const char*)sString);
-            _report += sString;
-
+            Serial.printf("Pitch bend %d, %d\n", nParam1, nParam2);
             break;
 
         default:
-            _error.Format("Unknown MIDI type %02X", nType);
+            Serial.printf("ERROR: Unknown MIDI type %02X\n", nType);
             return false;
     }
 
@@ -583,42 +572,42 @@ bool MidiFile::GetMidiEvent(uint8_t nEvent, char* data, int dataSize, int& nProc
 }
 
 //=================================================================================================
-bool MidiFile::GetNote(int nChannel, bool bNoteOn, char* data, int dataSize, int& nProcessed, float dTrackTime, Track* track) {
+bool MidiFile::GetNote(uint32_t nChannel, bool bNoteOn, char* data, uint32_t dataSize, uint32_t& nProcessed, float dTrackTime, Track* track) {
     Note		Note;			    // Note to save
-    int			nNote = 0;		    // MIDI note
+    int32_t			nNote = 0;		    // MIDI note
     uint8_t		nVelocity = 0;	    // Velocity
     String	sString;		    // General string
 
     // Check data size
     if(dataSize < 2) {
-        _error.Format("Not enough data for a note: %d", dataSize);
+        Serial.printf("ERROR: Not enough data for a note: %d\n", dataSize);
         return false;
     }
 
     // MIDI note number
-    nNote = (int)(uint8_t)data[0];
+    nNote = (int32_t)(uint8_t)data[0];
     if((nNote < 0 || nNote > 200) && nNote != CHORD_MIDI_NOTE && nNote != FINGER_MIDI_NOTE) {
-        _error.Format("Bad MIDI note: %d", nNote);
+        Serial.printf("ERROR: Bad MIDI note: %d\n", nNote);
         return false;
     }
 
     // Velocity (0-127)
     nVelocity = (uint8_t)data[1];
     if(nVelocity > 127) {
-        _error.Format("Bad note velocity: %d", nVelocity);
+        Serial.printf("ERROR: Bad note velocity: %d\n", nVelocity);
         return false;
     }
 
     // Check whether this note has been started before.
     // If yes, end it and save, even if it's started again.
-    if(_notes[nNote]._nState == Note::STATE_START) { // This note was started
+    if(_notes[nNote]._state == Note::STATE_START) { // This note was started
         Note = _notes[nNote];
         AddNote(&Note, dTrackTime, track);
 
-        _notes[nNote]._nState = Note::STATE_NONE; // Done with this note
-        _note.Reset(); // No info for the next note unless it's read from the file again
-        _chordType = CHORD_NONE; // No chord type unless set
-        _chordRoot = NO_MIDI_NOTE; // No chord root unless set
+        _notes[nNote]._state = Note::STATE_NONE; // Done with this note
+        _note.reset(); // No info for the next note unless it's read from the file again
+        //_chordType = CHORD_NONE; // No chord type unless set
+        //_chordRoot = NO_MIDI_NOTE; // No chord root unless set
     }
 
     // Start a new note, if the velocity is not zero.
@@ -630,18 +619,15 @@ bool MidiFile::GetNote(int nChannel, bool bNoteOn, char* data, int dataSize, int
         _notes[nNote]._start = dTrackTime;
         _notes[nNote]._midiNote = nNote;
         _notes[nNote]._nChannel = nChannel;
-        _notes[nNote]._nState = Note::STATE_START;
+        _notes[nNote]._state = Note::STATE_START;
         _notes[nNote]._Tab = _note._Tab; // Save note's tab info
-        _notes[nNote]._nInterval = _note._nInterval;
+        /*_notes[nNote]._nInterval = _note._nInterval;
         _notes[nNote]._ChordInfo._nType = _chordType;
-        _notes[nNote]._ChordInfo._nRoot = _chordRoot;
+        _notes[nNote]._ChordInfo._nRoot = _chordRoot;*/
     }
 
-    // Add to the report
-    sString.Format("%7.3f sec: Note %s, note %3d, velocity %3d, channel=%d",
-                   dTrackTime, bNoteOn ? "on" : "off", nNote, nVelocity, nChannel);
-    Log((const char*)sString);
-    _report += sString;
+    Serial.printf("%7.3f sec: Note %s, note %3d, velocity %3d, channel=%d\n",
+                  dTrackTime, bNoteOn ? "on" : "off", nNote, nVelocity, nChannel);
 
     nProcessed = 2;
 
@@ -650,66 +636,65 @@ bool MidiFile::GetNote(int nChannel, bool bNoteOn, char* data, int dataSize, int
 
 //=================================================================================================
 bool MidiFile::AddNote(Note* note, float dTrackTime, Track* track) {
-    THING       nInstrument = PERCUSSION;    // Instrument type
-    String sInstrument;        // Instrument name
+    INSTRUMENT instrument = PERCUSSION;    // Instrument type
+    String instrumentName;        // Instrument name
 
     // Set note's instrument
     // If this is a drum set track, set the drum type for this note
     if(note->_nChannel == DRUM_CHANNEL) { // MIDI channel 9 (counting from 0) is reserved for drum sets
-        if(GetDrumInfo(note->_midiNote, sInstrument, nInstrument))
-            note->_instrument = nInstrument;
+        if(GetDrumInfo(note->_midiNote, instrumentName, instrument))
+            note->_instrument = instrument;
         else
-            note->_instrument = 0;
+            note->_instrument = PERCUSSION;
     } else
         note->_instrument = track->_instrument;
 
     // Save the note
     note->_duration = dTrackTime - note->_start;
-    note->_nSource = Note::SOURCE_FILE;
-    track->AddNote(*note);
+    //note->_nSource = Note::SOURCE_FILE;
+    track->_notes.push_back(*note);
 
     return true;
 }
 
 //=================================================================================================
 // Get MIDI program (instrument or patch)
-bool MidiFile::GetProgram(int nChannel, char* data, int dataSize, int& nProcessed, float dTrackTime, Track* track) {
-    THING		nInstrument = PERCUSSION;	// Instrument ID for this program
-    int			nProgram = 0;	// Program number. 0-127 in the file, but 1-128 in the specifications
+bool MidiFile::GetProgram(uint32_t nChannel, char* data, uint32_t dataSize, uint32_t& nProcessed, float dTrackTime, Track* track) {
+    INSTRUMENT instrument = PERCUSSION;	// Instrument ID for this program
+    uint32_t nProgram = 0;	// Program number. 0-127 in the file, but 1-128 in the specifications
     String	sProgramName;	// Program name
     String	sString;		// General string
 
     // Check data size
     if(dataSize < 1) {
-        _error.Format("Not enough data for a program change: %d", dataSize);
+        Serial.printf("ERROR: Not enough data for a program change: %d\n", dataSize);
         return false;
     }
 
     // MIDI program number
-    nProgram = (int)(uint8_t)data[0];
+    nProgram = (int32_t)(uint8_t)data[0];
     if(nProgram < 0 || nProgram > 127) {
-        _error.Format("Bad program number: %d", nProgram);
+        Serial.printf("ERROR: Bad program number: %d\n", nProgram);
         return false;
     }
 
     // Get program's info
     if(nChannel == DRUM_CHANNEL) { // Check whether this is a Drum Channel: channel 9, with channel numbers starting with 0.
-        nInstrument = PERCUSSION;
+        instrument = PERCUSSION;
         sProgramName = "Drum set";
     } else {
-        if(!GetProgramInfo(nProgram, sProgramName, nInstrument))
+        if(!GetProgramInfo(nProgram, sProgramName, instrument)) {
+            Serial.printf("ERROR: GetProgramInfo\n");
             return false;
+        }
     }
 
     // Save the program
     track->_nMidiProgram = nProgram;
-    track->_instrument = nInstrument;
-    track->_sInstrument = sProgramName;
+    track->_instrument = instrument;
+    track->_instrumentName = sProgramName;
 
-    // Add to the report
-    sString.Format("Program %3d, '%s', channel=%d", nProgram, (const char*)sProgramName, nChannel);
-    //Log((const char*)sString);
-    _report += sString;
+    Serial.printf("Program %3d, '%s', channel=%d\n", nProgram, sProgramName.c_str(), nChannel);
 
     nProcessed = 1;
 
@@ -718,29 +703,31 @@ bool MidiFile::GetProgram(int nChannel, char* data, int dataSize, int& nProcesse
 
 //=================================================================================================
 // Get MIDI control code
-bool MidiFile::GetControl(int nChannel, char* data, int dataSize, int& nProcessed, float dTrackTime, Track* track) {
+bool MidiFile::GetControl(uint32_t nChannel, char* data, uint32_t dataSize, uint32_t& nProcessed, float dTrackTime, Track* track) {
     float		fHalf = 127.0f / 2.0f;	// Half of the value range
     String	sControlName;	// Control name
-    int			nControl = 0;	// Control type
-    int			nValue = 0;		// Control value, 0-127
+    int32_t			nControl = 0;	// Control type
+    int32_t			nValue = 0;		// Control value, 0-127
     float		fValue = 0.0f;	// Control value, 0.0 - 1.0
     String	sString;		// General string
 
     // Check data size
     if(dataSize < 2) {
-        _error.Format("Not enough data for a control event: %d", dataSize);
+        Serial.printf("ERROR: Not enough data for a control event: %d\n", dataSize);
         return false;
     }
 
     // Control type (0 - 127)
-    nControl = (int)(uint8_t)data[0];
+    nControl = (int32_t)(uint8_t)data[0];
 
     // Control value (0 - 127)
-    nValue = (int)(uint8_t)data[1];
+    nValue = (int32_t)(uint8_t)data[1];
 
     // Get control's info
-    if(!GetControlInfo(nControl, sControlName))
+    if(!GetControlInfo(nControl, sControlName)) {
+        Serial.printf("ERROR: GetControlInfo\n");
         return false;
+    }
 
     // Process the control
     fValue = (float)nValue / 127;
@@ -766,22 +753,19 @@ bool MidiFile::GetControl(int nChannel, char* data, int dataSize, int& nProcesse
             break;
 
         case CONTROL_TAB_MODE: // Guitar tab - playing mode
-            _note._Tab._nMode = (Note::TAB_INFO::MODE)nValue;
+            _note._Tab._nMode = (Note::TabInfo::MODE)nValue;
             break;
 
         case CONTROL_CHORD_TYPE: // Chord type
-            _chordType = (CHORD_TYPE)nValue;
+            //_chordType = (CHORD_TYPE)nValue;
             break;
 
         case CONTROL_CHORD_ROOT: // Chord's root note
-            _chordRoot = (int)nValue;
+            //_chordRoot = (int32_t)nValue;
             break;
     }
 
-    // Add to the report
-    sString.Format("Control %3d, '%s' = %d, channel=%d", nControl, (const char*)sControlName, nValue, nChannel);
-    //Log((const char*)sString);
-    _report += sString;
+    Serial.printf("Control %3d, '%s' = %d, channel=%d\n", nControl, sControlName.c_str(), nValue, nChannel);
 
     nProcessed = 2;
 
@@ -791,12 +775,12 @@ bool MidiFile::GetControl(int nChannel, char* data, int dataSize, int& nProcesse
 //=================================================================================================
 // Resets all started notes
 bool MidiFile::ResetNotes() {
-    int	size = 0;	// Array size
-    int	i = 0;		// Loop counter
+    int32_t	size = 0;	// Array size
+    int32_t	i = 0;		// Loop counter
 
     size = sizeof(_notes) / sizeof(Note);
     for(i = 0; i < size; i++)
-        _notes[i]._nState = Note::STATE_NONE; // Note was not started
+        _notes[i]._state = Note::STATE_NONE; // Note was not started
 
     return true;
 }
@@ -805,8 +789,8 @@ bool MidiFile::ResetNotes() {
 // Saves a variable length number
 // dataSize - (in) size of data array
 // nBytes - (out) number of bytes saved into data
-bool MidiFile::PutVarLen(int nValue, char* data, int dataSize, int& nBytes) {
-    int	Temp = 0;		// Buffer for reversed data
+bool MidiFile::PutVarLen(int32_t nValue, char* data, uint32_t dataSize, uint32_t& nBytes) {
+    int32_t	Temp = 0;		// Buffer for reversed data
     bool	done = false;	// Whether done processing
 
     nBytes = 0;
@@ -841,8 +825,8 @@ bool MidiFile::PutVarLen(int nValue, char* data, int dataSize, int& nBytes) {
 
 //=================================================================================================
 // Gets a variable length number
-bool MidiFile::GetVarLen(char* data, int dataSize, int& nValue, int& nProcessed) {
-    int		i = 0;		// Data index
+bool MidiFile::GetVarLen(char* data, uint32_t dataSize, int32_t& nValue, uint32_t& nProcessed) {
+    uint32_t		i = 0;		// Data index
     uint8_t	nData = 0;	// Current byte
 
     nProcessed = 0;
@@ -910,530 +894,530 @@ float MidiFile::MidiToVolume(uint8_t nVelocity) {
 
 //=================================================================================================
 // Get program info by it's number
-bool MidiFile::GetProgramInfo(int nProgram, String& sName, THING& nInstrument) {
+bool MidiFile::GetProgramInfo(uint32_t nProgram, String& sName, INSTRUMENT& instrument) {
     switch(nProgram) {
         case 0:
             sName = "Acoustic Grand Piano";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 1:
             sName = "Bright Acoustic Piano";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 2:
             sName = "Electric Grand Piano";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 3:
             sName = "Honky-tonk Piano";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 4:
             sName = "Electric Piano 1";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 5:
             sName = "Electric Piano 2";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 6:
             sName = "Harpsichord";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 7:
             sName = "Clavi";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 8:
             sName = "Celesta";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 9:
             sName = "Glockenspiel";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 10:
             sName = "Music Box";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 11:
             sName = "Vibraphone";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 12:
             sName = "Marimba";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 13:
             sName = "Xylophone";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 14:
             sName = "Tubular Bells";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 15:
             sName = "Dulcimer";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 16:
             sName = "Drawbar Organ";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 17:
             sName = "Percussive Organ";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 18:
             sName = "Rock Organ";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 19:
             sName = "Church Organ";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 20:
             sName = "Reed Organ";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 21:
             sName = "Accordion";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 22:
             sName = "Harmonica";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 23:
             sName = "Tango Accordion";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
 
         case 24:
             sName = "Acoustic Guitar (nylon)";
-            nInstrument = THING_RHYTHM_GUITAR;
+            instrument = ELECTRIC_GUITAR_CLEAN;
             break;
         case 25:
             sName = "Acoustic Guitar (steel)";
-            nInstrument = THING_RHYTHM_GUITAR;
+            instrument = ELECTRIC_GUITAR_CLEAN;
             break;
         case 26:
             sName = "Electric Guitar (jazz)";
-            nInstrument = THING_RHYTHM_GUITAR;
+            instrument = ELECTRIC_GUITAR_CLEAN;
             break;
         case 27:
             sName = "Electric Guitar (clean)";
-            nInstrument = THING_RHYTHM_GUITAR;
+            instrument = ELECTRIC_GUITAR_CLEAN;
             break;
         case 28:
             sName = "Electric Guitar (muted)";
-            nInstrument = THING_RHYTHM_GUITAR;
+            instrument = ELECTRIC_GUITAR_CLEAN;
             break;
 
         case 29:
             sName = "Overdriven Guitar";
-            nInstrument = THING_LEAD_GUITAR;
+            instrument = DISTORTION_GUITAR;
             break;
         case 30:
             sName = "Distortion Guitar";
-            nInstrument = THING_SOLO_GUITAR;
+            instrument = DISTORTION_GUITAR;
             break;
         case 31:
             sName = "Guitar harmonics";
-            nInstrument = THING_LEAD_GUITAR;
+            instrument = DISTORTION_GUITAR;
             break;
 
         case 32:
             sName = "Acoustic Bass";
-            nInstrument = THING_BASS_GUITAR;
+            instrument = ACOUSTIC_BASS;
             break;
         case 33:
             sName = "Electric Bass (finger)";
-            nInstrument = THING_BASS_GUITAR;
+            instrument = ACOUSTIC_BASS;
             break;
         case 34:
             sName = "Electric Bass (pick)";
-            nInstrument = THING_BASS_GUITAR;
+            instrument = ACOUSTIC_BASS;
             break;
         case 35:
             sName = "Fretless Bass";
-            nInstrument = THING_BASS_GUITAR;
+            instrument = ACOUSTIC_BASS;
             break;
         case 36:
             sName = "Slap Bass 1";
-            nInstrument = THING_BASS_GUITAR;
+            instrument = ACOUSTIC_BASS;
             break;
         case 37:
             sName = "Slap Bass 2";
-            nInstrument = THING_BASS_GUITAR;
+            instrument = ACOUSTIC_BASS;
             break;
         case 38:
             sName = "Synth Bass 1";
-            nInstrument = THING_BASS_GUITAR;
+            instrument = ACOUSTIC_BASS;
             break;
         case 39:
             sName = "Synth Bass 2";
-            nInstrument = THING_BASS_GUITAR;
+            instrument = ACOUSTIC_BASS;
             break;
 
         case 40:
             sName = "Violin";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 41:
             sName = "Viola";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 42:
             sName = "Cello";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 43:
             sName = "Contrabass";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 44:
             sName = "Tremolo Strings";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 45:
             sName = "Pizzicato Strings";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 46:
             sName = "Orchestral Harp";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 47:
             sName = "Timpani";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 48:
             sName = "String Ensemble 1";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 49:
             sName = "String Ensemble 2";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 50:
             sName = "SynthStrings 1";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 51:
             sName = "SynthStrings 2";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 52:
             sName = "Choir Aahs";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 53:
             sName = "Voice Oohs";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 54:
             sName = "Synth Voice";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 55:
             sName = "Orchestra Hit";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 56:
             sName = "Trumpet";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 57:
             sName = "Trombone";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 58:
             sName = "Tuba";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 59:
             sName = "Muted Trumpet";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 60:
             sName = "French Horn";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 61:
             sName = "Brass Section";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 62:
             sName = "SynthBrass 1";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 63:
             sName = "SynthBrass 2";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 64:
             sName = "Soprano Sax";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 65:
             sName = "Alto Sax";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 66:
             sName = "Tenor Sax";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 67:
             sName = "Baritone Sax";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 68:
             sName = "Oboe";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 69:
             sName = "English Horn";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 70:
             sName = "Bassoon";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 71:
             sName = "Clarinet";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 72:
             sName = "Piccolo";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 73:
             sName = "Flute";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 74:
             sName = "Recorder";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 75:
             sName = "Pan Flute";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 76:
             sName = "Blown Bottle";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 77:
             sName = "Shakuhachi";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 78:
             sName = "Whistle";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 79:
             sName = "Ocarina";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 80:
             sName = "Lead 1 (square)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 81:
             sName = "Lead 2 (sawtooth)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 82:
             sName = "Lead 3 (calliope)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 83:
             sName = "Lead 4 (chiff)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 84:
             sName = "Lead 5 (charang)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 85:
             sName = "Lead 6 (voice)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 86:
             sName = "Lead 7 (fifths)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 87:
             sName = "Lead 8 (bass + lead)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 88:
             sName = "Pad 1 (new age)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 89:
             sName = "Pad 2 (warm)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 90:
             sName = "Pad 3 (polysynth)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 91:
             sName = "Pad 4 (choir)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 92:
             sName = "Pad 5 (bowed)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 93:
             sName = "Pad 6 (metallic)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 94:
             sName = "Pad 7 (halo)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 95:
             sName = "Pad 8 (sweep)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 96:
             sName = "FX 1 (rain)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 97:
             sName = "FX 2 (soundtrack)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 98:
             sName = "FX 3 (crystal)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 99:
             sName = "FX 4 (atmosphere)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 100:
             sName = "FX 5 (brightness)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 101:
             sName = "FX 6 (goblins)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 102:
             sName = "FX 7 (echoes)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 103:
             sName = "FX 8 (sci-fi)";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 104:
             sName = "Sitar";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 105:
             sName = "Banjo";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 106:
             sName = "Shamisen";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 107:
             sName = "Koto";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 108:
             sName = "Kalimba";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 109:
             sName = "Bag pipe";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 110:
             sName = "Fiddle";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 111:
             sName = "Shanai";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 112:
             sName = "Tinkle Bell";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 113:
             sName = "Agogo";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 114:
             sName = "Steel Drums";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 115:
             sName = "Woodblock";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 116:
             sName = "Taiko Drum";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 117:
             sName = "Melodic Tom";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 118:
             sName = "Synth Drum";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 119:
             sName = "Reverse Cymbal";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 120:
             sName = "Guitar Fret Noise";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 121:
             sName = "Breath Noise";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 122:
             sName = "Seashore";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 123:
             sName = "Bird Tweet";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 124:
             sName = "Telephone Ring";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 125:
             sName = "Helicopter";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 126:
             sName = "Applause";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 127:
             sName = "Gunshot";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 128:
 
         default:
             sName = "";
-            nInstrument = PERCUSSION;
-            _error.Format("Unknown program %d (1-128 range)", nProgram);
+            instrument = PERCUSSION;
+            Serial.printf("Unknown program %d (1-128 range)\n", nProgram);
             break;
     }
 
@@ -1442,7 +1426,7 @@ bool MidiFile::GetProgramInfo(int nProgram, String& sName, THING& nInstrument) {
 
 //=================================================================================================
 // Get MIDI control(ler) info by it's number
-bool MidiFile::GetControlInfo(int nControl, String& sName) {
+bool MidiFile::GetControlInfo(uint32_t nControl, String& sName) {
     switch(nControl) {
         case 0:
             sName = "Bank Select";
@@ -1826,8 +1810,7 @@ bool MidiFile::GetControlInfo(int nControl, String& sName) {
             sName = "Channel Mode Message: Poly On (Mono Off)";
             break;
         default:
-            sName.Format("Unknown conrol %d", nControl);
-            _error.Format("Unknown conrol %d", nControl);
+            Serial.printf("Unknown conrol %d\n", nControl);
             break;
     }
 
@@ -1838,7 +1821,7 @@ bool MidiFile::GetControlInfo(int nControl, String& sName) {
 // Gets MIDI note number for a drum set instrument (thing) type
 uint8_t MidiFile::GetMidiDrumNote(INSTRUMENT instrument) {
     switch(instrument) {
-        case DRUM_BASS_DRUM_2:
+        /*case DRUM_BASS_DRUM_2:
             return 35; // Bass Drum 2
         case DRUM_BASS_DRUM_1:
             return 36; // Bass Drum 1
@@ -1878,7 +1861,7 @@ uint8_t MidiFile::GetMidiDrumNote(INSTRUMENT instrument) {
         case DRUM_CHINESE_1:
             return 52; // Chinese Cymbal
         case DRUM_SPLASH_1:
-            return 55; // Splash Cymbal
+            return 55; // Splash Cymbal*/
 
         default:
             return NO_MIDI_NOTE;
@@ -1899,260 +1882,260 @@ uint8_t MidiFile::GetMidiDrumNote(INSTRUMENT instrument) {
 // 49 Orchestra Kit - a collection of concert drums and timpani
 // 57 Sound FX Kit - a collection of sound effects
 // 128 CM-64/CM-32L - the standard MT-32 Drum Kit
-bool MidiFile::GetDrumInfo(int nNote, String& sName, INSTRUMENT& nInstrument) {
+bool MidiFile::GetDrumInfo(uint32_t nNote, String& sName, INSTRUMENT& instrument) {
     switch(nNote) {
-        case 27:
+        /*case 27:
             sName = "High Q";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 28:
             sName = "Slap";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 29:
             sName = "Scratch1";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 30:
             sName = "Scratch2";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 31:
             sName = "Sticks";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 32:
             sName = "Square";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 33:
             sName = "Metronome1";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 34:
             sName = "Metronome2";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 35:
             sName = "Bass Drum 2";
-            nInstrument = (INSTRUMENT)DRUM_BASS_DRUM_2;
+            instrument = (INSTRUMENT)DRUM_BASS_DRUM_2;
             break;
         case 36:
             sName = "Bass Drum 1";
-            nInstrument = (INSTRUMENT)DRUM_BASS_DRUM_1;
+            instrument = (INSTRUMENT)DRUM_BASS_DRUM_1;
             break;
         case 37:
             sName = "Side Stick";
-            nInstrument = (INSTRUMENT)PERCUSSION;
+            instrument = (INSTRUMENT)PERCUSSION;
             break;
         case 38:
             sName = "Snare 1";
-            nInstrument = (INSTRUMENT)DRUM_SNARE;
+            instrument = (INSTRUMENT)DRUM_SNARE;
             break;
         case 39:
             sName = "Hand Clap";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 40:
             sName = "Snare 2";
-            nInstrument = (INSTRUMENT)DRUM_SNARE;
+            instrument = (INSTRUMENT)DRUM_SNARE;
             break;
         case 41:
             sName = "Low Tom 2";
-            nInstrument = (INSTRUMENT)DRUM_TOM_6;
+            instrument = (INSTRUMENT)DRUM_TOM_6;
             break;
         case 42:
             sName = "Closed Hi-Hat";
-            nInstrument = (INSTRUMENT)DRUM_HIHAT_CLOSED;
+            instrument = (INSTRUMENT)DRUM_HIHAT_CLOSED;
             break;
         case 43:
             sName = "Low Tom 1";
-            nInstrument = (INSTRUMENT)DRUM_TOM_5;
+            instrument = (INSTRUMENT)DRUM_TOM_5;
             break;
         case 44:
             sName = "Pedal Hi-Hat";
-            nInstrument = (INSTRUMENT)DRUM_HIHAT_FOOT;
+            instrument = (INSTRUMENT)DRUM_HIHAT_FOOT;
             break;
         case 45:
             sName = "Mid Tom 2";
-            nInstrument = (INSTRUMENT)DRUM_TOM_4;
+            instrument = (INSTRUMENT)DRUM_TOM_4;
             break;
         case 46:
             sName = "Open Hi-Hat";
-            nInstrument = (INSTRUMENT)DRUM_HIHAT_OPEN;
+            instrument = (INSTRUMENT)DRUM_HIHAT_OPEN;
             break;
         case 47:
             sName = "Mid Tom 1";
-            nInstrument = (INSTRUMENT)DRUM_TOM_3;
+            instrument = (INSTRUMENT)DRUM_TOM_3;
             break;
         case 48:
             sName = "High Tom 2";
-            nInstrument = (INSTRUMENT)DRUM_TOM_2;
+            instrument = (INSTRUMENT)DRUM_TOM_2;
             break;
         case 49:
             sName = "Crash Cymbal 1";
-            nInstrument = (INSTRUMENT)DRUM_CRASH_1;
+            instrument = (INSTRUMENT)DRUM_CRASH_1;
             break;
         case 50:
             sName = "High Tom 1";
-            nInstrument = (INSTRUMENT)DRUM_TOM_1;
+            instrument = (INSTRUMENT)DRUM_TOM_1;
             break;
         case 51:
             sName = "Ride Cymbal 1";
-            nInstrument = (INSTRUMENT)DRUM_RIDE_CYMBAL;
+            instrument = (INSTRUMENT)DRUM_RIDE_CYMBAL;
             break;
         case 52:
             sName = "Chinese Cymbal";
-            nInstrument = (INSTRUMENT)DRUM_CHINESE_1;
+            instrument = (INSTRUMENT)DRUM_CHINESE_1;
             break;
         case 53:
             sName = "Ride Bell";
-            nInstrument = (INSTRUMENT)DRUM_RIDE_BELL;
+            instrument = (INSTRUMENT)DRUM_RIDE_BELL;
             break;
         case 54:
             sName = "Tambourine";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 55:
             sName = "Splash Cymbal";
-            nInstrument = (INSTRUMENT)DRUM_SPLASH_1;
+            instrument = (INSTRUMENT)DRUM_SPLASH_1;
             break;
         case 56:
             sName = "Cowbell";
-            nInstrument = (INSTRUMENT)PERCUSSION;
+            instrument = (INSTRUMENT)PERCUSSION;
             break;
         case 57:
             sName = "Crash Cymbal 2";
-            nInstrument = (INSTRUMENT)DRUM_CRASH_2;
+            instrument = (INSTRUMENT)DRUM_CRASH_2;
             break;
         case 58:
             sName = "Vibra Slap";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 59:
             sName = "Ride Cymbal 2";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 60:
             sName = "Hi Bongo";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 61:
             sName = "Low Bongo";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 62:
             sName = "Mute Hi Conga";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 63:
             sName = "Open Hi Conga";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 64:
             sName = "Low Conga";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 65:
             sName = "High Timbale";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 66:
             sName = "Low Timbale";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 67:
             sName = "High Agogo";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 68:
             sName = "Low Agogo";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 69:
             sName = "Cabasa";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 70:
             sName = "Maracas";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 71:
             sName = "Short Whistle";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 72:
             sName = "Long Whistle";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 73:
             sName = "Short Guiro";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 74:
             sName = "Long Guiro";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 75:
             sName = "Claves";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 76:
             sName = "Hi Wood Block";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 77:
             sName = "Low Wood Block";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 78:
             sName = "Mute Cuica";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 79:
             sName = "Open Cuica";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 80:
             sName = "Mute Triangle";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 81:
             sName = "Open Triangle";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 82:
             sName = "Shaker";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 83:
             sName = "Jingle Bell";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 84:
             sName = "Belltree";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 85:
             sName = "Castanets";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 86:
             sName = "Mute Surdo";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             break;
         case 87:
             sName = "Open Surdo";
-            nInstrument = PERCUSSION;
-            break;
+            instrument = PERCUSSION;
+            break;*/
         default:
             sName = "";
-            nInstrument = PERCUSSION;
+            instrument = PERCUSSION;
             //_ASSERTE(false);
             return false;
     }
 
-    if(nInstrument == 0)
+    if(instrument == 0)
         return false;
 
     return true;
@@ -2160,7 +2143,7 @@ bool MidiFile::GetDrumInfo(int nNote, String& sName, INSTRUMENT& nInstrument) {
 /*
 //=================================================================================================
 // Saves a song into MIDI file
-bool MidiFile::SaveData(char*& data, int& dwDataSize, Song* song) {
+bool MidiFile::SaveData(char*& data, int32_t& dwDataSize, Song* song) {
     bool	bRet = true;	// Return value
 
     #ifndef _DEBUG
@@ -2215,8 +2198,8 @@ Exit:
 // Saves a song into MIDI file
 bool MidiFile::SaveData(const char* pFile, Song* song) {
     bool	bRet = true;	// Return value
-    int     dataSize;
-    int ret;
+    int32_t     dataSize;
+    int32_t ret;
 
     Log("========== MIDI file '%s': save ===============", pFile);
     //song->Show("MidiFile::SaveData");
@@ -2231,7 +2214,7 @@ bool MidiFile::SaveData(const char* pFile, Song* song) {
 
     // Set some parameters
     _format = 1;
-    _tracks = (int)song->_tracks.size();
+    _tracks = (int32_t)song->_tracks.size();
     _timeDivision = 1000;//960;
     _beatTime = GetBeatTime(song->_beatTime);
 
@@ -2254,7 +2237,7 @@ bool MidiFile::SaveData(const char* pFile, Song* song) {
     }
 
     // Write the file
-    dataSize = (int)(_dataOffset - _data);
+    dataSize = (int32_t)(_dataOffset - _data);
     if(!Write(_data, dataSize)) {
         bRet = false;
         goto Exit;
@@ -2311,7 +2294,7 @@ bool MidiFile::SaveHeader(Song* song) {
 bool MidiFile::SaveSongInfo(Song* song) {
     uint8_t		szBuffer[64];	// Conversion buffer
     Buffer		sTrackData;		// Track's data
-    int		dwData = 0;		// Converted data
+    int32_t		dwData = 0;		// Converted data
 
     // Name
     if(song->_name.Length()) {
@@ -2347,7 +2330,7 @@ bool MidiFile::SaveSongInfo(Song* song) {
         return false;
 
     // Tempo: 3 bytes, microseconds per quarter note
-    dwData = (int)(song->_beatTime * (1000.0 * 1000.0) + 0.5);
+    dwData = (int32_t)(song->_beatTime * (1000.0 * 1000.0) + 0.5);
     Reverse4Bytes((char*)&dwData);
     if(!SaveMetaEvent(0, META_TEMPO, 0, (const char*)&dwData + 1, 3, sTrackData))
         return false;
@@ -2366,11 +2349,11 @@ bool MidiFile::SaveSongInfo(Song* song) {
 //=================================================================================================
 // Saves info of all song parts
 bool MidiFile::SaveParts(Song* song, Buffer& sTrackData) {
-    int         nIndex;
+    int32_t         index;
     SongPart*  pPart;
 
-    song->_SongParts.MoveToFirst(nIndex);
-    while(song->_SongParts.GetNext(nIndex, pPart)) {
+    song->_SongParts.MoveToFirst(index);
+    while(song->_SongParts.GetNext(index, pPart)) {
         if(!SavePartInfo(0, pPart, sTrackData))
             return false;
     }
@@ -2381,7 +2364,7 @@ bool MidiFile::SaveParts(Song* song, Buffer& sTrackData) {
 //=================================================================================================
 // Saves all song's tracks
 bool MidiFile::SaveAllTracks(Song* song) {
-    int			channel = 0;		// Track counter
+    int32_t			channel = 0;		// Track counter
     Track*		track = NULL;	// Current track
     Buffer		sTrackData;		// Track's data
     TRACKS_ITER iter;
@@ -2421,11 +2404,11 @@ bool MidiFile::SaveAllTracks(Song* song) {
 bool MidiFile::SaveTrackInfo(Track* track, Buffer& sTrackData) {
     float	    fHalf = 127.0f / 2.0f;	// Half of the value range
     uint8_t	    cValue = 0;	    // Control value
-    int         nValue;
+    int32_t         nValue;
     String	sString;		// General string
 
     // Add to the report
-    sString.Format("Save track %d '%s' (%s) -------------",
+    Serial.printf("Save track %d '%s' (%s) -------------",
                    track->_trackNumber, (const char*)track->_trackName, (const char*)track->_instrumentName);
     Log((const char*)sString);
     _report += sString;
@@ -2450,7 +2433,7 @@ bool MidiFile::SaveTrackInfo(Track* track, Buffer& sTrackData) {
     }
 
     // Volume
-    nValue = (int)(127.0f * track->_volume + 0.5f);
+    nValue = (int32_t)(127.0f * track->_volume + 0.5f);
     if(nValue < 0)
         nValue = 0;
 
@@ -2462,7 +2445,7 @@ bool MidiFile::SaveTrackInfo(Track* track, Buffer& sTrackData) {
         return false;
 
     // Pan
-    nValue = (int)(fHalf + track->_pan * fHalf + 0.5f);
+    nValue = (int32_t)(fHalf + track->_pan * fHalf + 0.5f);
     if(nValue < 0)
         nValue = 0;
 
@@ -2487,7 +2470,7 @@ bool MidiFile::SaveTrackNotes(Track* track, Buffer& sTrackData) {
     Note*		note = NULL;		// Current note
     Note		Note;				// Current note
     float		dPrevTime = 0.0;	// Last note's time
-    int		    nTimeDiff;	        // Time difference
+    int32_t		    nTimeDiff;	        // Time difference
     NOTES	events;				// List of notes as on/off events
     NOTES_ITER noteIter;
 
@@ -2537,7 +2520,7 @@ bool MidiFile::SaveTrackNotes(Track* track, Buffer& sTrackData) {
 
 //=================================================================================================
 // Saves one track
-bool MidiFile::SaveTrack(const char* pTrackData, int nTrackLength) {
+bool MidiFile::SaveTrack(const char* pTrackData, int32_t nTrackLength) {
     ChunkHeader	ChunkHeader;	// chunk header
 
     // Set chunk ID
@@ -2560,10 +2543,10 @@ bool MidiFile::SaveTrack(const char* pTrackData, int nTrackLength) {
 
 //=================================================================================================
 // Saves meta event
-bool MidiFile::SaveMetaEvent(int nTimeDiff, META_EVENT nMetaEvent, int nChannel, const char* pEventData, int nEventDataSize,
+bool MidiFile::SaveMetaEvent(int32_t nTimeDiff, META_EVENT nMetaEvent, int32_t nChannel, const char* pEventData, int32_t nEventDataSize,
                               Buffer& sTrackData) {
     uint8_t		szBuffer[64];	// Conversion buffer
-    int			nBytes = 0;		// Bytes saved in the conversion
+    int32_t			nBytes = 0;		// Bytes saved in the conversion
     Buffer		sEventData;		// Converted event data
     String	sString;		// General string
     String	sData;
@@ -2590,7 +2573,7 @@ bool MidiFile::SaveMetaEvent(int nTimeDiff, META_EVENT nMetaEvent, int nChannel,
 
 //=================================================================================================
 // Saves control event
-bool MidiFile::SaveControlEvent(int nTimeDiff, int nChannel, uint8_t nType, uint8_t nValue, Buffer& sTrackData) {
+bool MidiFile::SaveControlEvent(int32_t nTimeDiff, int32_t nChannel, uint8_t nType, uint8_t nValue, Buffer& sTrackData) {
     String	sControlName;	// Control name
     String	sString;		// General string
     uint8_t	    szBuffer[8];	// Event data
@@ -2600,7 +2583,7 @@ bool MidiFile::SaveControlEvent(int nTimeDiff, int nChannel, uint8_t nType, uint
         return false;
 
     // Add to the report
-    sString.Format("Control %3d, '%s' = %d, channel=%d", nType, (const char*)sControlName, nValue, nChannel);
+    Serial.printf("Control %3d, '%s' = %d, channel=%d", nType, (const char*)sControlName, nValue, nChannel);
     //Log((const char*)sString);
     _report += sString;
 
@@ -2617,8 +2600,8 @@ bool MidiFile::SaveControlEvent(int nTimeDiff, int nChannel, uint8_t nType, uint
 
 //=================================================================================================
 // Saves a marker note
-bool MidiFile::SaveMarker(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
-    switch(note->_nState) {
+bool MidiFile::SaveMarker(int32_t nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+    switch(note->_state) {
         case Note::STATE_CHORD_MARK:
             if(!SaveChord(nTimeDiff, note, track, sTrackData))
                 return false;
@@ -2646,7 +2629,7 @@ bool MidiFile::SaveMarker(int nTimeDiff, Note* note, Track* track, Buffer& sTrac
 
 //=================================================================================================
 // Saves note's chord info using MIDI control events
-bool MidiFile::SaveChord(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+bool MidiFile::SaveChord(int32_t nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
     String sData;  // Data to be saved
     String sValue;
     String sPair;
@@ -2695,7 +2678,7 @@ bool MidiFile::SaveChord(int nTimeDiff, Note* note, Track* track, Buffer& sTrack
     sData += sPair;
 
     // Add to the report
-    sString.Format("Chord: %s", (const char*)sData);
+    Serial.printf("Chord: %s", (const char*)sData);
     //Log((const char*)sString);
     _report += sString;
 
@@ -2760,14 +2743,14 @@ bool MidiFile::GetChord(const char* pMarker, float dTrackTime, Song* song, Track
     Note._start = dTrackTime;
     Note._volume = 0.0f;
     Note._duration = 0.0f;
-    Note._nState = Note::STATE_CHORD_MARK;
+    Note._state = Note::STATE_CHORD_MARK;
     Note._ChordInfo = Chord._RootNote._ChordInfo;
     Note._nSource = Note::SOURCE_FILE;
 
     track->AddNote(Note);
 
     // Add to the report
-    sString.Format("%6.2f  Chord: %d", dTrackTime, Chord._RootNote._ChordInfo._nRoot);
+    Serial.printf("%6.2f  Chord: %d", dTrackTime, Chord._RootNote._ChordInfo._nRoot);
     //Log((const char*)sString);
     _report += sString;
 
@@ -2776,7 +2759,7 @@ bool MidiFile::GetChord(const char* pMarker, float dTrackTime, Song* song, Track
 
 //=================================================================================================
 // Saves mix data
-bool MidiFile::SaveMix(int nTimeDiff, CMix* pMix, Buffer& sTrackData) {
+bool MidiFile::SaveMix(int32_t nTimeDiff, CMix* pMix, Buffer& sTrackData) {
     MIX_MAP_ITER    Iter;	    // Map iterator
     MIX_INFO*       pMixInfo;   // Mix info
     String sData;  // Data to be saved
@@ -2807,7 +2790,7 @@ bool MidiFile::SaveMix(int nTimeDiff, CMix* pMix, Buffer& sTrackData) {
     }
 
     // Add to the report
-    sString.Format("Mix: %s", (const char*)sData);
+    Serial.printf("Mix: %s", (const char*)sData);
     //Log((const char*)sString);
     _report += sString;
 
@@ -2827,7 +2810,7 @@ bool MidiFile::GetMix(const char* pMarker, Song* song) {
     char*		pNextToken = NULL;	// Next token
     String	sCopy;	    // String copy
     const char* pValue;
-    THING       nInstrument;        // Source instrument
+    THING       instrument;        // Source instrument
     THING       nToInstrument;      // Mapped instrument
 
     sCopy = pMarker;
@@ -2839,17 +2822,17 @@ bool MidiFile::GetMix(const char* pMarker, Song* song) {
                 // Insert the info
                 Pair = song->_Mix._Mixes.insert(MIX_MAP_PAIR(MixInfo._instrument, MixInfo));
                 if(!Pair.second) { // Can't insert
-                    _error.Format("Can't insert into mix map");
+                    Serial.printf("Can't insert into mix map");
                     return false;
                 }
             }
 
             pValue = pField + strlen(MARKER_FIELD_INSTRUMENT);
-            if(!StringToThing(pValue, nInstrument)) {
+            if(!StringToThing(pValue, instrument)) {
                 return false;
             }
 
-            MapThings(nInstrument, nToInstrument);
+            MapThings(instrument, nToInstrument);
             MixInfo._instrument = nToInstrument;
         } else if(!strncmp(pField, MARKER_FIELD_VOLUME, strlen(MARKER_FIELD_VOLUME))) { // Volume
             pValue = pField + strlen(MARKER_FIELD_VOLUME);
@@ -2869,7 +2852,7 @@ bool MidiFile::GetMix(const char* pMarker, Song* song) {
         // Insert the info
         Pair = song->_Mix._Mixes.insert(MIX_MAP_PAIR(MixInfo._instrument, MixInfo));
         if(!Pair.second) { // Can't insert
-            _error.Format("Can't insert into mix map");
+            Serial.printf("Can't insert into mix map");
             return false;
         }
     }
@@ -2902,7 +2885,7 @@ bool MidiFile::SaveSongInfo(Song* song, Buffer& sTrackData) {
     }
 
     // Add to the report
-    sString.Format("Song info: %s", (const char*)sData);
+    Serial.printf("Song info: %s", (const char*)sData);
     Log((const char*)sString);
     _report += sString;
 
@@ -2945,7 +2928,7 @@ bool MidiFile::GetSongInfo(const char* pMarker, float dTrackTime, Song* song, Tr
 
 //=================================================================================================
 // Saves full info of one song part
-bool MidiFile::SavePartInfo(int nTimeDiff, SongPart* pPart, Buffer& sTrackData) {
+bool MidiFile::SavePartInfo(int32_t nTimeDiff, SongPart* pPart, Buffer& sTrackData) {
     String sData;  // Data to be saved
     String sValue;
     String sPair;
@@ -3017,7 +3000,7 @@ bool MidiFile::SavePartInfo(int nTimeDiff, SongPart* pPart, Buffer& sTrackData) 
     sData += sPair;
 
     // Add to the report
-    sString.Format("Song part info: %s", (const char*)sData);
+    Serial.printf("Song part info: %s", (const char*)sData);
     Log((const char*)sString);
     _report += sString;
 
@@ -3102,7 +3085,7 @@ bool MidiFile::GetPartInfo(const char* pMarker, float dTrackTime, Song* song, Tr
 
 //=================================================================================================
 // Saves note info
-bool MidiFile::SaveNoteInfo(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+bool MidiFile::SaveNoteInfo(int32_t nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
     String sData;  // Data to be saved
     String sValue;
     String sPair;
@@ -3141,7 +3124,7 @@ bool MidiFile::SaveNoteInfo(int nTimeDiff, Note* note, Track* track, Buffer& sTr
     }
 
     // Add to the report
-    sString.Format("Note info: %s", (const char*)sData);
+    Serial.printf("Note info: %s", (const char*)sData);
     //Log((const char*)sString);
     _report += sString;
 
@@ -3190,7 +3173,7 @@ bool MidiFile::GetNoteInfo(const char* pMarker, float dTrackTime, Song* song, Tr
 
 //=================================================================================================
 // Saves song part's name to mark the start of new part
-bool MidiFile::SaveSongPart(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+bool MidiFile::SaveSongPart(int32_t nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
     String sData;  // Data to be saved
     String sValue;
     String sPair;
@@ -3203,7 +3186,7 @@ bool MidiFile::SaveSongPart(int nTimeDiff, Note* note, Track* track, Buffer& sTr
     sData += sPair;
 
     // Add to the report
-    sString.Format("Song part: %s", (const char*)sData);
+    Serial.printf("Song part: %s", (const char*)sData);
     Log((const char*)sString);
     _report += sString;
 
@@ -3241,13 +3224,13 @@ bool MidiFile::GetSongPart(const char* pMarker, float dTrackTime, Song* song, Tr
     Note._start = dTrackTime;
     Note._volume = 0.0f;
     Note._duration = 0.0f;
-    Note._nState = Note::STATE_PART_MARK;
+    Note._state = Note::STATE_PART_MARK;
     Note._nSource = Note::SOURCE_FILE;
 
     track->AddNote(Note);
 
     // Add to the report
-    sString.Format("%6.2f  Song part: %s", dTrackTime, (const char*)Note._sSongPart);
+    Serial.printf("%6.2f  Song part: %s", dTrackTime, (const char*)Note._sSongPart);
     Log((const char*)sString);
     _report += sString;
 
@@ -3256,7 +3239,7 @@ bool MidiFile::GetSongPart(const char* pMarker, float dTrackTime, Song* song, Tr
 
 //=================================================================================================
 // Saves measure numbers using MIDI control events
-bool MidiFile::SaveMeasure(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+bool MidiFile::SaveMeasure(int32_t nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
     String sData;  // Data to be saved
     String sValue;
     String sPair;
@@ -3273,7 +3256,7 @@ bool MidiFile::SaveMeasure(int nTimeDiff, Note* note, Track* track, Buffer& sTra
     sData += sPair;
 
     // Add to the report
-    sString.Format("Measure: %s", (const char*)sData);
+    Serial.printf("Measure: %s", (const char*)sData);
     //Log((const char*)sString);
     _report += sString;
 
@@ -3314,13 +3297,13 @@ bool MidiFile::GetMeasure(const char* pMarker, float dTrackTime, Song* song, Tra
     Note._start = dTrackTime;
     Note._volume = 0.0f;
     Note._duration = 0.0f;
-    Note._nState = Note::STATE_MEASURE_MARK;
+    Note._state = Note::STATE_MEASURE_MARK;
     Note._nSource = Note::SOURCE_FILE;
 
     track->AddNote(Note);
 
     // Add to the report
-    sString.Format("%6.2f  Measure: %d/%d", dTrackTime, Note._nPartMeasure, Note._nSongMeasure);
+    Serial.printf("%6.2f  Measure: %d/%d", dTrackTime, Note._nPartMeasure, Note._nSongMeasure);
     //Log((const char*)sString);
     _report += sString;
 
@@ -3359,7 +3342,7 @@ bool MidiFile::GetMarker(const char* pMarker, float dTrackTime, Song* song, Trac
 
 //=================================================================================================
 // Saves note's tab info using MIDI control events
-bool MidiFile::SaveTab(int nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
+bool MidiFile::SaveTab(int32_t nTimeDiff, Note* note, Track* track, Buffer& sTrackData) {
     // String
     if(note->_Tab._nString != NO_INT) {
         if(!SaveControlEvent(nTimeDiff, track->_channel, CONTROL_TAB_STRING, note->_Tab._nString, sTrackData))
@@ -3390,7 +3373,7 @@ bool MidiFile::SaveTab(int nTimeDiff, Note* note, Track* track, Buffer& sTrackDa
 //=================================================================================================
 // Saves control event
 // bEvent - whether to save event ID or keep the 'running status'
-bool MidiFile::SaveNote(int nTimeDiff, bool bEvent, int nChannel, bool bOn, int nNote, float fVolume, Buffer& sTrackData) {
+bool MidiFile::SaveNote(int32_t nTimeDiff, bool bEvent, int32_t nChannel, bool bOn, int32_t nNote, float fVolume, Buffer& sTrackData) {
     uint8_t	    szBuffer[8];	// Event data
     String	sString;		// General string
 
@@ -3404,7 +3387,7 @@ bool MidiFile::SaveNote(int nTimeDiff, bool bEvent, int nChannel, bool bOn, int 
     } else // End of the note
         szBuffer[1] = 0;
 
-    sString.Format("%7.3f sec: Save note %d, volume %0.2f, velocity %d", GetTimeDiff(nTimeDiff), nNote, fVolume, szBuffer[1]);
+    Serial.printf("%7.3f sec: Save note %d, volume %0.2f, velocity %d", GetTimeDiff(nTimeDiff), nNote, fVolume, szBuffer[1]);
     Log((const char*)sString);
 
     // Save the event
@@ -3416,10 +3399,10 @@ bool MidiFile::SaveNote(int nTimeDiff, bool bEvent, int nChannel, bool bOn, int 
 
 //=================================================================================================
 // Saves a MIDI (note, system or meta) event
-bool MidiFile::SaveEvent(int nTimeDiff, MIDI_EVENT nEvent, int nChannel, const char* pEventData, int nEventDataSize, Buffer& sTrackData) {
+bool MidiFile::SaveEvent(int32_t nTimeDiff, MIDI_EVENT nEvent, int32_t nChannel, const char* pEventData, int32_t nEventDataSize, Buffer& sTrackData) {
     uint8_t	    szBuffer[64];	// Conversion buffer
     float      dTimeDiff;		// Event time
-    int		    nBytes = 0;		// Bytes saved in the conversion
+    int32_t		    nBytes = 0;		// Bytes saved in the conversion
     uint8_t	    nEventID = 0;	// Event ID and channel (4 bits and 4 bits)
     String	sString;		// General string
 
@@ -3430,8 +3413,8 @@ bool MidiFile::SaveEvent(int nTimeDiff, MIDI_EVENT nEvent, int nChannel, const c
         return false;
 
     // Add event time to the report
-    dTimeDiff = GetTimeDiff((int)nTimeDiff);
-    sString.Format("Event diff: %04d, %7.3f sec, beat=%7.3f", nTimeDiff, dTimeDiff, _beatTime);
+    dTimeDiff = GetTimeDiff((int32_t)nTimeDiff);
+    Serial.printf("Event diff: %04d, %7.3f sec, beat=%7.3f", nTimeDiff, dTimeDiff, _beatTime);
     //Log((const char*)sString);
     _report += sString;
 
@@ -3482,17 +3465,17 @@ bool MidiFile::Log(const char* pFormat, const char* pMessage) {
 
 //=================================================================================================
 // Adds data to the buffer
-bool MidiFile::AddData(void* data, int size) {
-    int increment = 1024 * 100;
-    int dataSize;
+bool MidiFile::AddData(void* data, int32_t size) {
+    int32_t increment = 1024 * 100;
+    int32_t dataSize;
 
     // Check the buffer size
-    dataSize = (int)(_dataOffset - _data);
-    if(dataSize + size > (int)_dataSize) {
+    dataSize = (int32_t)(_dataOffset - _data);
+    if(dataSize + size > (int32_t)_dataSize) {
         _dataSize += Max(increment, size);
         _data = (char*)realloc(_data, _dataSize); // +1 is for zero-terminator
         if(!_data) {
-            _error.Format("Can't allocate %d bytes", _dataSize);
+            Serial.printf("Can't allocate %d bytes", _dataSize);
             return false;
         }
 
