@@ -9,13 +9,13 @@ public:
     uint8_t _trackNumber; // Track number
     float _volume{}; // Volume: 1.0f - full volume, 0.0f - silence
     String _name{};
-    uint32_t _nMidiProgram{0};	// Program number. 0-127 in the file, but 1-128 in the specifications
+    uint32_t _midiProgram{0};	// Program number. 0-127 in the file, but 1-128 in the specifications
     float _pan{};
 
     Track();
     virtual ~Track();
     void sortNotes();
-    static bool SortNoteTime(Note note1, Note note2);
+    static bool sortNoteTime(Note note1, Note note2);
     void show();
 };
 

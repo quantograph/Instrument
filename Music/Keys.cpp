@@ -7,7 +7,7 @@ Keys::Keys() {
 }
 
 //=================================================================================================
-bool Keys::Init() {
+bool Keys::init() {
     _sopranoSaxInfo._instrument = INSTRUMENT::SOPRANO_SAX;
     _sopranoSaxInfo._name = "Soprano saxophone";
     //_sopranoSaxInfo._midiInstrument = MIDI_SOPRANO_SAXOPHONE;
@@ -153,8 +153,8 @@ void Keys::SetInstrument() {
             break;
     }
 
-    _fingers.Init(_currentInstrument, 3, 80);
-    _staff.Init(45, 80);
+    _fingers.init(_currentInstrument, 3, 80);
+    _staff.init(45, 80);
     //Serial.printf("Keys::SetInstrument: %s\n", _currentInstrument->_name.c_str());
 }
 
@@ -184,7 +184,7 @@ bool Keys::MapButtons(InstrumentInfo* info) {
         while(key) {
             //Serial.printf("Buttons %d: ", f);
             bitSet(data->_keys, atoi(key) - 1);
-            key = strtok(NULL, ",");
+            key = strtok(nullptr, ",");
         }
 
         //Serial.printf("Buttons %d: ", f);
@@ -332,12 +332,12 @@ void Keys::PlayDrums(uint32_t touched) {
                 if(_currentInstrument->_buttonMap[n] == bit + 1) {
                     note = _currentInstrument->_noteMap[n];
                     if(on) {
-                        g_audio.NoteOn(AudioBoard::Instrument::drums, note, g_settings._data._volume);
+                        g_audio.noteOn(AudioBoard::Instrument::drums, note, g_settings._data._volume);
                         ShowNote(note, true);
                         //sprintf(g_string, "Drum note: %d", note);
                         //LogScreen(g_string);
                     } else {
-                        g_audio.NoteOff(AudioBoard::Instrument::drums, note);
+                        g_audio.noteOff(AudioBoard::Instrument::drums, note);
                         ShowNote(note, false);
                     }
 
@@ -354,7 +354,7 @@ void Keys::PlayDrums(uint32_t touched) {
 //=================================================================================================
 // Check the touch buttons and play a note, if found
 void Keys::PlaySaxophone(uint32_t touched) {
-    Fingering* data = NULL;
+    Fingering* data = nullptr;
     uint32_t buttons = 0;
     uint32_t keys = 0;
     int note = NO_NOTE;
@@ -377,13 +377,13 @@ void Keys::PlaySaxophone(uint32_t touched) {
     // Stop the last note played
     if(_prevNoteNumber != NO_NOTE) {
         ShowNote(_prevNoteNumber, false);
-        //g_audio.NoteOff(AudioBoard::Instrument::drums, _prevNoteNumber);
+        //g_audio.noteOff(AudioBoard::Instrument::drums, _prevNoteNumber);
     }
 
     // Play the new note
     if(note != NO_NOTE && play) {
         //Serial.printf("Play note");
-        //g_audio.NoteOn(AudioBoard::Instrument::drums, note, g_settings._data._volume);
+        //g_audio.noteOn(AudioBoard::Instrument::drums, note, g_settings._data._volume);
         _prevNoteNumber = note;
         ShowNote(note, true);
     } else {
@@ -394,7 +394,7 @@ void Keys::PlaySaxophone(uint32_t touched) {
     if(_currentInstrument == &_trumpetInfo)
         ShowTrumpet(g_screen._width / 3, g_screen._height / 2 + 10, keys, note == NO_NOTE);
     else
-        _fingers.ShowSaxophone(keys, note == NO_NOTE);
+        _fingers.showSaxophone(keys, note == NO_NOTE);
 
     // Debugging the key combinations
     String b = " ";
@@ -434,10 +434,10 @@ void Keys::PlaySaxophone(uint32_t touched) {
 
 //=================================================================================================
 void Keys::ShowNote(int noteNumber, bool show) {
-    const char* noteName = NULL; // Curent note's name
+    const char* noteName = nullptr; // Curent note's name
     int x = 70;
     int y = 55;
-    //g_screen.Clear();
+    //g_screen.clear();
 
     // Show the current note
     if(noteNumber <= 84)

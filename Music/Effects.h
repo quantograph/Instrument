@@ -12,9 +12,9 @@ class Effects {
 public:
     Effects(AudioStream* source, uint8_t sourceOutput, AudioStream* dest, uint8_t destInput);
     ~Effects();
-    void Flange(double freq);
-    void Chorus();
-    void Reset();
+    void flange(double freq);
+    void chorus();
+    void reset();
 
     AudioStream* _source{nullptr};
     uint8_t _sourceOutput{0};

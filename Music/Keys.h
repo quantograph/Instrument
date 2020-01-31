@@ -195,7 +195,7 @@ uint32_t _steelDrumKeyMask = 0; // Bitmask for the 'unwanted' keys
     static const int _cNumber; // MIDI note number for note 'middle C'
 
     Keys();
-    bool Init();
+    bool init();
     void SetInstrument();
     void ShowIntrument(const char* name);
     void Play(uint32_t touched);

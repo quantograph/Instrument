@@ -4,10 +4,10 @@
 class Bluetooth {
 public:
     Bluetooth();
-    bool Init();
-    bool Send(const char* buffer, int size);
-    bool Receive();
-    bool Process();
+    bool init();
+    bool send(const char* buffer, int size);
+    bool receive();
+    bool process();
     #define BUFFER_SIZE 1024
     char _buffer[BUFFER_SIZE];
     int _packetSize = 0;

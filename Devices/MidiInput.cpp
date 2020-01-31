@@ -6,7 +6,7 @@ Synth* MidiInput::_synth{nullptr};
 USBHost _usbHost;
 MIDIDevice _midiDevice(_usbHost);
 
-void MidiInput::Init(Synth* synth) {
+void MidiInput::init(Synth* synth) {
     Serial.begin(115200);
     
     _synth = synth;
@@ -45,7 +45,7 @@ void MidiInput::Init(Synth* synth) {
   Serial.println("MidiInput::Init");
 }
 
-void MidiInput::Process() {
+void MidiInput::process() {
   // The handler functions are called when _midiDevice reads data.  They
   // will not be called automatically.  You must call _midiDevice.read()
   // regularly from loop() for _midiDevice to actually read incoming
@@ -65,7 +65,7 @@ void MidiInput::myNoteOn(byte channel, byte note, byte velocity) {
   Serial.print(", velocity=");
   Serial.println(velocity, DEC);*/
 
-  _synth->NoteOn(note, velocity);
+  _synth->noteOn(note, velocity);
 }
 
 void MidiInput::myNoteOff(byte channel, byte note, byte velocity) {
@@ -76,7 +76,7 @@ void MidiInput::myNoteOff(byte channel, byte note, byte velocity) {
   Serial.print(", velocity=");
   Serial.println(velocity, DEC);*/
 
-  _synth->NoteOff(note);
+  _synth->noteOff(note);
 }
 
 void MidiInput::myAfterTouchPoly(byte channel, byte note, byte velocity) {

@@ -24,12 +24,12 @@ public:
     // Guitar tab info: string and fret number
     struct TabInfo {
         TabInfo() :
-            _nString(NO_INT),
-            _nFret(NO_INT),
-            _nShift(0),
-            _nPosition(NO_INT),
-            _nFinger(NO_INT),
-            _nMode(MODE_NONE) {
+            _string(NO_INT),
+            _fret(NO_INT),
+            _shift(0),
+            _position(NO_INT),
+            _finger(NO_INT),
+            _mode(MODE_NONE) {
         }
 
         enum MODE { // Playing mode
@@ -42,20 +42,20 @@ public:
         };
 
         // Data -----
-        int     _nString;      // Guitar string number, from high to low (by pitch)
-        int     _nFret;        // Guitar fret number, 0 - open string
-        int     _nShift;       // Shift for the finger position withing the fret, for several fingers withing the same fret on different strings
-        int     _nPosition;    // Guitar position - fret number for the root of first finger
-        int     _nFinger;      // Finger
-        MODE    _nMode;        // Playing mode
+        int     _string;      // Guitar string number, from high to low (by pitch)
+        int     _fret;        // Guitar fret number, 0 - open string
+        int     _shift;       // Shift for the finger position withing the fret, for several fingers withing the same fret on different strings
+        int     _position;    // Guitar position - fret number for the root of first finger
+        int     _finger;      // Finger
+        MODE    _mode;        // Playing mode
 
-        void Reset() {
-            _nString = NO_INT;
-            _nFret = NO_INT;
-            _nShift = 0;
-            _nPosition = NO_INT;
-            _nFinger = NO_INT;
-            _nMode = MODE_NONE;
+        void reset() {
+            _string = NO_INT;
+            _fret = NO_INT;
+            _shift = 0;
+            _position = NO_INT;
+            _finger = NO_INT;
+            _mode = MODE_NONE;
         }
     };
 
@@ -64,8 +64,8 @@ public:
     float _start{0.0}; // Start time, in seconds
     float _duration{0.0}; // Duration of the note, in seconds
     STATE _state{STATE_NONE};
-    TabInfo _Tab; // String and fret for this note, for one particular notation
-    uint16_t _nChannel{0}; // MIDI channel
+    TabInfo _tab; // String and fret for this note, for one particular notation
+    uint16_t _channel{0}; // MIDI channel
     INSTRUMENT _instrument{PERCUSSION}; // Instrument type
 
     Note();

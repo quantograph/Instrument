@@ -29,10 +29,10 @@ public:
     #define T_IRQ 6 // (ScrT-IRQ 14)
 
     TouchScreen();
-    void Init();
-    bool Read();
-    void Clear();
-    static void OnTouched();
+    void init();
+    bool read();
+    void clear();
+    static void onTouched();
 
     XPT2046_Touchscreen _touch;
     ILI9341_t3 _screen;

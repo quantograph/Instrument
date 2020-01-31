@@ -7,8 +7,8 @@ class Synth;
 
 class MidiInput {
 public:
-    void Init(Synth* synth);
-    void Process();
+    void init(Synth* synth);
+    void process();
     static void myNoteOn(byte channel, byte note, byte velocity);
     static void myNoteOff(byte channel, byte note, byte velocity);
     static void myAfterTouchPoly(byte channel, byte note, byte velocity);

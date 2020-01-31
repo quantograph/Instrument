@@ -10,7 +10,7 @@ class Fingers {
         int _y = -1;
     };
 
-    InstrumentInfo* _instrument = NULL;
+    InstrumentInfo* _instrument = nullptr;
     int _x = -1;
     int _y = -1;
     Key _keys[24];
@@ -26,9 +26,9 @@ class Fingers {
 
 public:
     Fingers();
-    bool Init(InstrumentInfo* instrument, int x, int y);
-    void InitSaxophone();
-    void ShowSaxophone(uint32_t keys, bool error);
+    bool init(InstrumentInfo* instrument, int x, int y);
+    void initSaxophone();
+    void showSaxophone(uint32_t keys, bool error);
 };
 
 #endif

@@ -2,7 +2,7 @@
 
 //-----------------------------------------------------------------------------
 // Reverses 2 bytes
-void Reverse2Bytes(char* data) {
+void reverse2Bytes(char* data) {
     char byte = 0; // Temporary byte
 
     byte = data[0];
@@ -12,7 +12,7 @@ void Reverse2Bytes(char* data) {
 
 //-----------------------------------------------------------------------------
 // Reverses 4 bytes
-void Reverse4Bytes(char* data) {
+void reverse4Bytes(char* data) {
     char byte = 0; // Temporary byte
 
     // Outer bytes

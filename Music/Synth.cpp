@@ -6,7 +6,7 @@ Synth::Synth(AudioBoard* audio) : _audio(audio) {
 }
 
 //=================================================================================================
-void Synth::Init(int voices) {
+void Synth::init(int voices) {
     _voices = voices;
 
     // Clear all mixer connections
@@ -41,7 +41,7 @@ void Synth::Init(int voices) {
 }
 
 //=================================================================================================
-void Synth::NoteOn(byte note, byte velocity) {
+void Synth::noteOn(byte note, byte velocity) {
     SynthVoice* voice{nullptr};
     SynthVoice* oldestVoice{nullptr};
     uint32_t minTime{0};
@@ -71,7 +71,7 @@ void Synth::NoteOn(byte note, byte velocity) {
 }
 
 //=================================================================================================
-void Synth::NoteOff(byte note) {
+void Synth::noteOff(byte note) {
     SynthVoice* voice{nullptr};
 
     // Find the voice for the note to stop

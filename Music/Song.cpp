@@ -27,7 +27,7 @@ void Song::reset() {
 void Song::show() {
     // Show song info
     Serial.printf("Song '%s', tempo=%d, time=%6.2f, beatTime=%6.2f, %d/%d\n",
-                  _name.c_str(), _tempo, _dSongTime, _beatTime, _measureBeats, _beatNotes);
+                  _name.c_str(), _tempo, _songTime, _beatTime, _measureBeats, _beatNotes);
 
     // Show all tracks
     Serial.printf("%d tracks:\n", _tracks.size());

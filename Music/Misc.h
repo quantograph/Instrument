@@ -6,8 +6,8 @@
 #include <vector>
 #include <float.h>
 
-void Reverse2Bytes(char* data);
-void Reverse4Bytes(char* data);
+void reverse2Bytes(char* data);
+void reverse4Bytes(char* data);
 //void ShowBits(uint32_t value, String& s);
 //void LogScreen(const char* line);
 extern const char* _instrumentNames[];
@@ -142,13 +142,14 @@ enum SCALE {
 // 49-56   Ensemble                 113-120 Percussive
 // 57-64   Brass                    121-128 Sound Effects
 enum INSTRUMENT {
-    PERCUSSION,
+    ACOUSTIC_GRAND_PIANO,
     BRIGHT_ACOUSTIC_PIANO,
     ELECTRIC_GRAND_PIANO,
     HONKY_TONK_PIANO,
     ELECTRIC_PIANO_1,
     ELECTRIC_PIANO_2,
-    HARPSICHORD,CLAVI,
+    HARPSICHORD,
+    CLAVI,
     CELESTA,
     GLOCKENSPIEL,
     MUSIC_BOX,
@@ -162,7 +163,8 @@ enum INSTRUMENT {
     ROCK_ORGAN,
     CHURCH_ORGAN,
     REED_ORGAN,
-    ACCORDION,HARMONICA,
+    ACCORDION,
+    HARMONICA,
     TANGO_ACCORDION,
     ACOUSTIC_GUITAR_NYLON,
     ACOUSTIC_GUITAR_STEEL,
@@ -268,58 +270,61 @@ enum INSTRUMENT {
     HELICOPTER,
     APPLAUSE,
     GUNSHOT,
-    ACOUSTIC_GRAND_PIANO
+    PERCUSSION,
+    NONE,
 };
 
 // MIDI notes for drums
-#define DRUM_BASS_DRUM    35 // Acoustic Bass Drum
-//#define DRUM_BASS_DRUM    36 // Bass Drum 1
-//#define DRUM_SIDE_STICK     37 // Side Stick
-#define DRUM_SNARE          38 // Acoustic Snare
-// 39 Hand Clap
-// 40 Electric Snare
-#define DRUM_TOM_1          41 // Low Floor Tom
-#define DRUM_HIHAT_CLOSED   42 // Closed Hi-Hat
-#define DRUM_TOM_2          43 // High Floor Tom
-#define DRUM_HIHAT_FOOT     44 // Pedal Hi-Hat
-#define DRUM_TOM_3          45 // Low Tom
-#define DRUM_HIHAT_OPEN     46 // Open Hi-Hat
-#define DRUM_TOM_4          47 // Low-Mid Tom
-#define DRUM_TOM_5          48 // Hi-Mid Tom
-#define DRUM_CRASH_1        49 // Crash Cymbal 1
-#define DRUM_TOM_6          50 // High Tom
-#define DRUM_RIDE_CYMBAL    51 // Ride Cymbal 1
-#define DRUM_CHINESE_1      52 // Chinese Cymbal
-#define DRUM_RIDE_BELL      53 // Ride bell
-// 54 Tambourine
-#define DRUM_SPLASH_1       55 // Splash Cymbal
-// 56 Cowbell
-#define DRUM_CRASH_2        57 // Crash Cymbal 2
-// 58 Vibraslap
-// 59 Ride Cymbal 2
-// 60 Hi Bongo
-// 61 Low Bongo
-// 62 Mute Hi Conga
-// 63 Open Hi Conga
-// 64 Low Conga
-// 65 High Timbale
-// 66 Low Timbale
-// 67 High Agogo
-// 68 Low Agogo
-// 69 Cabasa
-// 70 Maracas
-// 71 Short Whistle
-// 72 Long Whistle
-// 73 Short Guiro
-// 74 Long Guiro
-// 75 Claves
-// 76 Hi Wood Block
-// 77 Low Wood Block
-// 78 Mute Cuica
-// 79 Open Cuica
-// 80 Mute Triangle
-// 81 Open Triangle
-// 82 Shaker
+enum DRUM_NOTES {
+    DRUM_BASS1 = 35,       // Acoustic Bass Drum
+    DRUM_BASS2,            // 36 Bass Drum 1
+    DRUM_SIDE_STICK,       // 37 Side Stick
+    DRUM_SNARE,            // 38 Acoustic Snare
+    DRUM_HAND_CLAP,        // 39 Hand Clap
+    DRUM_ELECTRIC_SNARE,   // 40 Electric Snare
+    DRUM_TOM_1,            // 41 Low Floor Tom
+    DRUM_HIHAT_CLOSED,     // 42 Closed Hi-Hat
+    DRUM_TOM_2,            // 43 High Floor Tom
+    DRUM_HIHAT_FOOT,       // 44 Pedal Hi-Hat
+    DRUM_TOM_3,            // 45 Low Tom
+    DRUM_HIHAT_OPEN,       // 46 Open Hi-Hat
+    DRUM_TOM_4,            // 47 Low-Mid Tom
+    DRUM_TOM_5,            // 48 Hi-Mid Tom
+    DRUM_CRASH_1,          // 49 Crash Cymbal 1
+    DRUM_TOM_6,            // 50 High Tom
+    DRUM_RIDE_CYMBAL,      // 51 Ride Cymbal 1
+    DRUM_CHINESE_1,        // 52 Chinese Cymbal
+    DRUM_RIDE_BELL,        // 53 Ride bell
+    DRUM_TAMBOURINE,       // 54 Tambourine
+    DRUM_SPLASH_1,         // 55 Splash Cymbal
+    DRUM_COWBELL,          // 56 Cowbell
+    DRUM_CRASH_2,          // 57 Crash Cymbal 2
+    DRUM_VIBRASLAP,        // 58 Vibraslap
+    DRUM_RIDE_CYMBAL_2,    // 59 Ride Cymbal 2
+    DRUM_HI_BONGO,         // 60 Hi Bongo
+    DRUM_LOW_BONGO,        // 61 Low Bongo
+    DRUM_MUTE_HI_CONGA,    // 62 Mute Hi Conga
+    DRUM_OPEN_HI_CONGA,    // 63 Open Hi Conga
+    DRUM_LOW_CONGA,        // 64 Low Conga
+    DRUM_HIGH_TIMBALE,     // 65 High Timbale
+    DRUM_LOW_TIMBALE,      // 66 Low Timbale
+    DRUM_HIGH_AGOGO,       // 67 High Agogo
+    DRUM_LOW_AGOGO,        // 68 Low Agogo
+    DRUM_CABASA,           // 69 Cabasa
+    DRUM_MARACAS,          // 70 Maracas
+    DRUM_SHORT_WHISTLE,    // 71 Short Whistle
+    DRUM_LONG_WHISTLE,     // 72 Long Whistle
+    DRUM_SHORT_GUIRO,      // 73 Short Guiro
+    DRUM_LONG_GUIRO,       // 74 Long Guiro
+    DRUM_CLAVES,           // 75 Claves
+    DRUM_HI_WOOD_BLOCK,    // 76 Hi Wood Block
+    DRUM_LOW_WOOD_BLOCK,   // 77 Low Wood Block
+    DRUM_MUTE_CUICA,       // 78 Mute Cuica
+    DRUM_OPEN_CUICA,       // 79 Open Cuica
+    DRUM_MUTE_TRIANGLE,    // 80 Mute Triangle
+    DRUM_OPEN_TRIANGLE,    // 81 Open Triangle
+    DRUM_SHAKER            // 82 Shaker
+};
 
 // Saxophone fingering
 struct Fingering {
@@ -339,11 +344,11 @@ struct InstrumentInfo {
     //uint8_t _midiInstrument = 0;
     int _startNote = 0; // MIDI note number for the first fingering
     int _fingeringCount = 0; // Number of fingerings in _fingerings
-    Fingering* _fingerings = NULL;
+    Fingering* _fingerings = nullptr;
     int _buttonCount = 0; // Number of buttons mapped
-    int* _buttonMap = NULL; // Touch sensors, array
-    int* _keyMap = NULL; // Instrument keys, array
-    uint8_t* _noteMap = NULL; // MIDI notes, array
+    int* _buttonMap = nullptr; // Touch sensors, array
+    int* _keyMap = nullptr; // Instrument keys, array
+    uint8_t* _noteMap = nullptr; // MIDI notes, array
     uint32_t _keyMask = 0; // Bitmask for the 'unwanted' keys
 };
 

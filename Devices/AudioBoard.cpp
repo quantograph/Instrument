@@ -17,7 +17,7 @@
 
 
 //=================================================================================================
-void AudioBoard::Init() {
+void AudioBoard::init() {
     AudioMemory(120);
 
     AudioNoInterrupts();
@@ -125,12 +125,12 @@ void AudioBoard::Init() {
 }
 
 //=================================================================================================
-void AudioBoard::NoteOn(Instrument instrument, uint8_t note, uint8_t volume, uint8_t string) {
+void AudioBoard::noteOn(Instrument instrument, uint8_t note, uint8_t volume, uint8_t string) {
     sprintf(_string, "On: %d in=%d vol=%d", note, instrument, volume);
     //LogScreen(_string);
 
-    uint8_t mappedNote = GetNote(instrument, note);
-    AudioSynthWavetable* mappedInstrument = GetInstrument(instrument, note, string);
+    uint8_t mappedNote = getNote(instrument, note);
+    AudioSynthWavetable* mappedInstrument = getInstrument(instrument, note, string);
     if(mappedInstrument) {
         mappedInstrument->playNote(mappedNote, volume);
         _playingNote = note;
@@ -140,21 +140,21 @@ void AudioBoard::NoteOn(Instrument instrument, uint8_t note, uint8_t volume, uin
 }
 
 //=================================================================================================
-void AudioBoard::NoteOff(Instrument instrument, uint8_t n, uint8_t string) {
+void AudioBoard::noteOff(Instrument instrument, uint8_t n, uint8_t string) {
     sprintf(_string, "Off");
     //LogScreen(_string);
 
     if(n == 0)
         n = _playingNote;
 
-    AudioSynthWavetable* mapped = GetInstrument(instrument, n, string);
+    AudioSynthWavetable* mapped = getInstrument(instrument, n, string);
     if(mapped) {
         mapped->stop();
     }
 }
 
 //=================================================================================================
-AudioSynthWavetable* AudioBoard::GetInstrument(Instrument instrument, uint8_t note, uint8_t string) {
+AudioSynthWavetable* AudioBoard::getInstrument(Instrument instrument, uint8_t note, uint8_t string) {
     switch(instrument) {
         case Instrument::leadGuitar: return &_leadGuitar;
         case Instrument::rhythmGuitar: 
@@ -168,20 +168,20 @@ AudioSynthWavetable* AudioBoard::GetInstrument(Instrument instrument, uint8_t no
                 default:
                     sprintf(_string, "No string: %d", string);
                     //LogScreen(_string);
-                    return NULL;
+                    return nullptr;
             }
         
         case Instrument::bassGuitar: return &_bassGuitar;
-        case Instrument::drums: return GetDrum(note);
+        case Instrument::drums: return getDrum(note);
         default: 
             sprintf(_string, "No instr: %d", instrument);
             //LogScreen(_string);
-            return NULL;
+            return nullptr;
     }
 }
 
 //=================================================================================================
-AudioSynthWavetable* AudioBoard::GetDrum(uint8_t note) {
+AudioSynthWavetable* AudioBoard::getDrum(uint8_t note) {
     switch(note) {
         case DrumNotes::hat: return &_drumHat;
         case DrumNotes::bass: return &_drumBass;
@@ -194,12 +194,12 @@ AudioSynthWavetable* AudioBoard::GetDrum(uint8_t note) {
         default: 
             sprintf(_string, "No drum: %d", note);
             //LogScreen(_string);
-            return NULL;
+            return nullptr;
     }
 }
 
 //=================================================================================================
-uint8_t AudioBoard::GetNote(Instrument instrument, uint8_t note) {
+uint8_t AudioBoard::getNote(Instrument instrument, uint8_t note) {
     if(instrument == Instrument::drums)
         return _drumMidiNotes[note];
     else
@@ -207,70 +207,70 @@ uint8_t AudioBoard::GetNote(Instrument instrument, uint8_t note) {
 }
 
 //=================================================================================================
-void AudioBoard::Test(int test) {
+void AudioBoard::test(int test) {
     int pause = 300;
     int strumPause = 150;
 
-    NoteOn(Instrument::rhythmGuitar, 50, 90, 1);
+    noteOn(Instrument::rhythmGuitar, 50, 90, 1);
     delay(strumPause);
-    NoteOn(Instrument::rhythmGuitar, 54, 90, 2);
+    noteOn(Instrument::rhythmGuitar, 54, 90, 2);
     delay(strumPause);
-    NoteOn(Instrument::rhythmGuitar, 57, 90, 3);
+    noteOn(Instrument::rhythmGuitar, 57, 90, 3);
     delay(strumPause);
-    NoteOn(Instrument::rhythmGuitar, 62, 90, 4);
+    noteOn(Instrument::rhythmGuitar, 62, 90, 4);
     delay(strumPause);
-    NoteOn(Instrument::rhythmGuitar, 66, 90, 5);
+    noteOn(Instrument::rhythmGuitar, 66, 90, 5);
     delay(strumPause);
-    NoteOn(Instrument::rhythmGuitar, 69, 90, 6);
+    noteOn(Instrument::rhythmGuitar, 69, 90, 6);
     delay(pause*3);
-    NoteOff(Instrument::rhythmGuitar, 50, 1);
-    NoteOff(Instrument::rhythmGuitar, 54, 2);
-    NoteOff(Instrument::rhythmGuitar, 57, 3);
-    NoteOff(Instrument::rhythmGuitar, 62, 4);
-    NoteOff(Instrument::rhythmGuitar, 66, 5);
-    NoteOff(Instrument::rhythmGuitar, 69, 6);
+    noteOff(Instrument::rhythmGuitar, 50, 1);
+    noteOff(Instrument::rhythmGuitar, 54, 2);
+    noteOff(Instrument::rhythmGuitar, 57, 3);
+    noteOff(Instrument::rhythmGuitar, 62, 4);
+    noteOff(Instrument::rhythmGuitar, 66, 5);
+    noteOff(Instrument::rhythmGuitar, 69, 6);
 
-    NoteOn(Instrument::leadGuitar, 60, 90);
+    noteOn(Instrument::leadGuitar, 60, 90);
     delay(pause);
-    NoteOff(Instrument::leadGuitar);
-    NoteOn(Instrument::leadGuitar, 62, 90);
+    noteOff(Instrument::leadGuitar);
+    noteOn(Instrument::leadGuitar, 62, 90);
     delay(pause);
-    NoteOff(Instrument::leadGuitar);
-    NoteOn(Instrument::leadGuitar, 64, 90);
+    noteOff(Instrument::leadGuitar);
+    noteOn(Instrument::leadGuitar, 64, 90);
     delay(pause);
-    NoteOff(Instrument::leadGuitar);
+    noteOff(Instrument::leadGuitar);
 
-    NoteOn(Instrument::bassGuitar, 30, 90);
+    noteOn(Instrument::bassGuitar, 30, 90);
     delay(pause);
-    NoteOff(Instrument::bassGuitar);
-    NoteOn(Instrument::bassGuitar, 32, 90);
+    noteOff(Instrument::bassGuitar);
+    noteOn(Instrument::bassGuitar, 32, 90);
     delay(pause);
-    NoteOff(Instrument::bassGuitar);
-    NoteOn(Instrument::bassGuitar, 34, 90);
+    noteOff(Instrument::bassGuitar);
+    noteOn(Instrument::bassGuitar, 34, 90);
     delay(pause);
-    NoteOff(Instrument::bassGuitar);
+    noteOff(Instrument::bassGuitar);
 
     // Drums
-    TestDrums(pause);
+    testDrums(pause);
 
     delay(1000);
 }
 
 //=================================================================================================
-void AudioBoard::TestDrums(int pause) {
-    NoteOn(Instrument::drums, DrumNotes::bass, 90); delay(pause);
-    NoteOn(Instrument::drums, DrumNotes::snare, 90); delay(pause);
-    NoteOn(Instrument::drums, DrumNotes::hat, 90); delay(pause);
-    NoteOn(Instrument::drums, DrumNotes::tomHigh, 90); delay(pause);
-    NoteOn(Instrument::drums, DrumNotes::tomLow, 90); delay(pause);
-    NoteOn(Instrument::drums, DrumNotes::ride, 90); delay(pause);
-    NoteOn(Instrument::drums, DrumNotes::crash, 90); delay(pause);
-    //NoteOn(Instrument::drums, DrumNotes::woodblock, 90); delay(pause);
+void AudioBoard::testDrums(int pause) {
+    noteOn(Instrument::drums, DrumNotes::bass, 90); delay(pause);
+    noteOn(Instrument::drums, DrumNotes::snare, 90); delay(pause);
+    noteOn(Instrument::drums, DrumNotes::hat, 90); delay(pause);
+    noteOn(Instrument::drums, DrumNotes::tomHigh, 90); delay(pause);
+    noteOn(Instrument::drums, DrumNotes::tomLow, 90); delay(pause);
+    noteOn(Instrument::drums, DrumNotes::ride, 90); delay(pause);
+    noteOn(Instrument::drums, DrumNotes::crash, 90); delay(pause);
+    //noteOn(Instrument::drums, DrumNotes::woodblock, 90); delay(pause);
 }
 
 //=================================================================================================
 // Audio loop
-void AudioBoard::PeakMeter() {
+void AudioBoard::peakMeter() {
     float width = 60.0;
 
     if (peak_L.available() && peak_R.available()) {
@@ -299,16 +299,16 @@ void AudioBoard::PeakMeter() {
 
 //=================================================================================================
 // Audio loop
-void AudioBoard::Process() {
-    //NoteFrequency();
-    //PeakMeter();
-    //Test();
+void AudioBoard::process() {
+    //noteFrequency();
+    //peakMeter();
+    //test();
 
     //delay(10);
 }
 
 //=================================================================================================
-void AudioBoard::NoteFrequency() {
+void AudioBoard::noteFrequency() {
     float peak = 0.0;
     float frequency = 0.0;
     float highPeak = 0.1;
@@ -345,7 +345,7 @@ void AudioBoard::NoteFrequency() {
     // Get the new note frequency
     if(notefreq.available()) {
         if(!_noteDetected) {
-            NoteDetected(frequency);
+            noteDetected(frequency);
             _noteDetected = true;
         }
     } else {
@@ -354,7 +354,7 @@ void AudioBoard::NoteFrequency() {
 }
 
 //=================================================================================================
-void AudioBoard::NoteDetected(float frequency) {
+void AudioBoard::noteDetected(float frequency) {
     _noteDetectTime = micros();
     frequency = notefreq.read();
     _noteNumber = AudioSynthWavetable::freqToNote(frequency);

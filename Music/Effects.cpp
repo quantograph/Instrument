@@ -7,11 +7,11 @@ Effects::Effects(AudioStream* source, uint8_t sourceOutput, AudioStream* dest, u
 
 //=================================================================================================
 Effects::~Effects() {
-    Reset();
+    reset();
 }
 
 //=================================================================================================
-void Effects::Reset() {
+void Effects::reset() {
     delete _flange;
     _flange = nullptr;
 
@@ -28,8 +28,8 @@ void Effects::Reset() {
 }
 
 //=================================================================================================
-void Effects::Flange(double freq) {
-    Reset();
+void Effects::flange(double freq) {
+    reset();
     _flange = new AudioEffectFlange();
 
     int s_idx = FLANGE_DELAY_LENGTH/4;
@@ -42,8 +42,8 @@ void Effects::Flange(double freq) {
 }
 
 //=================================================================================================
-void Effects::Chorus() {
-    Reset();
+void Effects::chorus() {
+    reset();
     _chorus = new AudioEffectChorus();
 
     int n_chorus = 2;

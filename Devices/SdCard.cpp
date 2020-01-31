@@ -6,7 +6,7 @@ SdCard::SdCard() {
 
 //=================================================================================================
 // Initializes the menu
-void SdCard::Init() {
+void SdCard::init() {
     Serial.println("SdCard::Init");
     if(!SD.begin(BUILTIN_SDCARD)) {
         Serial.println("##### No SD card");
@@ -14,7 +14,7 @@ void SdCard::Init() {
 }
 
 //=================================================================================================
-bool SdCard::ReadFile(const char* path, char*& data, uint32_t& dataSize) {
+bool SdCard::readFile(const char* path, char*& data, uint32_t& dataSize) {
     File file;
     uint32_t bytesRead = 0;
 
@@ -32,7 +32,7 @@ bool SdCard::ReadFile(const char* path, char*& data, uint32_t& dataSize) {
     dataSize = file.size();
     Serial.printf("Opened '%s' file, size=%d\n", path, dataSize);
     data = (char*)malloc(dataSize);
-    if(data == NULL) {
+    if(data == nullptr) {
         Serial.printf("Can't allocate %d bytes\n", dataSize);
     }
 
@@ -49,7 +49,7 @@ bool SdCard::ReadFile(const char* path, char*& data, uint32_t& dataSize) {
 }
 
 //=================================================================================================
-void SdCard::PrintDirectory(File dir, int numTabs) {
+void SdCard::printDirectory(File dir, int numTabs) {
     //Serial.println("SdCard::PrintDirectory");
     while(true) {
         File entry =  dir.openNextFile();
@@ -66,7 +66,7 @@ void SdCard::PrintDirectory(File dir, int numTabs) {
         Serial.println(entry.name());
         if(entry.isDirectory()) {
             Serial.print("/");
-            PrintDirectory(entry, numTabs + 1);
+            printDirectory(entry, numTabs + 1);
         } else {
             // files have sizes, directories do not
             Serial.print("\t\t");
@@ -78,7 +78,7 @@ void SdCard::PrintDirectory(File dir, int numTabs) {
 }
 
 //=================================================================================================
-void SdCard::Test() {
+void SdCard::test() {
   File myFile;
 
  //UNCOMMENT THESE TWO LINES FOR TEENSY AUDIO BOARD:
@@ -119,5 +119,5 @@ void SdCard::Test() {
     Serial.println("error2 opening test.txt");
   }
 
-    PrintDirectory(SD.open("/"), 0);
+    printDirectory(SD.open("/"), 0);
 }

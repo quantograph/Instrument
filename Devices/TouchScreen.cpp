@@ -7,7 +7,7 @@ TouchScreen::TouchScreen() : _touch(T_CS, T_IRQ), _screen(TFT_CS, TFT_DC, TFT_RS
 
 //=================================================================================================
 // Initializes the screent and the touch
-void TouchScreen::Init() {
+void TouchScreen::init() {
     // Initialize the screent
     _screen.begin();
     _screen.setRotation(0);
@@ -27,7 +27,7 @@ void TouchScreen::Init() {
 }
 
 //=================================================================================================
-bool TouchScreen::Read() {
+bool TouchScreen::read() {
     _touched = false;
     if(_touch.tirqTouched()) {
         if(_touch.touched()) {
@@ -47,12 +47,12 @@ bool TouchScreen::Read() {
 }
 
 //=================================================================================================
-void TouchScreen::Clear() {
+void TouchScreen::clear() {
     _screen.fillScreen(ILI9341_BLACK);
 }
 
 //=================================================================================================
-void TouchScreen::OnTouched() {
+void TouchScreen::onTouched() {
     Serial.println(">>>> Screen touched");
-    //_screen.Read();
+    //_screen.read();
 }

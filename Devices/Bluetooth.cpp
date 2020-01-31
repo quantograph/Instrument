@@ -37,7 +37,7 @@ Bluetooth::Bluetooth() {
 }
 
 //=================================================================================================
-bool Bluetooth::Init() {
+bool Bluetooth::init() {
     Serial.printf("BT starting...\n");
     Serial1.begin(9600); // RXD on Bluetooth goes to pin 1 on Teensy, TXD -> pin 0
     Serial.printf("BT started...\n");
@@ -46,13 +46,13 @@ bool Bluetooth::Init() {
 }
 
 //=================================================================================================
-bool Bluetooth::Send(const char* buffer, int size) {
+bool Bluetooth::send(const char* buffer, int size) {
     Serial1.write(buffer, size);
     return true;
 }
 
 //=================================================================================================
-bool Bluetooth::Receive() {
+bool Bluetooth::receive() {
     while(Serial1.available() > 0 && _received < BUFFER_SIZE - 1) {
         _buffer[_received++] = (char)Serial1.read();
     }
@@ -64,13 +64,13 @@ bool Bluetooth::Receive() {
 }
 
 //=================================================================================================
-bool Bluetooth::Process() {
+bool Bluetooth::process() {
     if(Serial1.available() == 0)
         return false;
 
     // Get the new packet size - first 2 bytes
 
-    //g_audio.NoteOn(AudioBoard::Instrument::drums, AudioBoard::DrumNotes::snare_low, 90);
+    //g_audio.noteOn(AudioBoard::Instrument::drums, AudioBoard::DrumNotes::snare_low, 90);
 
     sprintf(_string, "BT: %s", _buffer);
     //LogScreen(_string);

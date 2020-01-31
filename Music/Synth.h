@@ -20,9 +20,9 @@ struct SynthVoice {
 class Synth {
 public:
     Synth(AudioBoard* audio);
-    void Init(int voices);
-    void NoteOn(byte note, byte velocity);
-    void NoteOff(byte note);
+    void init(int voices);
+    void noteOn(byte note, byte velocity);
+    void noteOff(byte note);
 
     AudioBoard* _audio;
     SynthVoice* _synthVoices[SYNTH_VOICES]; // Synth voices

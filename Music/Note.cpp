@@ -16,8 +16,8 @@ void Note::reset() {
     _start = 0.0;
     _duration = 0.0;
     _state = STATE_NONE;
-    _Tab.Reset();
-    _nChannel = 0;
+    _tab.reset();
+    _channel = 0;
     _instrument = PERCUSSION;
 }
 
@@ -27,8 +27,8 @@ Note& Note::operator = (const Note& note) {
     _start = note._start;
     _duration = note._duration;
     _state = note._state;
-    _Tab = note._Tab;
-    _nChannel = note._nChannel;
+    _tab = note._tab;
+    _channel = note._channel;
     _instrument = note._instrument;
     return *this;
 }

@@ -8,7 +8,7 @@ Staff::Staff() {
 }
 /*
 //=================================================================================================
-bool Staff::Init(int x, int y) {
+bool Staff::init(int x, int y) {
     _x = x;
     _y = y;
     DrawStaff();
@@ -213,6 +213,6 @@ bool Staff::IsSharp(char note) {
 
 //=================================================================================================
 // Shows saxophone keys pressed
-void Staff::Test() {
+void Staff::test() {
 }
 */

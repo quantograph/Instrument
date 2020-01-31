@@ -7,7 +7,7 @@ Fingers::Fingers() {
 }
 
 //=================================================================================================
-bool Fingers::Init(InstrumentInfo* instrument, int x, int y) {
+bool Fingers::init(InstrumentInfo* instrument, int x, int y) {
     _instrument = instrument;
     _x = x;
     _y = y;
@@ -18,7 +18,7 @@ bool Fingers::Init(InstrumentInfo* instrument, int x, int y) {
         case INSTRUMENT::TENOR_SAX:
         case INSTRUMENT::BARITONE_SAX:
         case INSTRUMENT::FLUTE:
-            InitSaxophone();
+            initSaxophone();
             break;
 
         case INSTRUMENT::TRUMPET:
@@ -38,7 +38,7 @@ bool Fingers::Init(InstrumentInfo* instrument, int x, int y) {
 }
 
 //=================================================================================================
-void Fingers::InitSaxophone() {
+void Fingers::initSaxophone() {
     _keyStep = 30;
     _shift = _keyStep * 0.7;
     _radius = _keyStep / 2 - 2;
@@ -78,12 +78,12 @@ void Fingers::InitSaxophone() {
         //g_screen._screen.drawCircle(key->_x, key->_y, _radius, _backColor);
     }
 
-    ShowSaxophone(0, false);
+    showSaxophone(0, false);
 }
 
 //=================================================================================================
 // Shows saxophone keys pressed
-void Fingers::ShowSaxophone(uint32_t keys, bool error) {
+void Fingers::showSaxophone(uint32_t keys, bool error) {
     /*for(int i = 0; i < _keyCount; ++i) {
         Key* key = &_keys[i];
         if(bitRead(keys, _instrument->_keyMap[i] - 1)) {

@@ -9,12 +9,12 @@ public:
     #define GUITAR_PLUG 3 // Teensy pin connected to guitar plug contact
 
     AudioInput(AudioBoard* audio);
-    void Init();
-    static void OnPlug();
-    void Reset();
-    void Passthrough();
-    void Flange(double freq);
-    void Chorus();
+    void init();
+    static void onPlug();
+    void reset();
+    void passthrough();
+    void flange(double freq);
+    void chorus();
 
     AudioBoard* _audio{nullptr};
     AudioInputI2S _input; // audio shield: mic or line-in

@@ -24,10 +24,10 @@ void Track::show() {
 }
 
 void Track::sortNotes() {
-    std::sort(_notes.begin(), _notes.end(), SortNoteTime);
+    std::sort(_notes.begin(), _notes.end(), sortNoteTime);
 }
 
-bool Track::SortNoteTime(Note note1, Note note2) {
+bool Track::sortNoteTime(Note note1, Note note2) {
     if(note1._start > note2._start)
         return false;
     else if(note1._start < note2._start)

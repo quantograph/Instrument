@@ -78,20 +78,20 @@ public:
     uint32_t _noteStopTime = 0;
     uint32_t _noteDetectTime = 0;
 
-	void Init();
-    void Process();
-    void PeakMeter();
-    void Test(int test);
-    void TestDrums(int pause);
-    void NoteFrequency();
-    void NoteOn(Instrument instrument, uint8_t n, uint8_t vel, uint8_t string = 0);
-    void NoteOn(Instrument instrument, int n, int vel) { NoteOn(instrument, (uint8_t)n, (uint8_t)vel); }
-    void NoteOff(Instrument instrument, uint8_t n = 0, uint8_t string = 0);
-    void NoteOff(Instrument instrument, int n, int string) { NoteOff(instrument, (uint8_t)n, (uint8_t)string); }
-    AudioSynthWavetable* GetInstrument(Instrument instrument, uint8_t note, uint8_t string);
-    AudioSynthWavetable* GetDrum(uint8_t note);
-    uint8_t GetNote(Instrument instrument, uint8_t note);
-    void NoteDetected(float frequency);
+	void init();
+    void process();
+    void peakMeter();
+    void test(int test);
+    void testDrums(int pause);
+    void noteFrequency();
+    void noteOn(Instrument instrument, uint8_t n, uint8_t vel, uint8_t string = 0);
+    void noteOn(Instrument instrument, int n, int vel) { noteOn(instrument, (uint8_t)n, (uint8_t)vel); }
+    void noteOff(Instrument instrument, uint8_t n = 0, uint8_t string = 0);
+    void noteOff(Instrument instrument, int n, int string) { noteOff(instrument, (uint8_t)n, (uint8_t)string); }
+    AudioSynthWavetable* getInstrument(Instrument instrument, uint8_t note, uint8_t string);
+    AudioSynthWavetable* getDrum(uint8_t note);
+    uint8_t getNote(Instrument instrument, uint8_t note);
+    void noteDetected(float frequency);
 
 
 
