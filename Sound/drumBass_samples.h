@@ -1,9 +1,10 @@
 #pragma once
 
 #include <Audio.h>
+#include "../Music/Misc.h"
 
 extern const AudioSynthWavetable::sample_data drumBass_samples[1];
-const uint8_t drumBass_ranges[] = {36};
+const uint8_t drumBass_ranges[] = {DRUM_BASS1};
 
 const AudioSynthWavetable::instrument_data drumBass = {1, drumBass_ranges, drumBass_samples };
 

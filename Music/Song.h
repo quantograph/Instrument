@@ -17,6 +17,7 @@ public:
     virtual ~Song();
     void reset();
     void show();
+    void getAllNotes(NoteList* notes, InstrumentList* instruments);
 };
 
 #endif // Song_h

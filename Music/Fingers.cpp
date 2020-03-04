@@ -24,7 +24,7 @@ bool Fingers::init(InstrumentInfo* instrument, int x, int y) {
         case INSTRUMENT::TRUMPET:
             break;
 
-        case INSTRUMENT::PERCUSSION:
+        case INSTRUMENT::NONE:
             break;
 
         /*case INSTRUMENT::STEEL_DRUM:

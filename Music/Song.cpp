@@ -26,7 +26,7 @@ void Song::reset() {
 //-----------------------------------------------------------------------------
 void Song::show() {
     // Show song info
-    Serial.printf("Song '%s', tempo=%d, time=%6.2f, beatTime=%6.2f, %d/%d\n",
+    Serial.printf("\n===== Song '%s', tempo=%d, time=%6.2f, beatTime=%6.2f, %d/%d\n",
                   _name.c_str(), _tempo, _songTime, _beatTime, _measureBeats, _beatNotes);
 
     // Show all tracks
@@ -37,4 +37,20 @@ void Song::show() {
     }
 
     Serial.printf("----------------------------\n");
+}
+
+void Song::getAllNotes(NoteList* notes, InstrumentList* instruments) {
+    for(auto track : _tracks) {
+        track->getAllNotes(notes);
+        instruments->push_back(track->_instrument);
+    }
+
+    sortNotes(notes);
+
+    // Show all notes
+    Serial.printf("\n===== All notes:\n", _tracks.size());
+    for(auto note : *notes) {
+        note.show();
+    }
+    Serial.printf("\n");
 }

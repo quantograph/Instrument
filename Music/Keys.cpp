@@ -86,7 +86,7 @@ bool Keys::init() {
     if(!MapButtons(&_trumpetInfo))
         return false;
 
-    _drumsInfo._instrument = INSTRUMENT::PERCUSSION;
+    _drumsInfo._instrument = INSTRUMENT::NONE;
     _drumsInfo._name = "Drums";
     //_drumsInfo._midiInstrument = MIDI_DRUMS;
     _drumsInfo._startNote = 0;

@@ -5,7 +5,7 @@ class Track {
 public:
     NoteList _notes{}; // Track's notes
     String _instrumentName{}; // Instrument name
-    INSTRUMENT _instrument{PERCUSSION}; // MIDI instument ID
+    INSTRUMENT _instrument{NONE}; // MIDI instument ID
     uint8_t _trackNumber; // Track number
     float _volume{}; // Volume: 1.0f - full volume, 0.0f - silence
     String _name{};
@@ -14,9 +14,8 @@ public:
 
     Track();
     virtual ~Track();
-    void sortNotes();
-    static bool sortNoteTime(Note note1, Note note2);
     void show();
+    void getAllNotes(NoteList* notes);
 };
 
 typedef std::list<Track*> TrackList;

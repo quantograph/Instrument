@@ -66,7 +66,7 @@ public:
     STATE _state{STATE_NONE};
     TabInfo _tab; // String and fret for this note, for one particular notation
     uint16_t _channel{0}; // MIDI channel
-    INSTRUMENT _instrument{PERCUSSION}; // Instrument type
+    INSTRUMENT _instrument{NONE}; // Instrument type
 
     Note();
     Note(const Note& note) { *this = note; }
@@ -77,5 +77,9 @@ public:
 };
 
 typedef std::vector<Note> NoteList;
+typedef NoteList::iterator NoteListIter;
+
+bool sortNoteTime(Note note1, Note note2);
+void sortNotes(NoteList* notes);
 
 #endif // Note_h

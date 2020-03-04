@@ -1,7 +1,7 @@
 #include "drumTomLow_samples.h"
 const AudioSynthWavetable::sample_data drumTomLow_samples[1] = {
 	{
-		(int16_t*)sample_drumTomLow, // sample
+		(int16_t*)drumTomLow_samples, // sample
 		true, // LOOP
 		13, // LENGTH_BITS
 		(1 << (32 - 13)) * WAVETABLE_CENTS_SHIFT(-25) * 44100.0 / WAVETABLE_NOTE_TO_FREQUENCY(113) / AUDIO_SAMPLE_RATE_EXACT + 0.5, // PER_HERTZ_PHASE_INCREMENT

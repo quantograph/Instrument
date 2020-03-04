@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "Misc.h"
 #include "Note.h"
 
@@ -18,7 +19,7 @@ void Note::reset() {
     _state = STATE_NONE;
     _tab.reset();
     _channel = 0;
-    _instrument = PERCUSSION;
+    _instrument = NONE;
 }
 
 Note& Note::operator = (const Note& note) {
@@ -34,6 +35,24 @@ Note& Note::operator = (const Note& note) {
 }
 
 void Note::show() {
-    Serial.printf("Note: start=%6.2f, durat=%6.2f, note=%d, volume=6.2%\n", 
-                  _start, _duration, _midiNote, _volume);
+    Serial.printf("Note: instr=%3d, start=%6.3f, durat=%6.3f, note=%2d, volume=%3.2f\n", 
+                  _instrument, _start, _duration, _midiNote, _volume);
+}
+
+void sortNotes(NoteList* notes) {
+    std::sort(notes->begin(), notes->end(), sortNoteTime);
+}
+
+bool sortNoteTime(Note note1, Note note2) {
+    if(note1._start > note2._start)
+        return false;
+    else if(note1._start < note2._start)
+        return true;
+    else { // The start times are equal
+        // Make sure that ends of notes go before starts of note
+        if(note1._volume < note2._volume)
+            return true;
+        else
+            return false;
+    }
 }

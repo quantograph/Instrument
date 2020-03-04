@@ -110,7 +110,7 @@ bool MidiFile::getChunks(Song* song) {
             if(_format == 1 && fileTrack == 1) {
                 // Don't save first track if MIDI file format is 1. It only has song's data, no track notes.
             } else {
-                track->sortNotes();
+                sortNotes(&_notes);
                 song->_tracks.push_back(track);
                 saveTrack++;
             }
@@ -285,7 +285,7 @@ bool MidiFile::getTrack(ChunkInfo& chunk, Song* song, Track* track) {
         }
     }
 
-    if(track->_instrument == PERCUSSION) {
+    if(track->_instrument == NONE) {
         // End all notes which were started, but not finished
         size = sizeof(_notes) / sizeof(Note);
         for(i = 0; i < size; i++) {
@@ -482,8 +482,8 @@ bool MidiFile::getMidiEvent(uint8_t eventId, char* data, uint32_t dataSize, uint
 
     // There is no instrument type for the drum set. MIDI channel 9 is reserved for drums.
     // So, if the channel is 9, set track's instrument to 'drum set'
-    if(channel == DRUM_CHANNEL)
-        track->_instrument = PERCUSSION;
+    /*if(channel == DRUM_CHANNEL)
+        track->_instrument = PERCUSSION;*/
 
     // 4 left bits specify
     switch(type) {
@@ -620,7 +620,7 @@ bool MidiFile::getNote(uint32_t channel, bool noteOn, char* data, uint32_t dataS
 
 //=================================================================================================
 bool MidiFile::addNote(Note* note, float trackTime, Track* track) {
-    INSTRUMENT instrument{PERCUSSION}; // Instrument type
+    INSTRUMENT instrument{NONE}; // Instrument type
     String instrumentName{}; // Instrument name
 
     // Set note's instrument
@@ -629,7 +629,7 @@ bool MidiFile::addNote(Note* note, float trackTime, Track* track) {
         if(getDrumInfo(note->_midiNote, instrumentName, instrument))
             note->_instrument = instrument;
         else
-            note->_instrument = PERCUSSION;
+            note->_instrument = NONE;
     } else
         note->_instrument = track->_instrument;
 
@@ -644,7 +644,7 @@ bool MidiFile::addNote(Note* note, float trackTime, Track* track) {
 //=================================================================================================
 // Get MIDI program (instrument or patch)
 bool MidiFile::getProgram(uint32_t channel, char* data, uint32_t dataSize, uint32_t& processed, float trackTime, Track* track) {
-    INSTRUMENT instrument{PERCUSSION}; // Instrument ID for this program
+    INSTRUMENT instrument{NONE}; // Instrument ID for this program
     uint32_t program{0}; // Program number. 0-127 in the file, but 1-128 in the specifications
     String programName{}; // Program name
     String string{}; // General string
@@ -666,6 +666,7 @@ bool MidiFile::getProgram(uint32_t channel, char* data, uint32_t dataSize, uint3
     if(channel == DRUM_CHANNEL) { // Check whether this is a Drum Channel: channel 9, with channel numbers starting with 0.
         instrument = PERCUSSION;
         programName = "Drum set";
+        Serial.printf("########### Drum set channel\n", program, programName.c_str(), channel);
     } else {
         if(!getProgramInfo(program, programName, instrument)) {
             Serial.printf("ERROR: GetProgramInfo\n");
@@ -678,7 +679,7 @@ bool MidiFile::getProgram(uint32_t channel, char* data, uint32_t dataSize, uint3
     track->_instrument = instrument;
     track->_instrumentName = programName;
 
-    Serial.printf("Program %3d, '%s', channel=%d\n", program, programName.c_str(), channel);
+    Serial.printf("Program %3d, '%s', channel=%d, instrument=%d\n", program, programName.c_str(), channel, instrument);
 
     processed = 1;
 
@@ -1220,19 +1221,19 @@ uint8_t MidiFile::getMidiDrumNote(INSTRUMENT instrument) {
 // 128 CM-64/CM-32L - the standard MT-32 Drum Kit
 bool MidiFile::getDrumInfo(uint32_t midiNote, String& name, INSTRUMENT& instrument) {
     switch(midiNote) {
-        /*case 27: name = "High Q";         instrument = PERCUSSION; break;
-        case 28: name = "Slap";           instrument = PERCUSSION; break;
-        case 29: name = "Scratch1";       instrument = PERCUSSION; break;
-        case 30: name = "Scratch2";       instrument = PERCUSSION; break;
-        case 31: name = "Sticks";         instrument = PERCUSSION; break;
-        case 32: name = "Square";         instrument = PERCUSSION; break;
-        case 33: name = "Metronome1";     instrument = PERCUSSION; break;
-        case 34: name = "Metronome2";     instrument = PERCUSSION; break;
+        /*case 27: name = "High Q";         instrument = NONE; break;
+        case 28: name = "Slap";           instrument = NONE; break;
+        case 29: name = "Scratch1";       instrument = NONE; break;
+        case 30: name = "Scratch2";       instrument = NONE; break;
+        case 31: name = "Sticks";         instrument = NONE; break;
+        case 32: name = "Square";         instrument = NONE; break;
+        case 33: name = "Metronome1";     instrument = NONE; break;
+        case 34: name = "Metronome2";     instrument = NONE; break;
         case 35: name = "Bass Drum 2";    instrument = (INSTRUMENT)DRUM_BASS_DRUM_2; break;
         case 36: name = "Bass Drum 1";    instrument = (INSTRUMENT)DRUM_BASS_DRUM_1; break;
-        case 37: name = "Side Stick";     instrument = (INSTRUMENT)PERCUSSION; break;
+        case 37: name = "Side Stick";     instrument = (INSTRUMENT)NONE; break;
         case 38: name = "Snare 1";        instrument = (INSTRUMENT)DRUM_SNARE; break;
-        case 39: name = "Hand Clap";      instrument = PERCUSSION; break;
+        case 39: name = "Hand Clap";      instrument = NONE; break;
         case 40: name = "Snare 2";        instrument = (INSTRUMENT)DRUM_SNARE; break;
         case 41: name = "Low Tom 2";      instrument = (INSTRUMENT)DRUM_TOM_6; break;
         case 42: name = "Closed Hi-Hat";  instrument = (INSTRUMENT)DRUM_HIHAT_CLOSED; break;
@@ -1247,41 +1248,41 @@ bool MidiFile::getDrumInfo(uint32_t midiNote, String& name, INSTRUMENT& instrume
         case 51: name = "Ride Cymbal 1";  instrument = (INSTRUMENT)DRUM_RIDE_CYMBAL; break;
         case 52: name = "Chinese Cymbal"; instrument = (INSTRUMENT)DRUM_CHINESE_1; break;
         case 53: name = "Ride Bell";      instrument = (INSTRUMENT)DRUM_RIDE_BELL; break;
-        case 54: name = "Tambourine";     instrument = PERCUSSION; break;
+        case 54: name = "Tambourine";     instrument = NONE; break;
         case 55: name = "Splash Cymbal";  instrument = (INSTRUMENT)DRUM_SPLASH_1; break;
-        case 56: name = "Cowbell";        instrument = (INSTRUMENT)PERCUSSION; break;
+        case 56: name = "Cowbell";        instrument = (INSTRUMENT)NONE; break;
         case 57: name = "Crash Cymbal 2"; instrument = (INSTRUMENT)DRUM_CRASH_2; break;
-        case 58: name = "Vibra Slap";     instrument = PERCUSSION;  break;
-        case 59: name = "Ride Cymbal 2";  instrument = PERCUSSION;  break;
-        case 60: name = "Hi Bongo";       instrument = PERCUSSION;  break;
-        case 61: name = "Low Bongo";      instrument = PERCUSSION;  break;
-        case 62: name = "Mute Hi Conga";  instrument = PERCUSSION;  break;
-        case 63: name = "Open Hi Conga";  instrument = PERCUSSION;  break;
-        case 64: name = "Low Conga";      instrument = PERCUSSION;  break;
-        case 65: name = "High Timbale";   instrument = PERCUSSION;  break;
-        case 66: name = "Low Timbale";    instrument = PERCUSSION;  break;
-        case 67: name = "High Agogo";     instrument = PERCUSSION;  break;
-        case 68: name = "Low Agogo";      instrument = PERCUSSION;  break;
-        case 69: name = "Cabasa";         instrument = PERCUSSION;  break;
-        case 70: name = "Maracas";        instrument = PERCUSSION;  break;
-        case 71: name = "Short Whistle";  instrument = PERCUSSION;  break;
-        case 72: name = "Long Whistle";   instrument = PERCUSSION;  break;
-        case 73: name = "Short Guiro";    instrument = PERCUSSION;  break;
-        case 74: name = "Long Guiro";     instrument = PERCUSSION;  break;
-        case 75: name = "Claves";         instrument = PERCUSSION;  break;
-        case 76: name = "Hi Wood Block";  instrument = PERCUSSION;  break;
-        case 77: name = "Low Wood Block"; instrument = PERCUSSION;  break;
-        case 78: name = "Mute Cuica";     instrument = PERCUSSION;  break;
-        case 79: name = "Open Cuica";     instrument = PERCUSSION;  break;
-        case 80: name = "Mute Triangle";  instrument = PERCUSSION;  break;
-        case 81: name = "Open Triangle";  instrument = PERCUSSION;  break;
-        case 82: name = "Shaker";         instrument = PERCUSSION;  break;
-        case 83: name = "Jingle Bell";    instrument = PERCUSSION;  break;
-        case 84: name = "Belltree";       instrument = PERCUSSION;  break;
-        case 85: name = "Castanets";      instrument = PERCUSSION;  break;
-        case 86: name = "Mute Surdo";     instrument = PERCUSSION;  break;
-        case 87: name = "Open Surdo";     instrument = PERCUSSION;  break;*/
-        default: name = "";               instrument = PERCUSSION; return false;
+        case 58: name = "Vibra Slap";     instrument = NONE;  break;
+        case 59: name = "Ride Cymbal 2";  instrument = NONE;  break;
+        case 60: name = "Hi Bongo";       instrument = NONE;  break;
+        case 61: name = "Low Bongo";      instrument = NONE;  break;
+        case 62: name = "Mute Hi Conga";  instrument = NONE;  break;
+        case 63: name = "Open Hi Conga";  instrument = NONE;  break;
+        case 64: name = "Low Conga";      instrument = NONE;  break;
+        case 65: name = "High Timbale";   instrument = NONE;  break;
+        case 66: name = "Low Timbale";    instrument = NONE;  break;
+        case 67: name = "High Agogo";     instrument = NONE;  break;
+        case 68: name = "Low Agogo";      instrument = NONE;  break;
+        case 69: name = "Cabasa";         instrument = NONE;  break;
+        case 70: name = "Maracas";        instrument = NONE;  break;
+        case 71: name = "Short Whistle";  instrument = NONE;  break;
+        case 72: name = "Long Whistle";   instrument = NONE;  break;
+        case 73: name = "Short Guiro";    instrument = NONE;  break;
+        case 74: name = "Long Guiro";     instrument = NONE;  break;
+        case 75: name = "Claves";         instrument = NONE;  break;
+        case 76: name = "Hi Wood Block";  instrument = NONE;  break;
+        case 77: name = "Low Wood Block"; instrument = NONE;  break;
+        case 78: name = "Mute Cuica";     instrument = NONE;  break;
+        case 79: name = "Open Cuica";     instrument = NONE;  break;
+        case 80: name = "Mute Triangle";  instrument = NONE;  break;
+        case 81: name = "Open Triangle";  instrument = NONE;  break;
+        case 82: name = "Shaker";         instrument = NONE;  break;
+        case 83: name = "Jingle Bell";    instrument = NONE;  break;
+        case 84: name = "Belltree";       instrument = NONE;  break;
+        case 85: name = "Castanets";      instrument = NONE;  break;
+        case 86: name = "Mute Surdo";     instrument = NONE;  break;
+        case 87: name = "Open Surdo";     instrument = NONE;  break;*/
+        default: name = "";               instrument = NONE; return false;
     }
 
     if(instrument == 0)
@@ -1524,7 +1525,7 @@ bool MidiFile::SaveAllTracks(Song* song) {
         sTrackData.reset();
 
         // Set MIDI channel for drum set
-        if(track->_instrument == PERCUSSION)
+        if(track->_instrument == NONE)
             track->_channel = DRUM_CHANNEL;
         else
             track->_channel = channel;
@@ -2585,7 +2586,7 @@ uint8_t MidiFile::getProgram(INSTRUMENT instrument) {
             return PROGRAM_OVERDRIVEN_GUITAR;
         case DISTORTION_GUITAR:
             return PROGRAM_DISTORTION_GUITAR;
-        case PERCUSSION:
+        case NONE:
             return PROGRAM_DRUM_SET;
         default:
             return PROGRAM_NONE;

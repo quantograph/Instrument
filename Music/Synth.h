@@ -1,12 +1,11 @@
 #ifndef Synth_h
 #define Synth_h
 
-#include <Audio.h>
-#include "../Devices/AudioBoard.h"
+#include <list>
+#include <vector>
+#include "Misc.h"
 
-#define SYNTH_VOICES 10
-#define SYNTH_MIXERS 3
-
+// Data for one synth voice
 struct SynthVoice {
     SynthVoice() {}
     ~SynthVoice() { delete _cord; }
@@ -18,19 +17,21 @@ struct SynthVoice {
 };
 
 class Synth {
+#define MAX_MIXERS 4
 public:
-    Synth(AudioBoard* audio);
-    void init(int voices);
+    Synth();
+    ~Synth();
+    bool init(INSTRUMENT instrument, AudioBoard* audio);
+    void reset();
     void noteOn(byte note, byte velocity);
     void noteOff(byte note);
-
-    AudioBoard* _audio;
-    SynthVoice* _synthVoices[SYNTH_VOICES]; // Synth voices
-    AudioMixer4 _voiceMixers[SYNTH_MIXERS]; // 4-channel mixers for all synth voices
-    AudioConnection* _mixerCords[SYNTH_MIXERS]; // Connections from voice mixers to the synth output mixer
-    AudioMixer4 _outMixer; // Synth output mixer going to one of 4 main audio mixers
-    AudioConnection* _outCord; // Connection from synth output mixer to one of 4 main audio mixers
-    int _voices; // Number of symultanios voices
+private:
+    std::vector<SynthVoice*> _synthVoices; // Synth voices
+    std::list<AudioMixer4*> _voiceMixers; // 4-channel mixers for all synth voices
+    AudioConnection* _cords[MAX_MIXERS]; // Connections from voice mixers to the synth output mixer
+    AudioMixer4 _outMixer; // Synth output mixer going to one of the 4 main mixers in the AudioBoard
+    AudioConnection* _outCord{nullptr}; // Connection from synth output mixer to one of 4 main audio mixers
+    InstrumentInfo _instrumentInfo;
 };
 
 #endif

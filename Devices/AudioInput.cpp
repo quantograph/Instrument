@@ -10,14 +10,14 @@ AudioInput::AudioInput(AudioBoard* audio) : _audio(audio) {
 void AudioInput::init() {
     attachInterrupt(GUITAR_PLUG, onPlug, CHANGE);
 
-    //_audio->_audioControl.inputSelect(AUDIO_INPUT_MIC);
-    _audio->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
+    _audio->_audioControl.inputSelect(AUDIO_INPUT_MIC);
+    //_audio->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
 
     _audio->_audioControl.lineInLevel(22); // Potentiometer pin
     //_audio->_audioControl.inputLevel(0.2);
     _audio->_audioControl.micGain(40); // 0 - 63
 
-    //passthrough();
+    passthrough();
     chorus();
 }
 
