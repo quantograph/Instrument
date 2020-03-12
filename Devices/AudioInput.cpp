@@ -10,15 +10,18 @@ AudioInput::AudioInput(AudioBoard* audio) : _audio(audio) {
 void AudioInput::init() {
     attachInterrupt(GUITAR_PLUG, onPlug, CHANGE);
 
-    _audio->_audioControl.inputSelect(AUDIO_INPUT_MIC);
-    //_audio->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
+    //_audio->_audioControl.inputSelect(AUDIO_INPUT_MIC);
+    _audio->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
 
     _audio->_audioControl.lineInLevel(22); // Potentiometer pin
     //_audio->_audioControl.inputLevel(0.2);
     _audio->_audioControl.micGain(40); // 0 - 63
 
     passthrough();
-    chorus();
+    //flange(0.5);
+    //chorus();
+    //reverb();
+    freeReverb();
 }
 
 //=================================================================================================
@@ -49,17 +52,17 @@ void AudioInput::reset() {
 void AudioInput::passthrough() {
     reset();
 
-    _passthrough1 = new AudioConnection(_input, 0, _audio->_mixer1, 1);
-    _passthrough2 = new AudioConnection(_input, 1, _audio->_mixer4, 1);
+    _passthrough1 = new AudioConnection(_input, 0, _audio->_mixer1, 0);
+    _passthrough2 = new AudioConnection(_input, 1, _audio->_mixer4, 0);
 }
 
 //=================================================================================================
 void AudioInput::flange(double freq) {
     reset();
 
-    _effect1 = new Effects(&_input, 0, &_audio->_mixer1, 1);
+    _effect1 = new Effects(&_input, 0, &_audio->_mixer1, 0);
     _effect1->flange(freq);
-    _effect2 = new Effects(&_input, 1, &_audio->_mixer4, 1);
+    _effect2 = new Effects(&_input, 1, &_audio->_mixer4, 0);
     _effect2->flange(freq);
 }
 
@@ -67,8 +70,28 @@ void AudioInput::flange(double freq) {
 void AudioInput::chorus() {
     reset();
 
-    _effect1 = new Effects(&_input, 0, &_audio->_mixer1, 1);
+    _effect1 = new Effects(&_input, 0, &_audio->_mixer1, 0);
     _effect1->chorus();
-    _effect2 = new Effects(&_input, 1, &_audio->_mixer4, 1);
+    _effect2 = new Effects(&_input, 1, &_audio->_mixer4, 0);
     _effect2->chorus();
+}
+
+//=================================================================================================
+void AudioInput::reverb() {
+    reset();
+
+    _effect1 = new Effects(&_input, 0, &_audio->_mixer1, 0);
+    _effect1->reverb();
+    _effect2 = new Effects(&_input, 1, &_audio->_mixer4, 0);
+    _effect2->reverb();
+}
+
+//=================================================================================================
+void AudioInput::freeReverb() {
+    reset();
+
+    _effect1 = new Effects(&_input, 0, &_audio->_mixer1, 0);
+    _effect1->freeReverb();
+    _effect2 = new Effects(&_input, 1, &_audio->_mixer4, 0);
+    _effect2->freeReverb();
 }

@@ -15,6 +15,8 @@ public:
     void passthrough();
     void flange(double freq);
     void chorus();
+    void reverb();
+    void freeReverb();
 
     AudioBoard* _audio{nullptr};
     AudioInputI2S _input; // audio shield: mic or line-in

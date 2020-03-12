@@ -12,12 +12,6 @@ Effects::~Effects() {
 
 //=================================================================================================
 void Effects::reset() {
-    delete _flange;
-    _flange = nullptr;
-
-    delete _chorus;
-    _chorus = nullptr;
-
     delete _inConnection;
     _inConnection = nullptr;
 
@@ -25,6 +19,18 @@ void Effects::reset() {
     _outConnection = nullptr;
 
     memset(_delayLine, 0, DELAY_LINE_LENGTH);
+
+    delete _flange;
+    _flange = nullptr;
+
+    delete _chorus;
+    _chorus = nullptr;
+
+    delete _reverb;
+    _reverb = nullptr;
+
+    delete _freeReverb;
+    _freeReverb = nullptr;
 }
 
 //=================================================================================================
@@ -52,4 +58,30 @@ void Effects::chorus() {
 
     _inConnection = new AudioConnection(*_source, _sourceOutput, *_chorus, 0);
     _outConnection = new AudioConnection(*_chorus, 0, *_dest, _destInput);
+}
+
+//=================================================================================================
+void Effects::reverb() {
+    reset();
+    _reverb = new AudioEffectReverb();
+
+    _reverb->reverbTime(0.3);
+
+    _inConnection = new AudioConnection(*_source, _sourceOutput, *_reverb, 0);
+    _outConnection = new AudioConnection(*_reverb, 0, *_dest, _destInput);
+
+}
+
+
+//=================================================================================================
+void Effects::freeReverb() {
+    reset();
+    _freeReverb = new AudioEffectFreeverb();
+
+    _freeReverb->roomsize(0.7);
+    _freeReverb->damping(0.1);
+
+    _inConnection = new AudioConnection(*_source, _sourceOutput, *_freeReverb, 0);
+    _outConnection = new AudioConnection(*_freeReverb, 0, *_dest, _destInput);
+
 }

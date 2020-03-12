@@ -1,7 +1,7 @@
 #include "TouchScreen.h"
 
 //=================================================================================================
-TouchScreen::TouchScreen() : _touch(T_CS, T_IRQ), _screen(TFT_CS, TFT_DC, TFT_RST,
+TouchScreen::TouchScreen() : _touch(T_CS/*, T_IRQ*/), _screen(TFT_CS, TFT_DC, TFT_RST,
     TFT_MOSI, TFT_SCK, TFT_SDO) {
 }
 
@@ -21,26 +21,27 @@ void TouchScreen::init() {
     _height = _screen.height();
 
     pinMode(TFT_LED, OUTPUT);
-    analogWrite(TFT_LED, 255);
+    light(0.0);
 
-    //attachInterrupt(T_IRQ, OnTouched, FALLING);
+    //attachInterrupt(T_IRQ, onTouched, FALLING);
+}
+
+//=================================================================================================
+void TouchScreen::light(float value) {
+    analogWrite(TFT_LED, 255 * value);
 }
 
 //=================================================================================================
 bool TouchScreen::read() {
     _touched = false;
-    if(_touch.tirqTouched()) {
-        if(_touch.touched()) {
-            _touched = true;
+    if(/*_touch.tirqTouched() &&*/ _touch.touched()) {
+        _touched = true;
 
-            // Map the touch point to the screen coordinates
-            _touchPoint = _touch.getPoint();
-            _touchPoint.x = map(_touchPoint.x, 0, 4095, 0, _width);
-            _touchPoint.y = map(_touchPoint.y, 0, 4095, 0, _height);
-            //Serial.printf("Touch: x=%5d y=%5d\n", _touchPoint.x, _touchPoint.y);
-
-            //_screen.sleep(false);
-        }
+        // Map the touch point to the screen coordinates
+        _touchPoint = _touch.getPoint();
+        _touchPoint.x = map(_touchPoint.x, 0, 4095, 0, _width);
+        _touchPoint.y = map(_touchPoint.y, 0, 4095, 0, _height);
+        //Serial.printf("Touch: x=%5d y=%5d\n", _touchPoint.x, _touchPoint.y);
     }
 
     return _touched;
@@ -53,6 +54,6 @@ void TouchScreen::clear() {
 
 //=================================================================================================
 void TouchScreen::onTouched() {
-    Serial.println(">>>> Screen touched");
+    //Serial.println(">>>> Screen touched");
     //_screen.read();
 }

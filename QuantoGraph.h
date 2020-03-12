@@ -3,6 +3,12 @@
 
 #include <Arduino.h>
 
+#include "./GUI/Settings.h"
+#include "./GUI/Control.h"
+#include "./GUI/Window.h"
+#include "./GUI/Main.h"
+#include "./GUI/Gui.h"
+
 #include "./Music/MusicDef.h"
 #include "./Music/Misc.h"
 #include "./Music/MidiFile.h"

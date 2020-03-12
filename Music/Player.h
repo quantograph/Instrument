@@ -29,7 +29,7 @@ public:
     bool init();
     bool play(Song* song);
     void process();
-    void test();
+    void testMidiFile();
     bool playNote(Note* note);
 };
 

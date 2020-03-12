@@ -199,8 +199,18 @@ bool Player::playNote(Note* note) {
 }
 
 //=================================================================================================
-void Player::test() {
-    testDrums();
+void Player::testMidiFile() {
+    /*MidiFile file;
+    Song song;
+    char* data;
+    uint32_t dataSize;
+    
+    //g_sdCard.readFile("Test1.mid", data, dataSize);
+    g_sdCard.readFile("TEST2.mid", data, dataSize);
+    file.read(data, dataSize, &song);
+    free(data);
+    song.show();
+    play(&song);*/
 }
 
 //=================================================================================================
