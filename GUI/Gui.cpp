@@ -13,9 +13,9 @@ Gui::Gui(TouchScreen* screen, Settings::Data* settings) : _screen(screen), _sett
 
 //=================================================================================================
 bool Gui::process() {
-    bool touched{_screen->read()};
-    bool edge{false};
-    uint32_t delay{50};
+    bool touched{_screen->read()}; // Whether the screen is being touched
+    bool edge{false}; // If we are on the "edge" of touching or releasing the screen
+    uint32_t delay{50}; // Time to wait to see if the screen is no longer touched
 
     if(!touched && !_touched) // Was not touched and not touched now, nothing to do.
         return false;
@@ -41,14 +41,14 @@ bool Gui::process() {
         _firstTouch = 0;
     }
 
-    if(edge) { // Pressed or released
+    if(edge) { // Pressed or released just now
         _lastTouchPoint = _screen->_touchPoint;
         if(_touched) {
             onTouch(_lastTouchPoint);
         } else {
             onRelease(_firstTouchPoint, _lastTouchPoint);
         }
-    } else if(_touched && 
+    } else if(_touched && // Ignore very small movements of the finger
               std::max(abs(_lastTouchPoint.x - _screen->_touchPoint.x),
                        abs(_lastTouchPoint.y - _screen->_touchPoint.y)) > 3) {
         onMove(_lastTouchPoint, _screen->_touchPoint);

@@ -23,7 +23,7 @@
 #include "./Music/Synth.h"
 
 #include "./Devices/AudioBoard.h"
-#include "./Devices/AudioInput.h"
+//#include "./Devices/AudioInput.h"
 #include "./Devices/Bluetooth.h"
 //#include "./Devices/CapSensor.h"
 #include "./Devices/Led.cpp"

@@ -10,18 +10,45 @@ AudioInput::AudioInput(AudioBoard* audio) : _audio(audio) {
 void AudioInput::init() {
     attachInterrupt(GUITAR_PLUG, onPlug, CHANGE);
 
-    //_audio->_audioControl.inputSelect(AUDIO_INPUT_MIC);
-    _audio->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
-
-    _audio->_audioControl.lineInLevel(22); // Potentiometer pin
-    //_audio->_audioControl.inputLevel(0.2);
-    _audio->_audioControl.micGain(40); // 0 - 63
+    // Peak meters
+    _cords.push_back(new AudioConnection(_input, 0, _peakLeft, 0));
+    _cords.push_back(new AudioConnection(_input, 1, _peakRight, 0));
 
     passthrough();
     //flange(0.5);
     //chorus();
     //reverb();
     freeReverb();
+}
+
+//=================================================================================================
+// Audio loop
+void AudioInput::peakMeter() {
+    float width = 60.0;
+    int cnt = 0;
+
+    if (_peakLeft.available() && _peakRight.available()) {
+        float left = _peakLeft.read();
+        float right = _peakRight.read();
+        Serial.printf("%0.3f %0.3f\n", left, right);
+        uint8_t leftPeak = left * width;
+        uint8_t rightPeak = right * width;
+
+        /*for (cnt = 0; cnt < width - leftPeak; cnt++) {
+            Serial.print(" ");
+        }
+        while (cnt++ < width) {
+            Serial.print("<");
+        }
+        Serial.print("||");
+        for (cnt = 0; cnt < rightPeak; cnt++) {
+            Serial.print(">");
+        }
+        while (cnt++ < width) {
+            Serial.print(" ");
+        }
+        Serial.println();*/
+    }
 }
 
 //=================================================================================================

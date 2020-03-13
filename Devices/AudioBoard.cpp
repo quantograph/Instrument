@@ -1,11 +1,40 @@
+#include "../Music/Effects.h"
 #include "AudioBoard.h"
 
 //=================================================================================================
 void AudioBoard::init() {
     AudioMemory(120);
+    attachInterrupt(GUITAR_PLUG, onPlug, CHANGE);
 
-    AudioNoInterrupts();
+    _audioControl.enable();
 
+    //_audioControl.inputSelect(AUDIO_INPUT_MIC);
+    _audioControl.inputSelect(AUDIO_INPUT_LINEIN);
+
+    // Volume and input levels
+    _audioControl.volume(0.8);
+    //_audioControl.lineInLevel(22); // Potentiometer pin
+    _audioControl.inputLevel(1.0);
+    _audioControl.micGain(40); // 0 - 63
+
+    // Peak meters
+    _cords.push_back(new AudioConnection(_input, 0, _peakLeft, 0));
+    _cords.push_back(new AudioConnection(_input, 1, _peakRight, 0));
+
+    setupMixers();
+
+    //notefreq.begin(.15);
+
+    // Effects
+    passthrough();
+    //flange(0.5);
+    //chorus();
+    //reverb();
+    //freeReverb();
+}
+
+//=================================================================================================
+void AudioBoard::setupMixers() {
     // Connect 4 input mixers to 2 output mixers
     _cords.push_back(new AudioConnection(_mixer1, 0, _outMixer1, 0));
     _cords.push_back(new AudioConnection(_mixer1, 0, _outMixer2, 0));
@@ -29,74 +58,13 @@ void AudioBoard::init() {
     // 2 (stereo) output mixers go to the audio output
     _cords.push_back(new AudioConnection(_outMixer1, 0, _audioOutput, 0));
     _cords.push_back(new AudioConnection(_outMixer2, 0, _audioOutput, 1));
-
-    // Waveform
-    //waveform1.frequency(440);
-    //waveform1.amplitude(1.0);
-    //waveform1.begin(WAVEFORM_SINE);
-
-    // Pitch detection
-    /*voice.setInstrument(steelstrgtr); 
-    voice.amplitude(1);
-    envelope1.attack(30);
-    envelope1.decay(100);
-    envelope1.sustain(0.5);
-    envelope1.release(500);*/
-
-    _audioControl.enable();
-
-    // Volume and input levels
-    _audioControl.volume(0.8);
-
-    //notefreq.begin(.15);
-
-    /*c1.disconnect();
-    c2.disconnect();
-    c3.disconnect();
-    c4.disconnect();*/
-
-    /*c31.connect();
-    c32.connect();
-    c33.connect();
-    c34.connect();*/
-
-    AudioInterrupts();
-}
-
-//=================================================================================================
-// Audio loop
-void AudioBoard::peakMeter() {
-    float width = 60.0;
-
-    if (peak_L.available() && peak_R.available()) {
-        float left = peak_L.read();
-        float right = peak_R.read();
-        Serial.printf("%0.3f %0.3f\n", left, right);
-        uint8_t leftPeak = left * width;
-        uint8_t rightPeak = right * width;
-
-        for (cnt = 0; cnt < width - leftPeak; cnt++) {
-            Serial.print(" ");
-        }
-        while (cnt++ < width) {
-            Serial.print("<");
-        }
-        Serial.print("||");
-        for (cnt = 0; cnt < rightPeak; cnt++) {
-            Serial.print(">");
-        }
-        while (cnt++ < width) {
-            Serial.print(" ");
-        }
-        Serial.println();
-    }
 }
 
 //=================================================================================================
 // Audio loop
 void AudioBoard::process() {
     //noteFrequency();
-    //peakMeter();
+    peakMeter();
     //test();
 
     //delay(10);
@@ -110,9 +78,9 @@ void AudioBoard::noteFrequency() {
     float lowPeak = 0.05;
 
     // Get the peak value
-    if(peak_L.available() && peak_R.available()) {
-        float left = peak_L.read();
-        float right = peak_R.read();
+    if(_peakLeft.available() && _peakRight.available()) {
+        float left = _peakLeft.read();
+        float right = _peakRight.read();
         peak = (left + right) / 2.0f;
     } else {
         return;
@@ -167,4 +135,106 @@ void AudioBoard::noteDetected(float frequency) {
     //sprintf(_string, "%3.0f", frequency);
     //LogScreen(_string);
     //g_led.Play(1);
+}
+
+//=================================================================================================
+// Audio loop
+void AudioBoard::peakMeter() {
+    float width = 60.0;
+    int cnt = 0;
+
+    if (_peakLeft.available() && _peakRight.available()) {
+        float left = _peakLeft.read();
+        float right = _peakRight.read();
+        Serial.printf("%0.3f %0.3f\n", left, right);
+        uint8_t leftPeak = left * width;
+        uint8_t rightPeak = right * width;
+
+        /*for (cnt = 0; cnt < width - leftPeak; cnt++) {
+            Serial.print(" ");
+        }
+        while (cnt++ < width) {
+            Serial.print("<");
+        }
+        Serial.print("||");
+        for (cnt = 0; cnt < rightPeak; cnt++) {
+            Serial.print(">");
+        }
+        while (cnt++ < width) {
+            Serial.print(" ");
+        }
+        Serial.println();*/
+    }
+}
+
+//=================================================================================================
+void AudioBoard::onPlug() {
+    int value;
+
+    delay(200);
+    value = digitalRead(GUITAR_PLUG);
+    Serial.printf(">>>> Guitar plug: %s\n", value == HIGH ? "high" : "low");
+}
+
+//=================================================================================================
+void AudioBoard::reset() {
+    delete _effect1;
+    _effect1 = nullptr;
+
+    delete _effect2;
+    _effect2 = nullptr;
+
+    delete _passthrough1;
+    _passthrough1 = nullptr;
+
+    delete _passthrough2;
+    _passthrough2 = nullptr;
+}
+
+//=================================================================================================
+void AudioBoard::passthrough() {
+    reset();
+
+    _passthrough1 = new AudioConnection(_input, 0, _mixer1, 0);
+    _passthrough2 = new AudioConnection(_input, 1, _mixer4, 0);
+}
+
+//=================================================================================================
+void AudioBoard::flange(double freq) {
+    reset();
+
+    _effect1 = new Effects(&_input, 0, &_mixer1, 0);
+    _effect1->flange(freq);
+    _effect2 = new Effects(&_input, 1, &_mixer4, 0);
+    _effect2->flange(freq);
+}
+
+//=================================================================================================
+void AudioBoard::chorus() {
+    reset();
+
+    _effect1 = new Effects(&_input, 0, &_mixer1, 0);
+    _effect1->chorus();
+    _effect2 = new Effects(&_input, 1, &_mixer4, 0);
+    _effect2->chorus();
+}
+
+//=================================================================================================
+void AudioBoard::reverb() {
+    reset();
+
+    _effect1 = new Effects(&_input, 0, &_mixer1, 0);
+    _effect1->reverb();
+    _effect2 = new Effects(&_input, 1, &_mixer4, 0);
+    _effect2->reverb();
+}
+
+//=================================================================================================
+void AudioBoard::freeReverb() {
+    reset();
+
+    _effect1 = new Effects(&_input, 0, &_mixer1, 0);
+    _effect1->freeReverb();
+    _effect2 = new Effects(&_input, 1, &_mixer4, 0);
+    _effect2->freeReverb();
 }
