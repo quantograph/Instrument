@@ -20,10 +20,13 @@ public:
     TS_Point _firstTouchPoint{}; // Point of the first touch
     TS_Point _lastTouchPoint{}; // Last touch point before the current touch
 
+    bool init();
     bool process();
     void onTouch(TS_Point point);
     void onRelease(TS_Point fromPoint, TS_Point toPoint);
     void onMove(TS_Point fromPoint, TS_Point toPoint);
+    void onPeakMeter(float left, float right);
+    void drawMeterBar(int x, int y, float value);
 };
 
 #endif // Gui_h

@@ -1,15 +1,17 @@
 #ifndef AudioBoard_h
 #define AudioBoard_h
 
-#include <list>
 #include <Arduino.h>
 #include <Audio.h>
 
 class Effects;
+class Gui;
 
 class AudioBoard
 {
 public:
+    AudioBoard(Gui* gui);
+    Gui* _gui{};
 	void init();
     void setupMixers();
     void process();

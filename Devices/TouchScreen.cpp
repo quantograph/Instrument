@@ -1,3 +1,6 @@
+#include <XPT2046_Touchscreen.h>
+#include <ILI9341_t3.h>
+#include <font_Arial.h>
 #include "TouchScreen.h"
 
 //=================================================================================================
@@ -56,4 +59,12 @@ void TouchScreen::clear() {
 void TouchScreen::onTouched() {
     //Serial.println(">>>> Screen touched");
     //_screen.read();
+}
+
+//=================================================================================================
+// Draws a vertical rectangle
+void TouchScreen::vertRect(int x, int y, int height, int width, uint16_t color) {
+    for(int i = 0; i < 2; ++i) {
+	    _screen.drawFastVLine(x + i, y, height, color);
+    }
 }

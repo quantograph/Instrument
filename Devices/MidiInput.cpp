@@ -1,3 +1,4 @@
+#include <list>
 #include "AudioBoard.h"
 #include "../Music/Synth.h"
 #include "MidiInput.h"

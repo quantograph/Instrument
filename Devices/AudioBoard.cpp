@@ -1,21 +1,36 @@
+#include <vector>
+#include <list>
+#include <XPT2046_Touchscreen.h>
+#include <ILI9341_t3.h>
+#include <font_Arial.h>
+#include "TouchScreen.h"
 #include "../Music/Effects.h"
+#include "../GUI/Settings.h"
+#include "../GUI/Gui.h"
 #include "AudioBoard.h"
 
 //=================================================================================================
+AudioBoard::AudioBoard(Gui* gui) : _gui(gui) {
+}
+
+//=================================================================================================
 void AudioBoard::init() {
+    bool mic = true;
+
     AudioMemory(120);
     attachInterrupt(GUITAR_PLUG, onPlug, CHANGE);
 
     _audioControl.enable();
+    _audioControl.volume(0.6);
 
-    //_audioControl.inputSelect(AUDIO_INPUT_MIC);
-    _audioControl.inputSelect(AUDIO_INPUT_LINEIN);
-
-    // Volume and input levels
-    _audioControl.volume(0.8);
-    //_audioControl.lineInLevel(22); // Potentiometer pin
-    _audioControl.inputLevel(1.0);
-    _audioControl.micGain(40); // 0 - 63
+    // Input
+    if(mic) {
+        _audioControl.inputSelect(AUDIO_INPUT_MIC);
+        _audioControl.micGain(40); // 0 - 63
+    } else {
+        _audioControl.inputSelect(AUDIO_INPUT_LINEIN);
+        _audioControl.lineInLevel(15); // 0 - 15
+    }
 
     // Peak meters
     _cords.push_back(new AudioConnection(_input, 0, _peakLeft, 0));
@@ -140,15 +155,10 @@ void AudioBoard::noteDetected(float frequency) {
 //=================================================================================================
 // Audio loop
 void AudioBoard::peakMeter() {
-    float width = 60.0;
-    int cnt = 0;
-
     if (_peakLeft.available() && _peakRight.available()) {
         float left = _peakLeft.read();
         float right = _peakRight.read();
-        Serial.printf("%0.3f %0.3f\n", left, right);
-        uint8_t leftPeak = left * width;
-        uint8_t rightPeak = right * width;
+        _gui->onPeakMeter(left, right);
 
         /*for (cnt = 0; cnt < width - leftPeak; cnt++) {
             Serial.print(" ");

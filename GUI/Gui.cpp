@@ -12,6 +12,13 @@ Gui::Gui(TouchScreen* screen, Settings::Data* settings) : _screen(screen), _sett
 }
 
 //=================================================================================================
+bool Gui::init() {
+    _screen->light(1.0);
+
+    return true;
+}
+
+//=================================================================================================
 bool Gui::process() {
     bool touched{_screen->read()}; // Whether the screen is being touched
     bool edge{false}; // If we are on the "edge" of touching or releasing the screen
@@ -73,23 +80,17 @@ void Gui::onMove(TS_Point fromPoint, TS_Point toPoint) {
     Serial.printf("GUI moved from %dx%d to %dx%d\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
 }
 
-/*
-    bool process = false;
+//=================================================================================================
+void Gui::onPeakMeter(float left, float right) {
+    drawMeterBar(1, 0, left);
+    drawMeterBar(7, 0, right);
+}
 
-    if(!_screen->read())
-        return false;
-
+//=================================================================================================
+void Gui::drawMeterBar(int x, int y, float value) {
+    int height = _screen->_height * value;
+    uint16_t color = value > 0.99 ? ILI9341_RED : ILI9341_GREEN;
     
-    _lastTouch = now;
-    if(!process)
-        return false;
-
-    if(_current == nullptr) { // Not in the menu mode
-        _current = _main;
-        _current->draw();
-        _screen->light(1.0);
-    } else {
-        //_current->process(_screen->_touchPoint);
-
-    }
-*/
+    _screen->vertRect(x, y, _screen->_height - height, 3, ILI9341_NAVY);
+    _screen->vertRect(x, y + (_screen->_height - height), height, 3, color);
+}

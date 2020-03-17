@@ -35,6 +35,7 @@ public:
     void clear();
     void light(float value);
     static void onTouched();
+    void vertRect(int x, int y, int height, int width, uint16_t color);
 
     XPT2046_Touchscreen _touch;
     ILI9341_t3 _screen;
