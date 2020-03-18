@@ -1,18 +1,15 @@
 #ifndef AudioBoard_h
 #define AudioBoard_h
 
-#include <Arduino.h>
-#include <Audio.h>
-
 class Effects;
 class Gui;
+class Settings;
 
 class AudioBoard
 {
 public:
-    AudioBoard(Gui* gui);
-    Gui* _gui{};
-	void init();
+    AudioBoard();
+	void init(Gui* gui, Settings* settings);
     void setupMixers();
     void process();
     void noteFrequency();
@@ -27,6 +24,8 @@ public:
     void freeReverb();
 
     #define GUITAR_PLUG 3 // Teensy pin connected to guitar plug contact
+    Gui* _gui{};
+    Settings* _settings{};
     AudioInputI2S _input; // audio shield: mic or line-in
     std::list<AudioConnection*> _cords;
     int _noteNumber = 0;

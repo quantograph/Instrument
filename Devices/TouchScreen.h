@@ -1,10 +1,6 @@
 #ifndef TouchScreen_h
 #define TouchScreen_h
 
-#include <XPT2046_Touchscreen.h>
-#include <ILI9341_t3.h>
-#include <font_Arial.h>
-
 // Store: https://www.pjrc.com/store/display_ili9341_touch.html
 // Screen library: https://github.com/PaulStoffregen/ILI9341_t3
 // Touch screen: https://github.com/PaulStoffregen/XPT2046_Touchscreen

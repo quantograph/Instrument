@@ -1,10 +1,6 @@
 #ifndef Settings_h
 #define Settings_h
 
-#include <ILI9341_t3.h>
-#include <EEPROM.h>
-//#include <./Libraries/Teensy/SerialFlash/SerialFlash.h>
-
 class Settings {
 public:
     struct Data {
@@ -14,7 +10,9 @@ public:
         uint16_t _textColor{ILI9341_NAVY}; // Text color
         int _textSize{2}; // Text size
         // Sound
-        uint8_t _volume{127};
+        Inputs _input{Inputs::mic}; // Mic or line in
+        uint16_t _micGain{40}; // Microphone gain (0 - 63)
+        uint8_t _lineInLevel{7}; // 0 - 15
     };
 
     char _marker[5] = "ACDC";

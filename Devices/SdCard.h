@@ -1,8 +1,6 @@
 #ifndef SdCard_h
 #define SdCard_h
 
-#include <SD.h>
-
 class SdCard {
 public:
     SdCard();

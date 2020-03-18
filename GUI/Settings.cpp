@@ -1,3 +1,4 @@
+#include "../Devices/Devices.h"
 #include "Settings.h"
 
 // EEPROM API documentation: https://www.arduino.cc/en/Reference/EEPROM
@@ -83,5 +84,5 @@ void Settings::Show(const char* title) {
     Serial.printf("   Marker=%s\n", _marker);
     Serial.printf("   Size=%d\n", _size);
     //Serial.printf("   Instrument=%d\n", _data._midiInstrument);
-    Serial.printf("   Volume=%d\n", _data._volume);
+    //Serial.printf("   Volume=%d\n", _data._volume);
 }

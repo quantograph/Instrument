@@ -1,19 +1,26 @@
 #include <vector>
+#include "../Devices/Devices.h"
 #include "../Devices/TouchScreen.h"
 #include "Settings.h"
 #include "Control.h"
 #include "Window.h"
+#include "PeakMeter.h"
 #include "Main.h"
 #include "Gui.h"
 
 //=================================================================================================
-Gui::Gui(TouchScreen* screen, Settings::Data* settings) : _screen(screen), _settings(settings) {
-    _main = new Main(settings);
+Gui::Gui() {
 }
 
 //=================================================================================================
-bool Gui::init() {
+bool Gui::init(TouchScreen* screen, Settings::Data* settings) {
+    _screen = screen;
+    _settings = settings;
+
     _screen->light(1.0);
+    
+    _main = new Main();
+    _main->init(_screen, _settings);
 
     return true;
 }
@@ -82,15 +89,5 @@ void Gui::onMove(TS_Point fromPoint, TS_Point toPoint) {
 
 //=================================================================================================
 void Gui::onPeakMeter(float left, float right) {
-    drawMeterBar(1, 0, left);
-    drawMeterBar(7, 0, right);
-}
-
-//=================================================================================================
-void Gui::drawMeterBar(int x, int y, float value) {
-    int height = _screen->_height * value;
-    uint16_t color = value > 0.99 ? ILI9341_RED : ILI9341_GREEN;
-    
-    _screen->vertRect(x, y, _screen->_height - height, 3, ILI9341_NAVY);
-    _screen->vertRect(x, y + (_screen->_height - height), height, 3, color);
+    _main->onPeakMeter(left, right);
 }

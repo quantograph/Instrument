@@ -1,8 +1,4 @@
-#include <vector>
-#include <list>
-#include <XPT2046_Touchscreen.h>
-#include <ILI9341_t3.h>
-#include <font_Arial.h>
+#include "Devices.h"
 #include "TouchScreen.h"
 #include "../Music/Effects.h"
 #include "../GUI/Settings.h"
@@ -10,12 +6,13 @@
 #include "AudioBoard.h"
 
 //=================================================================================================
-AudioBoard::AudioBoard(Gui* gui) : _gui(gui) {
+AudioBoard::AudioBoard() {
 }
 
 //=================================================================================================
-void AudioBoard::init() {
-    bool mic = true;
+void AudioBoard::init(Gui* gui, Settings* settings) {
+    _gui = gui;
+    _settings = settings;
 
     AudioMemory(120);
     attachInterrupt(GUITAR_PLUG, onPlug, CHANGE);
@@ -24,12 +21,12 @@ void AudioBoard::init() {
     _audioControl.volume(0.6);
 
     // Input
-    if(mic) {
+    if(_settings->_data._input == Inputs::mic) {
         _audioControl.inputSelect(AUDIO_INPUT_MIC);
-        _audioControl.micGain(40); // 0 - 63
-    } else {
+        _audioControl.micGain(_settings->_data._micGain); // 0 - 63
+    } else if(_settings->_data._input == Inputs::line) {
         _audioControl.inputSelect(AUDIO_INPUT_LINEIN);
-        _audioControl.lineInLevel(15); // 0 - 15
+        _audioControl.lineInLevel(_settings->_data._lineInLevel); // 0 - 15
     }
 
     // Peak meters

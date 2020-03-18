@@ -3,6 +3,18 @@
 
 #include <Arduino.h>
 
+#include "./Devices/Devices.h"
+#include "./Devices/AudioBoard.h"
+//#include "./Devices/AudioInput.h"
+#include "./Devices/Bluetooth.h"
+//#include "./Devices/CapSensor.h"
+#include "./Devices/Led.h"
+//#include "./Devices/MidiChip.h"
+#include "./Devices/MidiInput.h"
+//#include "./Devices/Motion.h"
+#include "./Devices/SdCard.h"
+#include "./Devices/TouchScreen.h"
+
 #include "./GUI/Settings.h"
 #include "./GUI/Control.h"
 #include "./GUI/Window.h"
@@ -21,18 +33,6 @@
 #include "./Music/Keys.h"
 #include "./Music/Effects.h"
 #include "./Music/Synth.h"
-
-#include "./Devices/AudioBoard.h"
-//#include "./Devices/AudioInput.h"
-#include "./Devices/Bluetooth.h"
-//#include "./Devices/CapSensor.h"
-#include "./Devices/Led.cpp"
-#include "./Devices/Led.h"
-//#include "./Devices/MidiChip.h"
-#include "./Devices/MidiInput.h"
-//#include "./Devices/Motion.h"
-#include "./Devices/SdCard.h"
-#include "./Devices/TouchScreen.h"
 
 #include "./Sound/bassoon_samples.h"
 #include "./Sound/clarinet_samples.h"

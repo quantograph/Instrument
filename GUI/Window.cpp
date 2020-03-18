@@ -1,11 +1,10 @@
-#include <vector>
+#include "../Devices/Devices.h"
 #include "Settings.h"
 #include "Control.h"
 #include "Window.h"
 
 //=================================================================================================
-Window::Window(Settings::Data* settings) : _settings(settings) {
-
+Window::Window() {
 }
 
 //=================================================================================================
@@ -13,6 +12,14 @@ Window::~Window() {
     for(auto control : _controls){
         delete control;
     }
+}
+
+//=================================================================================================
+bool Window::init(TouchScreen* screen, Settings::Data* settings) {
+    _screen = screen;
+    _settings = settings;
+
+    return true;
 }
 
 //=================================================================================================

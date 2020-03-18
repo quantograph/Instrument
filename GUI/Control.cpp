@@ -1,3 +1,4 @@
+#include "../Devices/Devices.h"
 #include "Settings.h"
 #include "Control.h"
 
