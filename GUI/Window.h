@@ -14,6 +14,9 @@ public:
 
     virtual void draw();
     virtual bool init(TouchScreen* screen, Settings::Data* settings);
+    virtual void onTouch(TS_Point point) {}
+    virtual void onRelease(TS_Point fromPoint, TS_Point toPoint) {}
+    virtual void onMove(TS_Point fromPoint, TS_Point toPoint) {}
     virtual void onPeakMeter(float left, float right) {}
 };
 

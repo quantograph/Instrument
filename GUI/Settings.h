@@ -15,15 +15,23 @@ public:
         uint8_t _lineInLevel{7}; // 0 - 15
     };
 
-    char _marker[5] = "ACDC";
+    #define startTag "ACDC|" // Start marker
+    #define inputTag "inpt"  // _input
+    #define micGainTag  "mcgn" // _micGain
+    #define lineInLevelTag "inlv"  // _lineInLevel
+    #define endTag "####" 
+
+    char _marker[6] = "ACDC|";
     uint16_t _size = 0;
     
     Settings();
     bool read();
-    bool Write();
-    void Show(const char* title);
-    bool ReadBuffer(int address, uint8_t* buffer, int size);
-    bool WriteBuffer(int address, const uint8_t* buffer, int size);
+    bool write();
+    void show(const char* title);
+    bool readBuffer(int address, uint8_t* buffer, int size);
+    bool writeBuffer(int address, const uint8_t* buffer, int size);
+    void putValue(String& string, const char* tag, int16_t value);
+    bool getValue(char* pair);
 
     // Add new members to the end of this:
     Data  _data;

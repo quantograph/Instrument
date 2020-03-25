@@ -3,18 +3,12 @@
 
 class TouchScreen;
 
-class PeakMeter {
+class PeakMeter : public Control {
 public:
-    PeakMeter(TouchScreen* screen, int x, int y, int height, int width);
-
-    TouchScreen* _screen{};
-    int _x;
-    int _y;
-    int _height; 
-    int _width;
+    PeakMeter(Settings::Data* settings, TouchScreen* screen, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
     
     void draw(float left, float right);
-    void drawMeterBar(int x, int y, int width, float value);
+    void drawMeterBar(uint16_t x, uint16_t y, uint16_t width, float value);
 };
 
 #endif // Gui_h

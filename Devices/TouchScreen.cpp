@@ -60,9 +60,10 @@ void TouchScreen::onTouched() {
 }
 
 //=================================================================================================
-// Draws a vertical rectangle
-void TouchScreen::vertRect(int x, int y, int height, int width, uint16_t color) {
-    for(int i = 0; i < 3; ++i) {
-	    _screen.drawFastVLine(x + i, y, height, color);
+// Draws a vertical rectangle, x and y are for the upper left corner
+void TouchScreen::vertRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color) {
+    for(int i = 0; i < width; ++i) {
+        //Serial.printf("drawFastVLine: from %3dx%3d, %3d\n", x + i, y, height);
+	    _screen.drawFastVLine(x + i, y, height, color); // Height goes down
     }
 }

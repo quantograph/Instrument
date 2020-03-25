@@ -21,6 +21,7 @@ bool Gui::init(TouchScreen* screen, Settings::Data* settings) {
     
     _main = new Main();
     _main->init(_screen, _settings);
+    _current = _main;
 
     return true;
 }
@@ -74,20 +75,23 @@ bool Gui::process() {
 
 //=================================================================================================
 void Gui::onTouch(TS_Point point) {
-    Serial.printf("GUI touched at %dx%d\n", point.x, point.y);
+    //Serial.printf("GUI touched at %dx%d\n", point.x, point.y);
+    _current->onTouch(point);
 }
 
 //=================================================================================================
 void Gui::onRelease(TS_Point fromPoint, TS_Point toPoint) {
-    Serial.printf("GUI released, moved from %dx%d to %dx%d\n\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
+    //Serial.printf("GUI released, moved from %dx%d to %dx%d\n\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
+    _current->onRelease(fromPoint, toPoint);
 }
 
 //=================================================================================================
 void Gui::onMove(TS_Point fromPoint, TS_Point toPoint) {
-    Serial.printf("GUI moved from %dx%d to %dx%d\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
+    //Serial.printf("GUI moved from %dx%d to %dx%d\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
+    _current->onMove(fromPoint, toPoint);
 }
 
 //=================================================================================================
 void Gui::onPeakMeter(float left, float right) {
-    _main->onPeakMeter(left, right);
+    _current->onPeakMeter(left, right);
 }
