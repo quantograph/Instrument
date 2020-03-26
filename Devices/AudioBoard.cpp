@@ -16,6 +16,7 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
 
     AudioMemory(120);
     attachInterrupt(GUITAR_PLUG, onPlug, CHANGE);
+    //attachInterrupt(6, onVolume, CHANGE);
 
     _audioControl.enable();
     _audioControl.volume(0.6);
@@ -181,6 +182,14 @@ void AudioBoard::onPlug() {
     delay(200);
     value = digitalRead(GUITAR_PLUG);
     Serial.printf(">>>> Guitar plug: %s\n", value == HIGH ? "high" : "low");
+}
+
+//=================================================================================================
+void AudioBoard::onVolume() {
+    int value;
+
+    value = analogRead(VOLUME_PIN);
+    //Serial.printf(">>>> Volume change: %d\n", value);
 }
 
 //=================================================================================================

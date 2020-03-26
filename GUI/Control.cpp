@@ -4,8 +4,10 @@
 #include "Control.h"
 
 //=================================================================================================
-Control::Control(Settings::Data* settings, TouchScreen* screen, uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
-    _settings(settings), _screen(screen), _x(x), _y(y), _width(width), _height(height) {
+Control::Control(Settings::Data* settings, TouchScreen* screen, Window* parent, 
+                 uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
+    _settings(settings), _screen(screen), _parent(parent), 
+    _x(x), _y(y), _width(width), _height(height) {
 
 }
 

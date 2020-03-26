@@ -5,8 +5,9 @@
 #include "PeakMeter.h"
 
 //=================================================================================================
-PeakMeter::PeakMeter(Settings::Data* settings, TouchScreen* screen, uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
-    Control(settings, screen, x, y, width, height) {
+PeakMeter::PeakMeter(Settings::Data* settings, TouchScreen* screen, Window* parent, 
+                     uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
+    Control(settings, screen, parent, x, y, width, height) {
     //Serial.printf("PeakMeter: %dx%d, %dx%d\n", _x, _y, _height, _width);
 }
 

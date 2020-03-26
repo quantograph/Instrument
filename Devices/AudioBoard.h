@@ -16,6 +16,7 @@ public:
     void noteDetected(float frequency);
     void peakMeter();
     static void onPlug();
+    static void onVolume();
     void reset();
     void passthrough();
     void flange(double freq);
@@ -24,6 +25,7 @@ public:
     void freeReverb();
 
     #define GUITAR_PLUG 3 // Teensy pin connected to guitar plug contact
+    #define VOLUME_PIN 6 /*AVB - 22 in the last wiring */ // Teensy pin connected to guitar plug contact
     Gui* _gui{};
     Settings* _settings{};
     AudioInputI2S _input; // audio shield: mic or line-in

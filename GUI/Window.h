@@ -2,6 +2,8 @@
 #define Window_h
 
 class TouchScreen;
+class Control;
+class Button;
 
 class Window {
 public:
@@ -18,6 +20,7 @@ public:
     virtual void onRelease(TS_Point fromPoint, TS_Point toPoint) {}
     virtual void onMove(TS_Point fromPoint, TS_Point toPoint) {}
     virtual void onPeakMeter(float left, float right) {}
+    virtual void onButton(Button* button) {}
 };
 
 #endif // Window_h

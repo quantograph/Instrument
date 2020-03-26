@@ -5,8 +5,9 @@
 #include "Slider.h"
 
 //=================================================================================================
-Slider::Slider(Settings::Data* settings, TouchScreen* screen, uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
-    Control(settings, screen, x, y, width, height) {
+Slider::Slider(Settings::Data* settings, TouchScreen* screen, Window* parent, 
+               uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
+    Control(settings, screen, parent, x, y, width, height) {
 }
 
 //=================================================================================================
@@ -15,33 +16,33 @@ void Slider::init() {
 }
 
 //=================================================================================================
-void Slider::drawBar(uint16_t y, uint16_t color) {
-    for(uint16_t i = y - 2; i <= y + 2; ++i) {
-	    _screen->_screen.drawFastHLine(_x + 1, i, _width - 2, color);
+void Slider::drawBar(uint16_t x, uint16_t color) {
+    for(uint16_t i = x - 2; i <= x + 2; ++i) {
+	    _screen->_screen.drawFastVLine(i, _y + 1, _height - 2, color);
     }
 }
 
 //=================================================================================================
 void Slider::draw(TS_Point point) {
-    uint16_t top = _y + 3;
-    uint16_t bottom = _y + _height - 4;
-    uint16_t height = bottom - top;
-    uint16_t y = point.y;
+    uint16_t left = _x + 3;
+    uint16_t right = _x + _width - 4;
+    uint16_t width = right - left;
+    uint16_t x = point.x;
 
     // Limit within the control
-    y = max(top, y);
-    y = min(bottom, y);
+    x = max(left, x);
+    x = min(right, x);
 
     // Erase the old bar
-    if(_lastY > 0)
-        drawBar(_lastY, ILI9341_BLACK);
+    if(_lastX > 0)
+        drawBar(_lastX, ILI9341_BLACK);
 
-    drawBar(y, ILI9341_BLUE);
-    _lastY = y;
+    drawBar(x, ILI9341_BLUE);
+    _lastX = x;
 
     // Get the bar's value
-    _value = (float)(bottom - y) / height;
-    //Serial.printf("value=%0.2f\n", _value);
+    _value = (float)(x - left) / width;
+    Serial.printf("value=%0.2f\n", _value);
 }
 
 //=================================================================================================
