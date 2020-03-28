@@ -16,9 +16,9 @@ Window::~Window() {
 }
 
 //=================================================================================================
-bool Window::init(TouchScreen* screen, Settings::Data* settings) {
-    _screen = screen;
+bool Window::init(Settings* settings, Window* parent /* = nullptr */) {
     _settings = settings;
+    _parent = parent;
 
     return true;
 }

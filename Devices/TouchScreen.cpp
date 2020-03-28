@@ -55,7 +55,7 @@ void TouchScreen::clear() {
 
 //=================================================================================================
 void TouchScreen::onTouched() {
-    //Serial.println(">>>> Screen touched");
+    //Serial.printf(">>>> Screen touched\n");
     //_screen.read();
 }
 
@@ -65,5 +65,14 @@ void TouchScreen::vertRect(uint16_t x, uint16_t y, uint16_t width, uint16_t heig
     for(int i = 0; i < width; ++i) {
         //Serial.printf("drawFastVLine: from %3dx%3d, %3d\n", x + i, y, height);
 	    _screen.drawFastVLine(x + i, y, height, color); // Height goes down
+    }
+}
+
+//=================================================================================================
+// Draws a horizontal rectangle, x and y are for the upper left corner
+void TouchScreen::horRect(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color) {
+    for(int i = 0; i < height; ++i) {
+        //Serial.printf("drawFastHLine: from %3dx%3d, %3d\n", x + i, y, height);
+	    _screen.drawFastHLine(x, y + i, width, color); // Width goes right
     }
 }

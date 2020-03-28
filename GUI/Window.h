@@ -8,19 +8,20 @@ class Button;
 class Window {
 public:
     Window();
-    ~Window();
+    virtual ~Window();
 
-    TouchScreen* _screen{};
-    Settings::Data* _settings{};
+    Settings* _settings{};
+    Window* _parent{};
     std::vector<Control*> _controls{};
 
     virtual void draw();
-    virtual bool init(TouchScreen* screen, Settings::Data* settings);
-    virtual void onTouch(TS_Point point) {}
-    virtual void onRelease(TS_Point fromPoint, TS_Point toPoint) {}
-    virtual void onMove(TS_Point fromPoint, TS_Point toPoint) {}
+    virtual bool init(Settings* settings, Window* parent = nullptr);
+    virtual void onTouch(const TS_Point& point) {}
+    virtual void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {}
+    virtual void onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {}
     virtual void onPeakMeter(float left, float right) {}
     virtual void onButton(Button* button) {}
+    virtual void onBack(Window* window) {}
 };
 
 #endif // Window_h

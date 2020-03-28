@@ -7,9 +7,8 @@
 #include "Button.h"
 
 //=================================================================================================
-Button::Button(Settings::Data* settings, TouchScreen* screen, Window* parent, 
-               uint16_t x, uint16_t y, uint16_t width, uint16_t height, ButtonId id) : 
-    Control(settings, screen, parent, x, y, width, height), _id(id) {
+Button::Button(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, ButtonId id) : 
+    Control(settings, parent, x, y, width, height), _id(id) {
 }
 
 //=================================================================================================
@@ -31,24 +30,31 @@ void Button::init() {
             _text = "Setp";
             break;
 
+        case back:
+            _text = "Back";
+            break;
+
         default:
             Serial.printf("##### ERROR: unknown button ID: d\n", _id);
             break;
     }
-
-    // Draw the button's frame
-	_screen->_screen.fillRoundRect(_x, _y, _width, _height, _radius, _backColor);
-	_screen->_screen.drawRoundRect(_x, _y, _width, _height, _radius, _borderColor);
-
-    // Draw the text
-    _screen->_screen.setCursor(_x + 5, _y + 20);
-    _screen->_screen.setTextColor(_textColor);
-    _screen->_screen.setTextSize(_textSize);
-    _screen->_screen.print(_text);
 }
 
 //=================================================================================================
-void Button::onTouch(TS_Point point) {
+void Button::draw() {
+    // Draw the button's frame
+	_settings->_screen->_screen.fillRoundRect(_x, _y, _width, _height, _radius, _backColor);
+	_settings->_screen->_screen.drawRoundRect(_x, _y, _width, _height, _radius, _borderColor);
+
+    // Draw the text
+    _settings->_screen->_screen.setCursor(_x + 5, _y + 20);
+    _settings->_screen->_screen.setTextColor(_textColor);
+    _settings->_screen->_screen.setTextSize(_textSize);
+    _settings->_screen->_screen.print(_text);
+}
+
+//=================================================================================================
+void Button::onTouch(const TS_Point& point) {
     if(!inside(point))
         return;
 
@@ -57,5 +63,5 @@ void Button::onTouch(TS_Point point) {
 }
 
 //=================================================================================================
-void Button::onRelease(TS_Point fromPoint, TS_Point toPoint) {
+void Button::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
 }

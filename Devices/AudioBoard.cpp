@@ -11,6 +11,7 @@ AudioBoard::AudioBoard() {
 
 //=================================================================================================
 void AudioBoard::init(Gui* gui, Settings* settings) {
+    //Serial.printf("AudioBoard::init\n");
     _gui = gui;
     _settings = settings;
 
@@ -186,9 +187,9 @@ void AudioBoard::onPlug() {
 
 //=================================================================================================
 void AudioBoard::onVolume() {
-    int value;
+    /*int value;
 
-    value = analogRead(VOLUME_PIN);
+    value = analogRead(VOLUME_PIN);*/
     //Serial.printf(">>>> Volume change: %d\n", value);
 }
 

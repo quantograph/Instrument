@@ -10,8 +10,7 @@ class Gui {
 public:
     Gui();
 
-    TouchScreen* _screen{};
-    Settings::Data* _settings{};
+    Settings* _settings{};
     Window* _current{};
     Main* _main{};
     uint32_t _firstTouch{0}; // Time of the first screen touch
@@ -20,11 +19,11 @@ public:
     TS_Point _firstTouchPoint{}; // Point of the first touch
     TS_Point _lastTouchPoint{}; // Last touch point before the current touch
 
-    bool init(TouchScreen* screen, Settings::Data* settings);
+    bool init(Settings* settings);
     bool process();
-    void onTouch(TS_Point point);
-    void onRelease(TS_Point fromPoint, TS_Point toPoint);
-    void onMove(TS_Point fromPoint, TS_Point toPoint);
+    void onTouch(const TS_Point& point);
+    void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint);
+    void onMove(const TS_Point& fromPoint, const TS_Point& toPoint);
     void onPeakMeter(float left, float right);
 };
 

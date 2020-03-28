@@ -137,7 +137,7 @@ bool Settings::write() {
     writeBuffer(offset, (const uint8_t*)string.c_str(), _size);
 
     show("Saving");
-    //Serial.printf("\n(%d) %s\n", _size, string.c_str());
+    Serial.printf("\n(%d) %s\n", _size, string.c_str());
 
     return true;
 }
@@ -150,6 +150,9 @@ void Settings::show(const char* title) {
     Serial.printf("   _input=%d\n", _data._input);
     Serial.printf("   _micGain=%d\n", _data._micGain);
     Serial.printf("   _lineInLevel=%d\n", _data._lineInLevel);
+
+    //Serial.printf("      _screen=%p\n", _screen);
+
     //Serial.printf("   Instrument=%d\n", _data._midiInstrument);
     //Serial.printf("   Volume=%d\n", _data._volume);
 }

@@ -4,10 +4,8 @@
 #include "Control.h"
 
 //=================================================================================================
-Control::Control(Settings::Data* settings, TouchScreen* screen, Window* parent, 
-                 uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
-    _settings(settings), _screen(screen), _parent(parent), 
-    _x(x), _y(y), _width(width), _height(height) {
+Control::Control(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
+    _settings(settings), _parent(parent), _x(x), _y(y), _width(width), _height(height) {
 
 }
 
@@ -31,7 +29,7 @@ void Control::draw() {
 
 //=================================================================================================
 // Whether the point is inside the control
-bool Control::inside(TS_Point point) {
+bool Control::inside(const TS_Point& point) {
     if(point.x >= _x && point.x <= _x + _width &&
        point.y >= _y && point.y <= _y + _height)
         return true;

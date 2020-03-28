@@ -1,6 +1,15 @@
 #ifndef Settings_h
 #define Settings_h
 
+class TouchScreen;
+class Gui;
+class AudioBoard;
+class SdCard;
+class MidiInput;
+class Bluetooth;
+class Player;
+class Synth;
+
 class Settings {
 public:
     struct Data {
@@ -15,11 +24,25 @@ public:
         uint8_t _lineInLevel{7}; // 0 - 15
     };
 
+    #define MIC_GAIN_MAX 63 // 0 - 63
+    #define LINE_IN_MAX 15 // 0 - 15
+
+    // All devices
+    TouchScreen* _screen{};
+    Gui* _gui{};
+    AudioBoard* _audio{};
+    SdCard* _sdCard{};
+    MidiInput* _midiInput{};
+    Bluetooth* _bluetooth{};
+    Player* _player{};
+    Synth* _synth{};
+
+    // Markers
     #define startTag "ACDC|" // Start marker
     #define inputTag "inpt"  // _input
     #define micGainTag  "mcgn" // _micGain
     #define lineInLevelTag "inlv"  // _lineInLevel
-    #define endTag "####" 
+    #define endTag "####"
 
     char _marker[6] = "ACDC|";
     uint16_t _size = 0;

@@ -3,6 +3,7 @@
 
 class PeakMeter;
 class Slider;
+class Button;
 
 class SetAudio : public Window {
 public:
@@ -10,12 +11,18 @@ public:
 
     PeakMeter* _peakMeter{};
     Slider* _slider{};
+    Button* _backButton{};
 
-    virtual bool init(TouchScreen* screen, Settings::Data* settings);
-    void onPeakMeter(float left, float right);
-    void onTouch(TS_Point point) override;
-    void onRelease(TS_Point fromPoint, TS_Point toPoint) override;
-    void onMove(TS_Point fromPoint, TS_Point toPoint) override;
+    virtual bool init(Settings* settings, Window* parent);
+    void setupButtons();
+
+    void draw() override;
+    void save();
+    void onTouch(const TS_Point& point) override;
+    void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
+    void onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
+    void onPeakMeter(float left, float right) override;
+    void onButton(Button* button) override;
 };
 
 #endif

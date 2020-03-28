@@ -5,28 +5,32 @@
 #include "PeakMeter.h"
 
 //=================================================================================================
-PeakMeter::PeakMeter(Settings::Data* settings, TouchScreen* screen, Window* parent, 
-                     uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
-    Control(settings, screen, parent, x, y, width, height) {
+PeakMeter::PeakMeter(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
+    Control(settings, parent, x, y, width, height) {
     //Serial.printf("PeakMeter: %dx%d, %dx%d\n", _x, _y, _height, _width);
 }
 
 //=================================================================================================
-void PeakMeter::draw(float left, float right) {
-    int width = (_width / 2) - 1;
+void PeakMeter::draw() {
 
-    drawMeterBar(_x, _y, width, left);
-    drawMeterBar(_x + width + 1, _y, width, right);
 }
 
 //=================================================================================================
-void PeakMeter::drawMeterBar(uint16_t x, uint16_t y, uint16_t width, float value) {
-    int height = _height * value;
+void PeakMeter::update(float left, float right) {
+    int height = (_height / 2) - 1;
+
+    drawMeterBar(_y, height, left);
+    drawMeterBar(_y + height + 1, height, right);
+}
+
+//=================================================================================================
+void PeakMeter::drawMeterBar(uint16_t y, uint16_t height, float value) {
+    int width = _width * value;
     uint16_t color = value > 0.99 ? ILI9341_RED : ILI9341_GREEN;
     
     //Serial.printf("%dx%d, %dx%d, %0.2f\n", x, y, width, height, value);
 
-    int yMid = y + (_height - height);
-    _screen->vertRect(x, y, width, _height - height, ILI9341_NAVY); // Top
-    _screen->vertRect(x, yMid, width, height, color); // Bottom
+    int xMid = _x + width;
+    _settings->_screen->horRect(_x, y, width, height, color); // Left
+    _settings->_screen->horRect(xMid, y, _width - xMid, height, ILI9341_NAVY); // Right
 }

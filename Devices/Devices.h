@@ -12,6 +12,12 @@
 #include <SD.h>
 #include <EEPROM.h>
 
+#include "AudioBoard.h"
+#include "Bluetooth.h"
+#include "MidiInput.h"
+#include "SdCard.h"
+#include "TouchScreen.h"
+
 // Audio inputs
 enum Inputs {
     none,

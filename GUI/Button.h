@@ -7,14 +7,14 @@ class Button : public Control {
 public:
     enum ButtonId {
         none,
+        back,
         guitar,
         synth,
         band,
         settings
     };
 
-    Button(Settings::Data* settings, TouchScreen* screen, Window* parent, 
-           uint16_t x, uint16_t y, uint16_t width, uint16_t height, ButtonId id);
+    Button(Settings* settings, Window* parent,  uint16_t x, uint16_t y, uint16_t width, uint16_t height, ButtonId id);
 
     ButtonId _id{none}; // Button ID
     String _text{};
@@ -26,8 +26,9 @@ public:
     char _string[32];
 
     void init();
-    void onTouch(TS_Point point) override;
-    void onRelease(TS_Point fromPoint, TS_Point toPoint) override;
+    void draw() override;
+    void onTouch(const TS_Point& point) override;
+    void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
 };
 
 #endif

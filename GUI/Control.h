@@ -13,11 +13,11 @@ public:
         list // List of strings
     };
 
-    Control(Settings::Data* settings, TouchScreen* screen, Window* parent, 
-            uint16_t x, uint16_t y, uint16_t width, uint16_t height);
+    Control(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
 
-    Settings::Data* _settings{};
-    TouchScreen* _screen{};
+    virtual ~Control() {}
+
+    Settings* _settings{};
     Window* _parent; // Parent window of this control
     uint16_t _x{0}; // X coordinate of the control upper left corner
     uint16_t _y{0}; // Y coordinate of the control upper left corner
@@ -28,10 +28,10 @@ public:
     int _id{0}; // Button's menu ID
 
     virtual void draw();
-    virtual void onTouch(TS_Point point) {}
-    virtual void onRelease(TS_Point fromPoint, TS_Point toPoint) {}
-    virtual void onMove(TS_Point fromPoint, TS_Point toPoint) {}
-    bool inside(TS_Point point);
+    virtual void onTouch(const TS_Point& point) {}
+    virtual void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {}
+    virtual void onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {}
+    bool inside(const TS_Point& point);
 };
 
 #endif // Conrol_h
