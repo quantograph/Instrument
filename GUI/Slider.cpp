@@ -5,8 +5,8 @@
 #include "Slider.h"
 
 //=================================================================================================
-Slider::Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height) : 
-    Control(settings, parent, x, y, width, height) {
+Slider::Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id) : 
+    Control(settings, parent, x, y, width, height, id) {
     _left = _x + 3;
     _right = _x + _width - 4;
 }
@@ -50,7 +50,7 @@ void Slider::setValue(float value) {
     
     point.x = _left + (_right - _left) * value;
     point.y = 0;
-    Serial.printf("Slider::setValue: value=%0.2f, x=%d\n", value, point.x);
+    ///Serial.printf("Slider::setValue: value=%0.2f, x=%d\n", value, point.x);
     
     update(point);
 }
@@ -61,28 +61,34 @@ bool Slider::inside(const TS_Point& point) {
 }
 
 //=================================================================================================
-void Slider::onTouch(const TS_Point& point) {
+bool Slider::onTouch(const TS_Point& point) {
     if(!inside(point))
-        return;
+        return false;
 
     //Serial.printf("Slider::onTouch: %dx%d\n", point.x, point.y);
     update(point);
+
+    return true;
 }
 
 //=================================================================================================
-void Slider::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
+bool Slider::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
     if(!inside(toPoint))
-        return;
+        return false;
 
     //Serial.printf("Slider::onRelease: from %dx%d to %dx%d\n\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
     update(toPoint);
+
+    return true;
 }
 
 //=================================================================================================
-void Slider::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
+bool Slider::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
     if(!inside(toPoint))
-        return;
+        return false;
 
     //Serial.printf("Slider::onMove: from %dx%d to %dx%d\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
     update(toPoint);
+
+    return true;
 }

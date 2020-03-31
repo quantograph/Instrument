@@ -25,10 +25,10 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
     // Input
     if(_settings->_data._input == Inputs::mic) {
         _audioControl.inputSelect(AUDIO_INPUT_MIC);
-        _audioControl.micGain(_settings->_data._micGain); // 0 - 63
+        setMicGain();
     } else if(_settings->_data._input == Inputs::line) {
         _audioControl.inputSelect(AUDIO_INPUT_LINEIN);
-        _audioControl.lineInLevel(_settings->_data._lineInLevel); // 0 - 15
+        setLineInLevel();
     }
 
     // Peak meters
@@ -45,6 +45,20 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
     //chorus();
     //reverb();
     //freeReverb();
+}
+
+//=================================================================================================
+void AudioBoard::setLineInLevel() {
+    uint16_t value = (uint16_t)(_settings->_data._lineInLevel * LINE_IN_MAX + 0.5);
+    _settings->_audio->_audioControl.lineInLevel(value);
+    //Serial.printf("AudioBoard::setLineInLevel: %0.2f (%d)\n", _settings->_data._lineInLevel, value);
+}
+
+//=================================================================================================
+void AudioBoard::setMicGain() {
+    uint16_t value = (uint16_t)(_settings->_data._micGain * MIC_GAIN_MAX + 0.5);
+    _settings->_audio->_audioControl.micGain(value);
+    //Serial.printf("AudioBoard::setMicGain: %0.2f (%d)\n", _settings->_data._micGain, value);
 }
 
 //=================================================================================================

@@ -5,3 +5,6 @@
 /examples/Instrument/Debug
 /examples/Instrument/__vm
 /examples/Instrument/.vs/Instrument/v16
+/examples/Instrument/Instrument.sdf
+/examples/Instrument/Instrument.vcxproj.user
+/.vs

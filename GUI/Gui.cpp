@@ -76,21 +76,21 @@ bool Gui::process() {
 }
 
 //=================================================================================================
-void Gui::onTouch(const TS_Point& point) {
+bool Gui::onTouch(const TS_Point& point) {
     //Serial.printf("GUI touched at %dx%d\n", point.x, point.y);
-    _current->onTouch(point);
+    return _current->onTouch(point);
 }
 
 //=================================================================================================
-void Gui::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
+bool Gui::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
     //Serial.printf("GUI released, moved from %dx%d to %dx%d\n\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
-    _current->onRelease(fromPoint, toPoint);
+    return _current->onRelease(fromPoint, toPoint);
 }
 
 //=================================================================================================
-void Gui::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
+bool Gui::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
     //Serial.printf("GUI moved from %dx%d to %dx%d\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
-    _current->onMove(fromPoint, toPoint);
+    return _current->onMove(fromPoint, toPoint);
 }
 
 //=================================================================================================

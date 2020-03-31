@@ -5,7 +5,7 @@ class TouchScreen;
 
 class Slider : public Control {
 public:
-    Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height);
+    Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id = 0);
 
     float _value{0.0};
     int16_t _lastX{-1};
@@ -18,9 +18,9 @@ public:
     bool inside(const TS_Point& point);
 
     void draw() override;
-    void onTouch(const TS_Point& point) override;
-    void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
-    void onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
+    bool onTouch(const TS_Point& point) override;
+    bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
+    bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
 };
 
 #endif

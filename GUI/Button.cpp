@@ -7,8 +7,8 @@
 #include "Button.h"
 
 //=================================================================================================
-Button::Button(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, ButtonId id) : 
-    Control(settings, parent, x, y, width, height), _id(id) {
+Button::Button(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id) : 
+    Control(settings, parent, x, y, width, height, id) {
 }
 
 //=================================================================================================
@@ -54,14 +54,18 @@ void Button::draw() {
 }
 
 //=================================================================================================
-void Button::onTouch(const TS_Point& point) {
+bool Button::onTouch(const TS_Point& point) {
     if(!inside(point))
-        return;
+        return false;
 
     //Serial.printf("Button::onTouch: %s\n", _text.c_str());
     _parent->onButton(this);
+
+    return true;
 }
 
 //=================================================================================================
-void Button::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
+bool Button::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
+
+    return false;
 }

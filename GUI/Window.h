@@ -4,6 +4,7 @@
 class TouchScreen;
 class Control;
 class Button;
+class CheckBox;
 
 class Window {
 public:
@@ -16,11 +17,12 @@ public:
 
     virtual void draw();
     virtual bool init(Settings* settings, Window* parent = nullptr);
-    virtual void onTouch(const TS_Point& point) {}
-    virtual void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {}
-    virtual void onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {}
+    virtual bool onTouch(const TS_Point& point) { return false; }
+    virtual bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) { return false; }
+    virtual bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) { return false; }
     virtual void onPeakMeter(float left, float right) {}
-    virtual void onButton(Button* button) {}
+    virtual bool onButton(Button* button) { return false; }
+    virtual bool onCheckBox(CheckBox* checkBox) { return false; }
     virtual void onBack(Window* window) {}
 };
 

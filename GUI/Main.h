@@ -20,10 +20,10 @@ public:
     void onPeakMeter(float left, float right);
 
     void draw() override;
-    void onTouch(const TS_Point& point) override;
-    void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
-    void onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
-    void onButton(Button* button) override;
+    bool onTouch(const TS_Point& point) override;
+    bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
+    bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
+    bool onButton(Button* button) override;
     void onBack(Window* window) override;
 };
 

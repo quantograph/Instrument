@@ -38,6 +38,14 @@ void Settings::putValue(String& string, const char* tag, int16_t value) {
 
 //=================================================================================================
 // Read all settings
+void Settings::putValue(String& string, const char* tag, float value) {
+    char temp[32];
+    sprintf(temp, "%s=%0.2f|", tag, value);
+    string += temp;
+}
+
+//=================================================================================================
+// Read all settings
 bool Settings::read() {
     char marker[6];
     int offset = 0;
@@ -103,9 +111,9 @@ bool Settings::getValue(char* pair) {
     if(!strcmp(tag, inputTag))
         _data._input = (Inputs)atoi(value);
     else if(!strcmp(tag, micGainTag))
-        _data._micGain = atoi(value);
+        _data._micGain = atof(value);
     else if(!strcmp(tag, lineInLevelTag))
-        _data._lineInLevel = atoi(value);
+        _data._lineInLevel = atof(value);
     else {
         Serial.printf("##### ERROR: Unknown tag %s=%s\n", tag, value);
     }
@@ -148,8 +156,8 @@ void Settings::show(const char* title) {
     Serial.printf("   Marker=%s\n", _marker);
     Serial.printf("   Size=%d\n", _size);
     Serial.printf("   _input=%d\n", _data._input);
-    Serial.printf("   _micGain=%d\n", _data._micGain);
-    Serial.printf("   _lineInLevel=%d\n", _data._lineInLevel);
+    Serial.printf("   _micGain=%0.2f\n", _data._micGain);
+    Serial.printf("   _lineInLevel=%0.2f\n", _data._lineInLevel);
 
     //Serial.printf("      _screen=%p\n", _screen);
 

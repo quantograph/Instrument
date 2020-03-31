@@ -10,6 +10,8 @@ class AudioBoard
 public:
     AudioBoard();
 	void init(Gui* gui, Settings* settings);
+    void setLineInLevel();
+    void setMicGain();
     void setupMixers();
     void process();
     void noteFrequency();

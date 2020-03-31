@@ -20,8 +20,8 @@ public:
         int _textSize{2}; // Text size
         // Sound
         Inputs _input{Inputs::mic}; // Mic or line in
-        uint16_t _micGain{40}; // Microphone gain (0 - 63)
-        uint8_t _lineInLevel{7}; // 0 - 15
+        float _micGain{0.5}; // Microphone gain (0 - 63)
+        float _lineInLevel{0.5}; // 0 - 15
     };
 
     #define MIC_GAIN_MAX 63 // 0 - 63
@@ -54,6 +54,7 @@ public:
     bool readBuffer(int address, uint8_t* buffer, int size);
     bool writeBuffer(int address, const uint8_t* buffer, int size);
     void putValue(String& string, const char* tag, int16_t value);
+    void putValue(String& string, const char* tag, float value);
     bool getValue(char* pair);
 
     // Add new members to the end of this:

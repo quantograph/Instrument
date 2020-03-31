@@ -14,9 +14,8 @@ public:
         settings
     };
 
-    Button(Settings* settings, Window* parent,  uint16_t x, uint16_t y, uint16_t width, uint16_t height, ButtonId id);
+    Button(Settings* settings, Window* parent,  uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id);
 
-    ButtonId _id{none}; // Button ID
     String _text{};
     int _radius = 7; // Radius of the rectangle rounding
     uint16_t _backColor = ILI9341_NAVY; // Button's background color
@@ -27,8 +26,8 @@ public:
 
     void init();
     void draw() override;
-    void onTouch(const TS_Point& point) override;
-    void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
+    bool onTouch(const TS_Point& point) override;
+    bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
 };
 
 #endif

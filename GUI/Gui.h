@@ -21,9 +21,9 @@ public:
 
     bool init(Settings* settings);
     bool process();
-    void onTouch(const TS_Point& point);
-    void onRelease(const TS_Point& fromPoint, const TS_Point& toPoint);
-    void onMove(const TS_Point& fromPoint, const TS_Point& toPoint);
+    bool onTouch(const TS_Point& point);
+    bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint);
+    bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint);
     void onPeakMeter(float left, float right);
 };
 

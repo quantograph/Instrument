@@ -99,6 +99,7 @@
     <ClInclude Include="..\..\Devices\SdCard.h" />
     <ClInclude Include="..\..\Devices\TouchScreen.h" />
     <ClInclude Include="..\..\GUI\Button.h" />
+    <ClInclude Include="..\..\GUI\CheckBox.h" />
     <ClInclude Include="..\..\GUI\Control.h" />
     <ClInclude Include="..\..\GUI\Gui.h" />
     <ClInclude Include="..\..\GUI\GuiMisc.h" />
@@ -107,6 +108,7 @@
     <ClInclude Include="..\..\GUI\SetAudio.h" />
     <ClInclude Include="..\..\GUI\Settings.h" />
     <ClInclude Include="..\..\GUI\Slider.h" />
+    <ClInclude Include="..\..\GUI\TextBox.h" />
     <ClInclude Include="..\..\GUI\Window.h" />
     <ClInclude Include="..\..\Music\Effects.h" />
     <ClInclude Include="..\..\Music\Fingers.h" />
@@ -169,6 +171,7 @@
     <ClCompile Include="..\..\Devices\SdCard.cpp" />
     <ClCompile Include="..\..\Devices\TouchScreen.cpp" />
     <ClCompile Include="..\..\GUI\Button.cpp" />
+    <ClCompile Include="..\..\GUI\CheckBox.cpp" />
     <ClCompile Include="..\..\GUI\Control.cpp" />
     <ClCompile Include="..\..\GUI\Gui.cpp" />
     <ClCompile Include="..\..\GUI\GuiMisc.cpp" />
@@ -177,6 +180,7 @@
     <ClCompile Include="..\..\GUI\SetAudio.cpp" />
     <ClCompile Include="..\..\GUI\Settings.cpp" />
     <ClCompile Include="..\..\GUI\Slider.cpp" />
+    <ClCompile Include="..\..\GUI\TextBox.cpp" />
     <ClCompile Include="..\..\GUI\Window.cpp" />
     <ClCompile Include="..\..\Music\Effects.cpp" />
     <ClCompile Include="..\..\Music\Fingers.cpp" />

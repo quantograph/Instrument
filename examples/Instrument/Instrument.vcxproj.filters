@@ -187,6 +187,12 @@
       <Filter>Sound</Filter>
     </ClInclude>
     <ClInclude Include="..\..\QuantoGraph.h" />
+    <ClInclude Include="..\..\GUI\CheckBox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GUI\TextBox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.md" />
@@ -387,6 +393,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Sound\vibraphone_samples.cpp">
       <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GUI\CheckBox.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GUI\TextBox.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

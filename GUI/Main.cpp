@@ -80,7 +80,7 @@ void Main::onPeakMeter(float left, float right) {
 }
 
 //=================================================================================================
-void Main::onTouch(const TS_Point& point) {
+bool Main::onTouch(const TS_Point& point) {
     //Serial.printf("Main::onTouch: %dx%d\n", point.x, point.y);
 
     if(_current) {
@@ -90,24 +90,30 @@ void Main::onTouch(const TS_Point& point) {
             button->onTouch(point);
         }
     }
+
+    return true;
 }
 
 //=================================================================================================
-void Main::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
+bool Main::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
     if(_current) {
         _current->onRelease(fromPoint, toPoint);
     }
+
+    return true;
 }
 
 //=================================================================================================
-void Main::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
+bool Main::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
     if(_current) {
         _current->onMove(fromPoint, toPoint);
     }
+
+    return true;
 }
 
 //=================================================================================================
-void Main::onButton(Button* button) {
+bool Main::onButton(Button* button) {
     Window* window{};
     //Serial.printf("Main::onButton: %s\n", button->_text.c_str());
 
@@ -127,14 +133,16 @@ void Main::onButton(Button* button) {
 
         default:
             Serial.printf("##### ERROR: unknown button ID: d\n", button->_id);
-            return;
+            return false;
     }
 
     if(window) {
         window->draw();
         _current = window;
-        Serial.printf("Main::onButton: _current=%p\n", _current);
+        //Serial.printf("Main::onButton: _current=%p\n", _current);
     }
+
+    return true;
 }
 
 //=================================================================================================
