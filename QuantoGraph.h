@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 
+#include "./Devices/Definitions.h"
 #include "./Devices/Devices.h"
 #include "./Devices/AudioBoard.h"
 //#include "./Devices/AudioInput.h"
@@ -14,8 +15,8 @@
 //#include "./Devices/Motion.h"
 #include "./Devices/SdCard.h"
 #include "./Devices/TouchScreen.h"
+#include "./Devices/Storage.h"
 
-#include "./GUI/Settings.h"
 #include "./GUI/Control.h"
 #include "./GUI/Window.h"
 #include "./GUI/Main.h"

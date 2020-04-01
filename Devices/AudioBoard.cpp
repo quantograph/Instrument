@@ -1,8 +1,6 @@
 #include "Devices.h"
-#include "TouchScreen.h"
-#include "../Music/Effects.h"
-#include "../GUI/Settings.h"
 #include "../GUI/Gui.h"
+#include "../Music/Effects.h"
 #include "AudioBoard.h"
 
 //=================================================================================================
@@ -23,10 +21,10 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
     _audioControl.volume(0.6);
 
     // Input
-    if(_settings->_data._input == Inputs::mic) {
+    if(_settings->_input == Inputs::mic) {
         _audioControl.inputSelect(AUDIO_INPUT_MIC);
         setMicGain();
-    } else if(_settings->_data._input == Inputs::line) {
+    } else if(_settings->_input == Inputs::line) {
         _audioControl.inputSelect(AUDIO_INPUT_LINEIN);
         setLineInLevel();
     }
@@ -40,7 +38,7 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
     //notefreq.begin(.15);
 
     // Effects
-    passthrough();
+    //passthrough();
     //flange(0.5);
     //chorus();
     //reverb();
@@ -49,16 +47,16 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
 
 //=================================================================================================
 void AudioBoard::setLineInLevel() {
-    uint16_t value = (uint16_t)(_settings->_data._lineInLevel * LINE_IN_MAX + 0.5);
+    uint16_t value = (uint16_t)(_settings->_lineInLevel * LINE_IN_MAX + 0.5);
     _settings->_audio->_audioControl.lineInLevel(value);
-    //Serial.printf("AudioBoard::setLineInLevel: %0.2f (%d)\n", _settings->_data._lineInLevel, value);
+    //Serial.printf("AudioBoard::setLineInLevel: %0.2f (%d)\n", _settings->_lineInLevel, value);
 }
 
 //=================================================================================================
 void AudioBoard::setMicGain() {
-    uint16_t value = (uint16_t)(_settings->_data._micGain * MIC_GAIN_MAX + 0.5);
+    uint16_t value = (uint16_t)(_settings->_micGain * MIC_GAIN_MAX + 0.5);
     _settings->_audio->_audioControl.micGain(value);
-    //Serial.printf("AudioBoard::setMicGain: %0.2f (%d)\n", _settings->_data._micGain, value);
+    //Serial.printf("AudioBoard::setMicGain: %0.2f (%d)\n", _settings->_micGain, value);
 }
 
 //=================================================================================================
@@ -214,58 +212,21 @@ void AudioBoard::reset() {
 
     delete _effect2;
     _effect2 = nullptr;
-
-    delete _passthrough1;
-    _passthrough1 = nullptr;
-
-    delete _passthrough2;
-    _passthrough2 = nullptr;
 }
 
 //=================================================================================================
-void AudioBoard::passthrough() {
+bool AudioBoard::effects(EffectType type1, EffectType type2) {
     reset();
 
-    _passthrough1 = new AudioConnection(_input, 0, _mixer1, 0);
-    _passthrough2 = new AudioConnection(_input, 1, _mixer4, 0);
-}
+    if(type1 != EffectType::noneType) {
+        _effect1 = new Effects(&_settings->_effect1, &_input, 0, &_mixer1, 0);
+        _effect1->init(type1);
+    }
 
-//=================================================================================================
-void AudioBoard::flange(double freq) {
-    reset();
+    if(type2 != EffectType::noneType) {
+        _effect2 = new Effects(&_settings->_effect2, &_input, 0, &_mixer4, 0);
+        _effect2->init(type2);
+    }
 
-    _effect1 = new Effects(&_input, 0, &_mixer1, 0);
-    _effect1->flange(freq);
-    _effect2 = new Effects(&_input, 1, &_mixer4, 0);
-    _effect2->flange(freq);
-}
-
-//=================================================================================================
-void AudioBoard::chorus() {
-    reset();
-
-    _effect1 = new Effects(&_input, 0, &_mixer1, 0);
-    _effect1->chorus();
-    _effect2 = new Effects(&_input, 1, &_mixer4, 0);
-    _effect2->chorus();
-}
-
-//=================================================================================================
-void AudioBoard::reverb() {
-    reset();
-
-    _effect1 = new Effects(&_input, 0, &_mixer1, 0);
-    _effect1->reverb();
-    _effect2 = new Effects(&_input, 1, &_mixer4, 0);
-    _effect2->reverb();
-}
-
-//=================================================================================================
-void AudioBoard::freeReverb() {
-    reset();
-
-    _effect1 = new Effects(&_input, 0, &_mixer1, 0);
-    _effect1->freeReverb();
-    _effect2 = new Effects(&_input, 1, &_mixer4, 0);
-    _effect2->freeReverb();
+    return true;
 }

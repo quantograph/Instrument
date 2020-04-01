@@ -1,6 +1,4 @@
 #include "../Devices/Devices.h"
-#include "../Devices/TouchScreen.h"
-#include "Settings.h"
 #include "Control.h"
 #include "Slider.h"
 

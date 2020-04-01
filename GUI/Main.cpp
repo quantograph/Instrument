@@ -1,11 +1,12 @@
 #include "../Devices/Devices.h"
-#include "../Devices/TouchScreen.h"
-#include "Settings.h"
 #include "Control.h"
 #include "PeakMeter.h"
 #include "Slider.h"
 #include "Button.h"
 #include "Window.h"
+#include "SetGuitar.h"
+#include "SetSynth.h"
+#include "SetBand.h"
 #include "SetAudio.h"
 #include "Main.h"
 
@@ -21,9 +22,19 @@ Main::~Main() {
 }
 
 //=================================================================================================
-bool Main::init(Settings* settings) {
+bool Main::init(Storage* storage, Settings* settings) {
+    _storage = storage;
     //Serial.printf("Main::init\n");
     Window::init(settings);
+
+    _setGuitar = new SetGuitar();
+    _setGuitar->init(settings, this);
+
+    _setSynth = new SetSynth();
+    _setSynth->init(settings, this);
+
+    _setBand = new SetBand();
+    _setBand->init(settings, this);
 
     _setAudio = new SetAudio();
     _setAudio->init(settings, this);
@@ -119,12 +130,15 @@ bool Main::onButton(Button* button) {
 
     switch(button->_id) {
         case Button::ButtonId::guitar:
+            window = _setGuitar;
             break;
 
         case Button::ButtonId::synth:
+            window = _setSynth;
             break;
 
         case Button::ButtonId::band:
+            window = _setBand;
             break;
 
         case Button::ButtonId::settings:
@@ -139,7 +153,7 @@ bool Main::onButton(Button* button) {
     if(window) {
         window->draw();
         _current = window;
-        //Serial.printf("Main::onButton: _current=%p\n", _current);
+        Serial.printf("Main::onButton: _current=%p\n", _current);
     }
 
     return true;
@@ -147,7 +161,7 @@ bool Main::onButton(Button* button) {
 
 //=================================================================================================
 void Main::onBack(Window* window) {
-    _settings->write();
+    _storage->write();
     _current = nullptr;
     draw();
 }

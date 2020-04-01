@@ -42,9 +42,6 @@
     <ClInclude Include="..\..\GUI\SetAudio.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GUI\Settings.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\GUI\Slider.h">
       <Filter>GUI</Filter>
     </ClInclude>
@@ -55,9 +52,6 @@
       <Filter>Music</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Music\Fingers.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Keys.h">
       <Filter>Music</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Music\MidiFile.h">
@@ -193,6 +187,21 @@
     <ClInclude Include="..\..\GUI\TextBox.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\GUI\SetBand.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GUI\SetGuitar.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GUI\SetSynth.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Devices\Definitions.h">
+      <Filter>Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Devices\Storage.h">
+      <Filter>Devices</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.md" />
@@ -256,9 +265,6 @@
     <ClCompile Include="..\..\GUI\SetAudio.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\GUI\Settings.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\GUI\Slider.cpp">
       <Filter>GUI</Filter>
     </ClCompile>
@@ -269,9 +275,6 @@
       <Filter>Music</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Music\Fingers.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Keys.cpp">
       <Filter>Music</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Music\MidiFile.cpp">
@@ -399,6 +402,18 @@
     </ClCompile>
     <ClCompile Include="..\..\GUI\TextBox.cpp">
       <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GUI\SetBand.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GUI\SetGuitar.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GUI\SetSynth.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Devices\Storage.cpp">
+      <Filter>Devices</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

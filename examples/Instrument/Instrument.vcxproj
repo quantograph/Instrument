@@ -94,9 +94,11 @@
   <ItemGroup>
     <ClInclude Include="..\..\Devices\AudioBoard.h" />
     <ClInclude Include="..\..\Devices\Bluetooth.h" />
+    <ClInclude Include="..\..\Devices\Definitions.h" />
     <ClInclude Include="..\..\Devices\Devices.h" />
     <ClInclude Include="..\..\Devices\MidiInput.h" />
     <ClInclude Include="..\..\Devices\SdCard.h" />
+    <ClInclude Include="..\..\Devices\Storage.h" />
     <ClInclude Include="..\..\Devices\TouchScreen.h" />
     <ClInclude Include="..\..\GUI\Button.h" />
     <ClInclude Include="..\..\GUI\CheckBox.h" />
@@ -106,13 +108,14 @@
     <ClInclude Include="..\..\GUI\Main.h" />
     <ClInclude Include="..\..\GUI\PeakMeter.h" />
     <ClInclude Include="..\..\GUI\SetAudio.h" />
-    <ClInclude Include="..\..\GUI\Settings.h" />
+    <ClInclude Include="..\..\GUI\SetBand.h" />
+    <ClInclude Include="..\..\GUI\SetGuitar.h" />
+    <ClInclude Include="..\..\GUI\SetSynth.h" />
     <ClInclude Include="..\..\GUI\Slider.h" />
     <ClInclude Include="..\..\GUI\TextBox.h" />
     <ClInclude Include="..\..\GUI\Window.h" />
     <ClInclude Include="..\..\Music\Effects.h" />
     <ClInclude Include="..\..\Music\Fingers.h" />
-    <ClInclude Include="..\..\Music\Keys.h" />
     <ClInclude Include="..\..\Music\MidiFile.h" />
     <ClInclude Include="..\..\Music\Misc.h" />
     <ClInclude Include="..\..\Music\MusicDef.h" />
@@ -169,6 +172,7 @@
     <ClCompile Include="..\..\Devices\Bluetooth.cpp" />
     <ClCompile Include="..\..\Devices\MidiInput.cpp" />
     <ClCompile Include="..\..\Devices\SdCard.cpp" />
+    <ClCompile Include="..\..\Devices\Storage.cpp" />
     <ClCompile Include="..\..\Devices\TouchScreen.cpp" />
     <ClCompile Include="..\..\GUI\Button.cpp" />
     <ClCompile Include="..\..\GUI\CheckBox.cpp" />
@@ -178,13 +182,14 @@
     <ClCompile Include="..\..\GUI\Main.cpp" />
     <ClCompile Include="..\..\GUI\PeakMeter.cpp" />
     <ClCompile Include="..\..\GUI\SetAudio.cpp" />
-    <ClCompile Include="..\..\GUI\Settings.cpp" />
+    <ClCompile Include="..\..\GUI\SetBand.cpp" />
+    <ClCompile Include="..\..\GUI\SetGuitar.cpp" />
+    <ClCompile Include="..\..\GUI\SetSynth.cpp" />
     <ClCompile Include="..\..\GUI\Slider.cpp" />
     <ClCompile Include="..\..\GUI\TextBox.cpp" />
     <ClCompile Include="..\..\GUI\Window.cpp" />
     <ClCompile Include="..\..\Music\Effects.cpp" />
     <ClCompile Include="..\..\Music\Fingers.cpp" />
-    <ClCompile Include="..\..\Music\Keys.cpp" />
     <ClCompile Include="..\..\Music\MidiFile.cpp" />
     <ClCompile Include="..\..\Music\Misc.cpp" />
     <ClCompile Include="..\..\Music\Note.cpp" />

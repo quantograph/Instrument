@@ -3,7 +3,7 @@
 
 class Effects;
 class Gui;
-class Settings;
+class Storage;
 
 class AudioBoard
 {
@@ -20,11 +20,7 @@ public:
     static void onPlug();
     static void onVolume();
     void reset();
-    void passthrough();
-    void flange(double freq);
-    void chorus();
-    void reverb();
-    void freeReverb();
+    bool effects(EffectType type1, EffectType type2);
 
     #define GUITAR_PLUG 3 // Teensy pin connected to guitar plug contact
     #define VOLUME_PIN 6 /*AVB - 22 in the last wiring */ // Teensy pin connected to guitar plug contact
@@ -54,8 +50,6 @@ public:
     char _string[64];
     Effects* _effect1{nullptr};
     Effects* _effect2{nullptr};
-    AudioConnection* _passthrough1{nullptr};
-    AudioConnection* _passthrough2{nullptr};
     AudioAnalyzePeak _peakLeft;
     AudioAnalyzePeak _peakRight;
 };

@@ -1,26 +1,24 @@
-#include "../Devices/Devices.h"
-#include "Settings.h"
+#include "Devices.h"
 
 // EEPROM API documentation: https://www.arduino.cc/en/Reference/EEPROM
 
 //=================================================================================================
-Settings::Settings() {
+Storage::Storage() {
 }
 
 //=================================================================================================
 // Reads all settings
-bool Settings::readBuffer(int address, uint8_t* buffer, int size) {
+bool Storage::readBuffer(int address, uint8_t* buffer, int size) {
     for(int i = 0; i < size; ++i) {
         buffer[i] = EEPROM.read(address + i);
     }
 
     return true;
 }
-
     
 //=================================================================================================
 // Writes all settings
-bool Settings::writeBuffer(int address, const uint8_t* buffer, int size) {
+bool Storage::writeBuffer(int address, const uint8_t* buffer, int size) {
     for(int i = 0; i < size; ++i) {
         EEPROM.write(address + i, buffer[i]);
     }
@@ -30,7 +28,7 @@ bool Settings::writeBuffer(int address, const uint8_t* buffer, int size) {
 
 //=================================================================================================
 // Read all settings
-void Settings::putValue(String& string, const char* tag, int16_t value) {
+void Storage::putValue(String& string, const char* tag, int16_t value) {
     char temp[32];
     sprintf(temp, "%s=%d|", tag, value);
     string += temp;
@@ -38,7 +36,7 @@ void Settings::putValue(String& string, const char* tag, int16_t value) {
 
 //=================================================================================================
 // Read all settings
-void Settings::putValue(String& string, const char* tag, float value) {
+void Storage::putValue(String& string, const char* tag, float value) {
     char temp[32];
     sprintf(temp, "%s=%0.2f|", tag, value);
     string += temp;
@@ -46,7 +44,7 @@ void Settings::putValue(String& string, const char* tag, float value) {
 
 //=================================================================================================
 // Read all settings
-bool Settings::read() {
+bool Storage::read() {
     char marker[6];
     int offset = 0;
     char* buffer;
@@ -55,7 +53,7 @@ bool Settings::read() {
     readBuffer(offset, (uint8_t*)marker, 5);
     marker[5] = 0;
     if(strncmp(_marker, marker, 5)) {
-        Serial.println("##### Settings start marker not found");
+        Serial.println("##### Storage start marker not found");
         return false;
     }
     
@@ -93,7 +91,7 @@ bool Settings::read() {
 }
 
 //=================================================================================================
-bool Settings::getValue(char* pair) {
+bool Storage::getValue(char* pair) {
     char* delim;
     char* tag;
     char* value;
@@ -109,11 +107,11 @@ bool Settings::getValue(char* pair) {
 
     // Put the value into its member variable
     if(!strcmp(tag, inputTag))
-        _data._input = (Inputs)atoi(value);
+        _settings._input = (Inputs)atoi(value);
     else if(!strcmp(tag, micGainTag))
-        _data._micGain = atof(value);
+        _settings._micGain = atof(value);
     else if(!strcmp(tag, lineInLevelTag))
-        _data._lineInLevel = atof(value);
+        _settings._lineInLevel = atof(value);
     else {
         Serial.printf("##### ERROR: Unknown tag %s=%s\n", tag, value);
     }
@@ -123,16 +121,16 @@ bool Settings::getValue(char* pair) {
 
 //=================================================================================================
 // Writes all settings
-bool Settings::write() {
+bool Storage::write() {
     int offset = 0;
     String string;
 
     writeBuffer(0, (const uint8_t*)_marker, 5); // Write the marker
 
     // Put all parameters
-    putValue(string, inputTag, (int16_t)_data._input);
-    putValue(string, micGainTag, _data._micGain);
-    putValue(string, lineInLevelTag, _data._lineInLevel);
+    putValue(string, inputTag, (int16_t)_settings._input);
+    putValue(string, micGainTag, _settings._micGain);
+    putValue(string, lineInLevelTag, _settings._lineInLevel);
     string += endTag;
 
     // Write the data size
@@ -145,22 +143,22 @@ bool Settings::write() {
     writeBuffer(offset, (const uint8_t*)string.c_str(), _size);
 
     show("Saving");
-    Serial.printf("\n(%d) %s\n", _size, string.c_str());
+    //Serial.printf("\n(%d) %s\n", _size, string.c_str());
 
     return true;
 }
 
 //=================================================================================================
-void Settings::show(const char* title) {
+void Storage::show(const char* title) {
     Serial.printf("===== %s settings\n", title);
     Serial.printf("   Marker=%s\n", _marker);
     Serial.printf("   Size=%d\n", _size);
-    Serial.printf("   _input=%d\n", _data._input);
-    Serial.printf("   _micGain=%0.2f\n", _data._micGain);
-    Serial.printf("   _lineInLevel=%0.2f\n", _data._lineInLevel);
+    Serial.printf("   _input=%d\n", _settings._input);
+    Serial.printf("   _micGain=%0.2f\n", _settings._micGain);
+    Serial.printf("   _lineInLevel=%0.2f\n", _settings._lineInLevel);
 
     //Serial.printf("      _screen=%p\n", _screen);
 
-    //Serial.printf("   Instrument=%d\n", _data._midiInstrument);
-    //Serial.printf("   Volume=%d\n", _data._volume);
+    //Serial.printf("   Instrument=%d\n", _settings._midiInstrument);
+    //Serial.printf("   Volume=%d\n", _settings._volume);
 }

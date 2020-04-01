@@ -1,6 +1,4 @@
 #include "../Devices/Devices.h"
-#include "../Devices/TouchScreen.h"
-#include "Settings.h"
 #include "Control.h"
 #include "Button.h"
 #include "PeakMeter.h"
@@ -82,20 +80,20 @@ void SetAudio::draw() {
 
 //=================================================================================================
 void SetAudio::updateInput() {
-    if(_settings->_data._input == Inputs::mic) { // Mic
+    if(_settings->_input == Inputs::mic) { // Mic
         _settings->_audio->_audioControl.inputSelect(AUDIO_INPUT_MIC);
         _micCheck->update(true);
         _lineCheck->update(false);
 
-        _slider->setValue(_settings->_data._micGain);
-        //Serial.printf("SetAudio::updateInput: _micGain=%0.2f\n", _settings->_data._micGain);
-    } else if(_settings->_data._input == Inputs::line) { // Line in
+        _slider->setValue(_settings->_micGain);
+        //Serial.printf("SetAudio::updateInput: _micGain=%0.2f\n", _settings->_micGain);
+    } else if(_settings->_input == Inputs::line) { // Line in
         _settings->_audio->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
         _micCheck->update(false);
         _lineCheck->update(true);
 
-        _slider->setValue(_settings->_data._lineInLevel);
-        //Serial.printf("SetAudio::updateInput: _lineInLevel=%0.2f\n", _settings->_data._lineInLevel);
+        _slider->setValue(_settings->_lineInLevel);
+        //Serial.printf("SetAudio::updateInput: _lineInLevel=%0.2f\n", _settings->_lineInLevel);
     }
 
     updateLevel(false);
@@ -103,22 +101,20 @@ void SetAudio::updateInput() {
 
 //=================================================================================================
 void SetAudio::updateLevel(bool getSlider) {
-    uint16_t value;
-
-    if(_settings->_data._input == Inputs::mic) { // Mic
+    if(_settings->_input == Inputs::mic) { // Mic
         if(getSlider)
-            _settings->_data._micGain = _slider->_value;
+            _settings->_micGain = _slider->_value;
 
         _settings->_audio->setMicGain();
-        sprintf(_string, "Mic gain: %d", (uint16_t)(_settings->_data._micGain * 100 + 0.5));
-        //Serial.printf("SetAudio::updateLevel: MicGain=%0.2f (%d)\n", _settings->_data._micGain, value);
-    } else if(_settings->_data._input == Inputs::line) { // Line in
+        sprintf(_string, "Mic gain: %d", (uint16_t)(_settings->_micGain * 100 + 0.5));
+        //Serial.printf("SetAudio::updateLevel: MicGain=%0.2f (%d)\n", _settings->_micGain, value);
+    } else if(_settings->_input == Inputs::line) { // Line in
         if(getSlider)
-            _settings->_data._lineInLevel = _slider->_value;
+            _settings->_lineInLevel = _slider->_value;
     
         _settings->_audio->setLineInLevel();
-        sprintf(_string, "Line in level: %d", (uint16_t)(_settings->_data._lineInLevel * 100 + 0.5));
-        //Serial.printf("SetAudio::updateLevel: LineLevel=%0.2f (%d)\n", _settings->_data._lineInLevel, value);
+        sprintf(_string, "Line in level: %d", (uint16_t)(_settings->_lineInLevel * 100 + 0.5));
+        //Serial.printf("SetAudio::updateLevel: LineLevel=%0.2f (%d)\n", _settings->_lineInLevel, value);
     }
 
     _level->update(_string);
@@ -186,12 +182,12 @@ bool SetAudio::onCheckBox(CheckBox* checkBox) {
 
     switch(checkBox->_id) {
         case CheckBox::CheckBoxId::mic:
-            _settings->_data._input = Inputs::mic;
+            _settings->_input = Inputs::mic;
             updateInput();
             break;
 
         case CheckBox::CheckBoxId::line:
-            _settings->_data._input = Inputs::line;
+            _settings->_input = Inputs::line;
             updateInput();
             break;
 

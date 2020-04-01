@@ -1,7 +1,4 @@
-#include <vector>
 #include "../Devices/Devices.h"
-#include "../Devices/TouchScreen.h"
-#include "Settings.h"
 #include "Window.h"
 #include "Control.h"
 #include "Button.h"

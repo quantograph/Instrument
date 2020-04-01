@@ -4,7 +4,7 @@
 // Instruments: https://wiki.musink.net/doku.php/midi:instrument
 // https://en.wikipedia.org/wiki/General_MIDI
 
-#include <limits>
+#include "../Devices/Devices.h"
 #include "Misc.h"
 #include "Note.h"
 #include "Track.h"

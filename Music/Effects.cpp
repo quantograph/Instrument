@@ -1,8 +1,11 @@
+#include "../Devices/Devices.h"
 #include "Effects.h"
 
 //=================================================================================================
-Effects::Effects(AudioStream* source, uint8_t sourceOutput, AudioStream* dest, uint8_t destInput) :
-    _source(source), _sourceOutput(sourceOutput), _dest(dest), _destInput(destInput) {
+Effects::Effects(EffectSettings* settings, AudioStream* source, uint8_t sourceOutput, 
+                 AudioStream* dest, uint8_t destInput) :
+    _settings(settings), _source(source), _sourceOutput(sourceOutput), _dest(dest), 
+    _destInput(destInput) {
 }
 
 //=================================================================================================
@@ -20,68 +23,121 @@ void Effects::reset() {
 
     memset(_delayLine, 0, DELAY_LINE_LENGTH);
 
-    delete _flange;
-    _flange = nullptr;
-
     delete _chorus;
     _chorus = nullptr;
+
+    delete _flange;
+    _flange = nullptr;
 
     delete _reverb;
     _reverb = nullptr;
 
-    delete _freeReverb;
-    _freeReverb = nullptr;
+    delete _freeverb;
+    _freeverb = nullptr;
 }
 
 //=================================================================================================
-void Effects::flange(double freq) {
+void Effects::connect(AudioStream* stream) {
+    _inConnection = new AudioConnection(*_source, _sourceOutput, *stream, 0);
+    _outConnection = new AudioConnection(*stream, 0, *_dest, _destInput);
+}
+
+//=================================================================================================
+// Update settings for the active effect
+bool Effects::init(EffectType type) {
+    switch(type) {
+        case cleanType:
+            clean();
+            break;
+
+        case chorusType:
+            chorus();
+            break;
+
+        case flangeType:
+            flange();
+            break;
+
+        case reverbType:
+            reverb();
+            break;
+
+        case freeverbType:
+            freeverb();
+            break;
+
+        default:
+            Serial.printf("##### ERROR: Unknown effect type: %d\n", type);
+            return false;
+    }
+
+    update();
+
+    return true;
+}
+
+//=================================================================================================
+// Update settings for the active effect
+void Effects::update() {
+    if(_chorus) {
+        _chorus->voices(_settings->_chorus._chorus);
+    } else if(_flange) {
+        int idx = FLANGE_DELAY_LENGTH/4;
+        int depth = FLANGE_DELAY_LENGTH/4;
+        _flange->voices(idx, depth, _settings->_flange._rate);
+        Serial.printf("_flange._rate: %0.2f\n", _settings->_flange._rate);
+    } else if(_reverb) {
+        _reverb->reverbTime(_settings->_reverb._reverbTime);
+        Serial.printf("_reverb._reverbTime: %0.2f\n", _settings->_reverb._reverbTime);
+    } else if(_freeverb) {
+        _freeverb->roomsize(_settings->_freeverb._roomsize);
+        _freeverb->damping(_settings->_freeverb._damping);
+        Serial.printf("_freeverb._roomsize: %0.2f, _damping: %0.2f\n",
+                      _settings->_freeverb._roomsize, _settings->_freeverb._damping);
+    }
+}
+
+//=================================================================================================
+void Effects::clean() {
+    Serial.printf("Effect: clean\n");
     reset();
-    _flange = new AudioEffectFlange();
-
-    int s_idx = FLANGE_DELAY_LENGTH/4;
-    int s_depth = FLANGE_DELAY_LENGTH/4;
-    _flange->begin(_delayLine, FLANGE_DELAY_LENGTH, s_idx, s_depth, freq);
-    _flange->voices(s_idx, s_depth, freq);
-
-    _inConnection = new AudioConnection(*_source, _sourceOutput, *_flange, 0);
-    _outConnection = new AudioConnection(*_flange, 0, *_dest, _destInput);
+    _outConnection = new AudioConnection(*_source, _sourceOutput, *_dest, _destInput);
 }
 
 //=================================================================================================
 void Effects::chorus() {
+    Serial.printf("Effect: chorus\n");
     reset();
     _chorus = new AudioEffectChorus();
+    _chorus->begin(_delayLine, CHORUS_DELAY_LENGTH, _settings->_chorus._chorus);
+    connect(_chorus);
+}
 
-    int n_chorus = 2;
-    _chorus->begin(_delayLine, CHORUS_DELAY_LENGTH, n_chorus);
-    _chorus->voices(n_chorus);
+//=================================================================================================
+void Effects::flange() {
+    Serial.printf("Effect: flange\n");
+    reset();
+    _flange = new AudioEffectFlange();
 
-    _inConnection = new AudioConnection(*_source, _sourceOutput, *_chorus, 0);
-    _outConnection = new AudioConnection(*_chorus, 0, *_dest, _destInput);
+    int idx = FLANGE_DELAY_LENGTH/4;
+    int depth = FLANGE_DELAY_LENGTH/4;
+    _flange->begin(_delayLine, FLANGE_DELAY_LENGTH, idx, depth, _settings->_flange._rate);
+
+    connect(_flange);
 }
 
 //=================================================================================================
 void Effects::reverb() {
+    Serial.printf("Effect: reverb\n");
     reset();
     _reverb = new AudioEffectReverb();
-
-    _reverb->reverbTime(0.3);
-
-    _inConnection = new AudioConnection(*_source, _sourceOutput, *_reverb, 0);
-    _outConnection = new AudioConnection(*_reverb, 0, *_dest, _destInput);
-
+    connect(_reverb);
 }
 
-
 //=================================================================================================
-void Effects::freeReverb() {
+void Effects::freeverb() {
+    Serial.printf("Effect: freeverb\n");
     reset();
-    _freeReverb = new AudioEffectFreeverb();
-
-    _freeReverb->roomsize(0.7);
-    _freeReverb->damping(0.1);
-
-    _inConnection = new AudioConnection(*_source, _sourceOutput, *_freeReverb, 0);
-    _outConnection = new AudioConnection(*_freeReverb, 0, *_dest, _destInput);
-
+    _freeverb = new AudioEffectFreeverb();
+    connect(_freeverb);
 }

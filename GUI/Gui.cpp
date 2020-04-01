@@ -1,7 +1,4 @@
-#include <vector>
 #include "../Devices/Devices.h"
-#include "../Devices/TouchScreen.h"
-#include "Settings.h"
 #include "Control.h"
 #include "Window.h"
 #include "PeakMeter.h"
@@ -13,7 +10,8 @@ Gui::Gui() {
 }
 
 //=================================================================================================
-bool Gui::init(Settings* settings) {
+bool Gui::init(Storage* storage, Settings* settings) {
+    _storage = storage;
     _settings = settings;
     //Serial.printf("Gui::init\n");
     //_settings->show("GUI");
@@ -21,7 +19,7 @@ bool Gui::init(Settings* settings) {
     _settings->_screen->light(1.0);
     
     _main = new Main();
-    _main->init(_settings);
+    _main->init(_storage, _settings);
     _main->draw();
     _current = _main;
 

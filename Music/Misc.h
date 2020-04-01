@@ -1,12 +1,7 @@
 #ifndef Misc_h
 #define Misc_h
 
-#include <Arduino.h>
-#include <Audio.h>
-#include <list>
-#include <vector>
-#include <float.h>
-#include "../Devices/AudioBoard.h"
+#include "../Devices/Devices.h"
 #include "../Sound/Sound.h"
 #include "MusicDef.h"
 

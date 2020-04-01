@@ -1,5 +1,4 @@
 #include "../Devices/Devices.h"
-#include "Settings.h"
 #include "Window.h"
 #include "Control.h"
 #include "CheckBox.h"
