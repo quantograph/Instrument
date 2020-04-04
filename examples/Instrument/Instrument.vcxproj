@@ -105,10 +105,12 @@
     <ClInclude Include="..\..\GUI\Control.h" />
     <ClInclude Include="..\..\GUI\Gui.h" />
     <ClInclude Include="..\..\GUI\GuiMisc.h" />
+    <ClInclude Include="..\..\GUI\List.h" />
     <ClInclude Include="..\..\GUI\Main.h" />
     <ClInclude Include="..\..\GUI\PeakMeter.h" />
     <ClInclude Include="..\..\GUI\SetAudio.h" />
     <ClInclude Include="..\..\GUI\SetBand.h" />
+    <ClInclude Include="..\..\GUI\SetEffect.h" />
     <ClInclude Include="..\..\GUI\SetGuitar.h" />
     <ClInclude Include="..\..\GUI\SetSynth.h" />
     <ClInclude Include="..\..\GUI\Slider.h" />
@@ -179,10 +181,12 @@
     <ClCompile Include="..\..\GUI\Control.cpp" />
     <ClCompile Include="..\..\GUI\Gui.cpp" />
     <ClCompile Include="..\..\GUI\GuiMisc.cpp" />
+    <ClCompile Include="..\..\GUI\List.cpp" />
     <ClCompile Include="..\..\GUI\Main.cpp" />
     <ClCompile Include="..\..\GUI\PeakMeter.cpp" />
     <ClCompile Include="..\..\GUI\SetAudio.cpp" />
     <ClCompile Include="..\..\GUI\SetBand.cpp" />
+    <ClCompile Include="..\..\GUI\SetEffect.cpp" />
     <ClCompile Include="..\..\GUI\SetGuitar.cpp" />
     <ClCompile Include="..\..\GUI\SetSynth.cpp" />
     <ClCompile Include="..\..\GUI\Slider.cpp" />

@@ -3,15 +3,8 @@
 
 class CheckBox : public Control {
 public:
-    enum CheckBoxId {
-        none,
-        mic,
-        line,
-    };
+    CheckBox(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, ControlId id);
 
-    CheckBox(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id);
-
-    String _text{};
     bool _checked{};
     uint16_t _textColor = ILI9341_WHITE;
     int _textSize = 2;

@@ -20,7 +20,6 @@ public:
     SetBand* _setBand{};
     PeakMeter* _peakMeter{};
     std::vector<Button*> _buttons;
-    Window* _current{};
     Storage* _storage{};
 
     virtual bool init(Storage* storage, Settings* settings);
@@ -28,11 +27,8 @@ public:
     void onPeakMeter(float left, float right);
 
     void draw() override;
-    bool onTouch(const TS_Point& point) override;
-    bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
-    bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
-    bool onButton(Button* button) override;
-    void onBack(Window* window) override;
+    bool onControl(Control* control) override;
+    void onBack(Window* window);
 };
 
 #endif // Main_h

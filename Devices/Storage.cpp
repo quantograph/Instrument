@@ -83,7 +83,7 @@ bool Storage::read() {
         start = end + 1;
     } while(end);
 
-    show("Reading");
+    //show("Reading");
 
     free(buffer);
 
@@ -142,7 +142,7 @@ bool Storage::write() {
     offset += 2;
     writeBuffer(offset, (const uint8_t*)string.c_str(), _size);
 
-    show("Saving");
+    //show("Saving");
     //Serial.printf("\n(%d) %s\n", _size, string.c_str());
 
     return true;

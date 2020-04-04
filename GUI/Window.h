@@ -1,10 +1,11 @@
 #ifndef Window_h
 #define Window_h
 
-class TouchScreen;
+class Gui;
 class Control;
 class Button;
 class CheckBox;
+class TextBox;
 
 class Window {
 public:
@@ -13,16 +14,16 @@ public:
 
     Settings* _settings{};
     Window* _parent{};
-    std::vector<Control*> _controls{};
+    std::list<Control*> _controls{};
 
     virtual void draw();
-    virtual bool init(Settings* settings, Window* parent = nullptr);
-    virtual bool onTouch(const TS_Point& point) { return false; }
-    virtual bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) { return false; }
-    virtual bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) { return false; }
+    virtual bool init(Settings* settings, Window* parent);
+    virtual bool onTouch(const TS_Point& point);
+    virtual bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint);
+    virtual bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint);
     virtual void onPeakMeter(float left, float right) {}
-    virtual bool onButton(Button* button) { return false; }
-    virtual bool onCheckBox(CheckBox* checkBox) { return false; }
+    virtual bool onControl(Control* control) { return false; }
+    virtual void activate();
     virtual void onBack(Window* window) {}
 };
 

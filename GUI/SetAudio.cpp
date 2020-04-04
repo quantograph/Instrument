@@ -33,13 +33,13 @@ bool SetAudio::init(Settings* settings, Window* parent) {
     y += height + 10;*/
 
     // "Mic" check box
-    height = 20;
+    height = 30;
     width = (_settings->_screen->_width / 2) - 10;
-    _micCheck = new CheckBox(_settings, this, 10, y, width, height, CheckBox::CheckBoxId::mic);
+    _micCheck = new CheckBox(_settings, this, 10, y, width, height, ControlId::chk_mic);
     _micCheck->_text = "Mic";
 
     // "Line" check box
-    _lineCheck = new CheckBox(_settings, this, _settings->_screen->_width / 2, y, width, height, CheckBox::CheckBoxId::line);
+    _lineCheck = new CheckBox(_settings, this, _settings->_screen->_width / 2, y, width, height, ControlId::chk_line);
     _lineCheck->_text = "Line";
     y += height + 30;
 
@@ -50,7 +50,7 @@ bool SetAudio::init(Settings* settings, Window* parent) {
 
     // Slider
     height = 40;
-    _slider = new Slider(_settings, this, 30, y, _settings->_screen->_width - 60, height);
+    _slider = new Slider(_settings, this, 30, y, _settings->_screen->_width - 60, height, ControlId::sld_velel);
     y += height + 30;
 
     // Buttons
@@ -64,7 +64,7 @@ bool SetAudio::init(Settings* settings, Window* parent) {
 void SetAudio::setupButtons() {
     int width = _settings->_screen->_width / 4;
     _backButton = new Button(_settings, this, _settings->_screen->_width - width, 
-                             _settings->_screen->_height - width, width, width, Button::ButtonId::back);
+                             _settings->_screen->_height - width, width, width, ControlId::btn_back);
     _backButton->init();
 }
 
@@ -128,71 +128,30 @@ void SetAudio::onPeakMeter(float left, float right) {
 }
 
 //=================================================================================================
-bool SetAudio::onTouch(const TS_Point& point) {
-    if(_micCheck->onTouch(point) || _lineCheck->onTouch(point)) {
-        //Serial.printf("===== SetAudio::onTouch check boxes: %dx%d\n", point.x, point.y);
-        updateInput();
-    } else if (_slider->onTouch(point)) {
-        //Serial.printf("===== SetAudio::onTouch slider: %dx%d\n", point.x, point.y);
-        updateLevel(true);
-    } else {
-        //Serial.printf("===== SetAudio::onTouch button: %dx%d\n", point.x, point.y);
-        _backButton->onTouch(point);
-    }
-
-    return true;
-}
-
-//=================================================================================================
-bool SetAudio::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
-    /*if(_slider->onRelease(fromPoint, toPoint))
-        updateLevel();*/
-
-    return true;
-}
-
-//=================================================================================================
-bool SetAudio::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
-    if(_slider->onMove(fromPoint, toPoint))
-        updateLevel(true);
-
-    return true;
-}
-
-//=================================================================================================
-bool SetAudio::onButton(Button* button) {
+bool SetAudio::onControl(Control* control) {
     //Serial.printf("SetAudio::: %s\n", button->_text.c_str());
 
-    switch(button->_id) {
-        case Button::ButtonId::back:
-            _parent->onBack(this);
-            break;
-
-        default:
-            Serial.printf("##### ERROR: unknown button ID: d\n", button->_id);
-            return false;
-    }
-
-    return true;
-}
-
-//=================================================================================================
-bool SetAudio::onCheckBox(CheckBox* checkBox) {
-    //Serial.printf("SetAudio::onCheckBox %d\n", checkBox->_text.c_str());
-
-    switch(checkBox->_id) {
-        case CheckBox::CheckBoxId::mic:
+    switch(control->_id) {
+        case ControlId::chk_mic:
             _settings->_input = Inputs::mic;
             updateInput();
             break;
 
-        case CheckBox::CheckBoxId::line:
+        case ControlId::chk_line:
             _settings->_input = Inputs::line;
             updateInput();
             break;
 
+        case ControlId::sld_velel:
+            updateLevel(true);
+            break;
+
+        case ControlId::btn_back:
+            _parent->onBack(this);
+            break;
+
         default:
-            Serial.printf("##### ERROR: unknown check box ID: d\n", checkBox->_id);
+            Serial.printf("##### ERROR SetAudio::onControl: unknown control ID d\n", control->_id);
             return false;
     }
 

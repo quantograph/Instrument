@@ -4,7 +4,7 @@
 #include "CheckBox.h"
 
 //=================================================================================================
-CheckBox::CheckBox(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id) : 
+CheckBox::CheckBox(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, ControlId id) : 
     Control(settings, parent, x, y, width, height, id) {
 }
 
@@ -26,11 +26,13 @@ void CheckBox::update(bool check) {
 
 //=================================================================================================
 bool CheckBox::onTouch(const TS_Point& point) {
-    if(!inside(point))
+    if(!inside(point)) {
+        //Serial.printf("CheckBox::onTouch, not inside: %s, touch=%dx%d, box=%dx%d,%dx%d\n", _text.c_str(), point.x, point.y, _x, _y, _x + _width, _y + _height);
         return false;
+    }
 
-    //Serial.printf("CheckBox::onTouch: %s %dx%d\n", _text.c_str(), point.x, point.y);
-    _parent->onCheckBox(this);
+    //Serial.printf("CheckBox::onTouch, inside: %s %dx%d\n", _text.c_str(), point.x, point.y);
+    _parent->onControl(this);
 
     return true;
 }

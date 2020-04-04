@@ -20,6 +20,27 @@ enum EffectType {
     freeverbType
 };
 
+enum ControlId {
+    ctl_none,
+    // Buttons
+    btn_back,
+    btn_guitar,
+    btn_synth,
+    btn_band,
+    btn_settings,
+    // Check boxes
+    chk_mic,
+    chk_line,
+    chk_singleEffect,
+    chk_doubleEffect,
+    // Text boxes
+    txt_effect,
+    txt_effect1,
+    txt_effect2,
+    // Sliders
+    sld_velel
+};
+
 // Effect settings
 struct Chorus {
     int _chorus{2}; // Number of voices
@@ -63,9 +84,9 @@ struct Settings {
     // Audio
     Inputs _input{Inputs::mic}; // Mic or line in
     float _micGain{0.5}; // Microphone gain (0 - 63)
-    //_guitarEffect1
-    //_guitarEffect2
     float _lineInLevel{0.5}; // 0 - 15
+    // Guitar
+    uint16_t _guitarEffects{1}; // Number of guitar effects (single or double)
     EffectSettings _effect1;
     EffectSettings _effect2;
 

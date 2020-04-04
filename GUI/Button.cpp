@@ -4,30 +4,30 @@
 #include "Button.h"
 
 //=================================================================================================
-Button::Button(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id) : 
+Button::Button(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, ControlId id) : 
     Control(settings, parent, x, y, width, height, id) {
 }
 
 //=================================================================================================
 void Button::init() {
     switch(_id) {
-        case guitar:
+        case btn_guitar:
             _text = "Gtr";
             break;
 
-        case synth:
+        case btn_synth:
             _text = "Synt";
             break;
 
-        case band:
+        case btn_band:
             _text = "Drum";
             break;
 
-        case settings:
+        case btn_settings:
             _text = "Setp";
             break;
 
-        case back:
+        case btn_back:
             _text = "Back";
             break;
 
@@ -35,6 +35,8 @@ void Button::init() {
             Serial.printf("##### ERROR: unknown button ID: d\n", _id);
             break;
     }
+
+    draw();
 }
 
 //=================================================================================================
@@ -56,7 +58,7 @@ bool Button::onTouch(const TS_Point& point) {
         return false;
 
     //Serial.printf("Button::onTouch: %s\n", _text.c_str());
-    _parent->onButton(this);
+    _parent->onControl(this);
 
     return true;
 }

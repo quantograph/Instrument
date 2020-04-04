@@ -1,9 +1,10 @@
 #include "../Devices/Devices.h"
+#include "Window.h"
 #include "Control.h"
 #include "Slider.h"
 
 //=================================================================================================
-Slider::Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id) : 
+Slider::Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, ControlId id) : 
     Control(settings, parent, x, y, width, height, id) {
     _left = _x + 3;
     _right = _x + _width - 4;
@@ -40,6 +41,8 @@ void Slider::update(TS_Point point) {
     // Get the bar's value
     _value = (float)(x - _left) / width;
     //Serial.printf("value=%0.2f\n", _value);
+
+    _parent->onControl(this);
 }
 
 //=================================================================================================

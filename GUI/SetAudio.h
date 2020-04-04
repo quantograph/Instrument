@@ -26,12 +26,8 @@ public:
     void draw() override;
     void updateInput();
     void updateLevel(bool getSlider);
-    bool onTouch(const TS_Point& point) override;
-    bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
-    bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
     void onPeakMeter(float left, float right) override;
-    bool onButton(Button* button) override;
-    bool onCheckBox(CheckBox* checkBox) override;
+    bool onControl(Control* control) override;
 };
 
 #endif

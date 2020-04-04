@@ -202,6 +202,12 @@
     <ClInclude Include="..\..\Devices\Storage.h">
       <Filter>Devices</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\GUI\List.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\GUI\SetEffect.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.md" />
@@ -414,6 +420,12 @@
     </ClCompile>
     <ClCompile Include="..\..\Devices\Storage.cpp">
       <Filter>Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GUI\List.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\GUI\SetEffect.cpp">
+      <Filter>GUI</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

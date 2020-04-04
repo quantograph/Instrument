@@ -1,4 +1,5 @@
 #include "../Devices/Devices.h"
+#include "Gui.h"
 #include "Control.h"
 #include "PeakMeter.h"
 #include "Slider.h"
@@ -24,20 +25,20 @@ Main::~Main() {
 //=================================================================================================
 bool Main::init(Storage* storage, Settings* settings) {
     _storage = storage;
-    //Serial.printf("Main::init\n");
-    Window::init(settings);
+    //Serial.printf("Main::init: this=%p\n", this);
+    Window::init(settings, nullptr);
 
     _setGuitar = new SetGuitar();
-    _setGuitar->init(settings, this);
+    _setGuitar->init(_settings, this);
 
     _setSynth = new SetSynth();
-    _setSynth->init(settings, this);
+    _setSynth->init(_settings, this);
 
     _setBand = new SetBand();
-    _setBand->init(settings, this);
+    _setBand->init(_settings, this);
 
     _setAudio = new SetAudio();
-    _setAudio->init(settings, this);
+    _setAudio->init(_settings, this);
 
     _peakMeter = new PeakMeter(settings, this, 0, 0, 10, _settings->_screen->_height / 2);
 
@@ -52,7 +53,7 @@ bool Main::init(Storage* storage, Settings* settings) {
 // Makes all menu buttons
 void Main::setupButtons() {
     Button* button;
-    Button::ButtonId id[] = {Button::ButtonId::guitar, Button::ButtonId::synth, Button::ButtonId::band, Button::ButtonId::settings};
+    ControlId id[] = {ControlId::btn_guitar, ControlId::btn_synth, ControlId::btn_band, ControlId::btn_settings};
     uint16_t width = _settings->_screen->_width / 4;
     uint16_t height = width;
     uint16_t x = 0;
@@ -81,79 +82,32 @@ void Main::draw() {
 //=================================================================================================
 void Main::onPeakMeter(float left, float right) {
     //Serial.printf("Main::onPeakMeter, _current=\n", _current);
-
-    if(_current) {
-        //Serial.printf("Main::onPeakMeter, current: left=%0.2f,  right=%0.2f\n", left, right);
-        _current->onPeakMeter(left, right);
-    } else {
-        //Serial.printf("Main::onPeakMeter, NO current: left=%0.2f,  right=%0.2f\n", left, right);
-    }
 }
 
 //=================================================================================================
-bool Main::onTouch(const TS_Point& point) {
-    //Serial.printf("Main::onTouch: %dx%d\n", point.x, point.y);
-
-    if(_current) {
-        _current->onTouch(point);
-    } else {
-        for(auto button : _buttons) {
-            button->onTouch(point);
-        }
-    }
-
-    return true;
-}
-
-//=================================================================================================
-bool Main::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
-    if(_current) {
-        _current->onRelease(fromPoint, toPoint);
-    }
-
-    return true;
-}
-
-//=================================================================================================
-bool Main::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
-    if(_current) {
-        _current->onMove(fromPoint, toPoint);
-    }
-
-    return true;
-}
-
-//=================================================================================================
-bool Main::onButton(Button* button) {
-    Window* window{};
+bool Main::onControl(Control* control) {
     //Serial.printf("Main::onButton: %s\n", button->_text.c_str());
 
-    switch(button->_id) {
-        case Button::ButtonId::guitar:
-            window = _setGuitar;
+    switch(control->_id) {
+        case ControlId::btn_guitar:
+            _setGuitar->activate();
             break;
 
-        case Button::ButtonId::synth:
-            window = _setSynth;
+        case ControlId::btn_synth:
+            _setSynth->activate();
             break;
 
-        case Button::ButtonId::band:
-            window = _setBand;
+        case ControlId::btn_band:
+            _setBand->activate();
             break;
 
-        case Button::ButtonId::settings:
-            window = _setAudio;
+        case ControlId::btn_settings:
+            _setAudio->activate();
             break;
 
         default:
-            Serial.printf("##### ERROR: unknown button ID: d\n", button->_id);
+            Serial.printf("##### ERROR Main::onControl: unknown control ID: d\n", control->_id);
             return false;
-    }
-
-    if(window) {
-        window->draw();
-        _current = window;
-        Serial.printf("Main::onButton: _current=%p\n", _current);
     }
 
     return true;
@@ -161,7 +115,9 @@ bool Main::onButton(Button* button) {
 
 //=================================================================================================
 void Main::onBack(Window* window) {
+    //Serial.printf("Main::onBack: window=%p\n", window);
+
     _storage->write();
-    _current = nullptr;
+    _settings->_gui->_current = this;
     draw();
 }

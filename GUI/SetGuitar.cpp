@@ -1,4 +1,5 @@
 #include "../Devices/Devices.h"
+#include "Gui.h"
 #include "Control.h"
 #include "Button.h"
 #include "PeakMeter.h"
@@ -6,6 +7,7 @@
 #include "TextBox.h"
 #include "CheckBox.h"
 #include "Window.h"
+#include "SetEffect.h"
 #include "SetGuitar.h"
 
 //=================================================================================================
@@ -15,8 +17,39 @@ SetGuitar::SetGuitar() {
 
 //=================================================================================================
 bool SetGuitar::init(Settings* settings, Window* parent) {
+    //Serial.printf("SetGuitar::init: this=%p, parent=%p\n", this, parent);
+    uint16_t y = 20;
+    uint16_t height;
+    uint16_t width;
 
     Window::init(settings, parent);
+
+    // "SetEffect window
+    _setEffect = new SetEffect();
+    _setEffect->init(_settings, this);
+
+    // "Single" check box
+    height = 30;
+    width = (_settings->_screen->_width / 2) - 10;
+    _singleCheck = new CheckBox(_settings, this, 10, y, width, height, ControlId::chk_singleEffect);
+    _singleCheck->_text = "Single";
+
+    // "Double" check box
+    _doubleCheck = new CheckBox(_settings, this, _settings->_screen->_width / 2, y, width, height, ControlId::chk_doubleEffect);
+    _doubleCheck->_text = "Double";
+    y += height + 30;
+
+    // "Effect 1" box
+    height = 30;
+    _effect1 = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, ControlId::txt_effect1);
+    _effect1->_frame = true;
+    y += height + 30;
+
+    // "Effect 2" box
+    height = 30;
+    _effect2 = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, ControlId::txt_effect2);
+    _effect2->_frame = true;
+    y += height + 30;
 
     // Buttons
     setupButtons();
@@ -29,7 +62,7 @@ bool SetGuitar::init(Settings* settings, Window* parent) {
 void SetGuitar::setupButtons() {
     int width = _settings->_screen->_width / 4;
     _backButton = new Button(_settings, this, _settings->_screen->_width - width, 
-                             _settings->_screen->_height - width, width, width, Button::ButtonId::back);
+                             _settings->_screen->_height - width, width, width, ControlId::btn_back);
     _backButton->init();
 }
 
@@ -37,41 +70,54 @@ void SetGuitar::setupButtons() {
 void SetGuitar::draw() {
     _settings->_screen->_screen.fillScreen(ILI9341_BLACK);
 
+    updateNumber();
+
+    _effect1->update("Effect1");
+    _effect2->update("Effect2");
+
     _backButton->draw();
 }
 
 //=================================================================================================
-bool SetGuitar::onTouch(const TS_Point& point) {
-    _backButton->onTouch(point);
-
-    return true;
+void SetGuitar::updateNumber() {
+    //Serial.printf("SetGuitar::updateNumber: %d\n", _settings->_guitarEffects);
+    if(_settings->_guitarEffects == 1) { // Single
+        _singleCheck->update(true);
+        _doubleCheck->update(false);
+    } else if(_settings->_guitarEffects == 2) { // Double
+        _singleCheck->update(false);
+        _doubleCheck->update(true);
+    }
 }
 
 //=================================================================================================
-bool SetGuitar::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
-    /*if(_slider->onRelease(fromPoint, toPoint))
-        updateLevel();*/
+bool SetGuitar::onControl(Control* control) {
+    switch(control->_id) {
+        case ControlId::chk_singleEffect:
+            _settings->_guitarEffects = 1;
+            updateNumber();
+            break;
 
-    return true;
-}
+        case ControlId::chk_doubleEffect:
+            _settings->_guitarEffects = 2;
+            updateNumber();
+            break;
 
-//=================================================================================================
-bool SetGuitar::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
+        case ControlId::txt_effect1:
+            _setEffect->activate(&_settings->_effect1);
+            break;
 
-    return true;
-}
+        case ControlId::txt_effect2:
+            _setEffect->activate(&_settings->_effect2);
+            break;
 
-//=================================================================================================
-bool SetGuitar::onButton(Button* button) {
-    //Serial.printf("SetGuitar::: %s\n", button->_text.c_str());
-
-    switch(button->_id) {
-        case Button::ButtonId::back:
+        case ControlId::btn_back:
+            //Serial.printf("SetGuitar::onControl %s, parent=%p\n", control->_text.c_str(), _parent);
             _parent->onBack(this);
             break;
 
         default:
-            Serial.printf("##### ERROR: unknown button ID: d\n", button->_id);
+            Serial.printf("##### ERROR SetGuitar::onControl: unknown control ID d\n", control->_id);
             return false;
     }
 
@@ -79,24 +125,8 @@ bool SetGuitar::onButton(Button* button) {
 }
 
 //=================================================================================================
-bool SetGuitar::onCheckBox(CheckBox* checkBox) {
-    //Serial.printf("SetGuitar::onCheckBox %d\n", checkBox->_text.c_str());
-
-    /*switch(checkBox->_id) {
-        case CheckBox::CheckBoxId::mic:
-            _settings->_input = Inputs::mic;
-            updateInput();
-            break;
-
-        case CheckBox::CheckBoxId::line:
-            _settings->_input = Inputs::line;
-            updateInput();
-            break;
-
-        default:
-            Serial.printf("##### ERROR: unknown check box ID: d\n", checkBox->_id);
-            return false;
-    }*/
-
-    return true;
+void SetGuitar::onBack(Window* window) {
+    //Serial.printf("SetGuitar::onBack: window=%p\n", window);
+    _settings->_gui->_current = this;
+    draw();
 }

@@ -3,7 +3,7 @@
 #include "PeakMeter.h"
 
 //=================================================================================================
-PeakMeter::PeakMeter(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id) : 
+PeakMeter::PeakMeter(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, ControlId id) : 
     Control(settings, parent, x, y, width, height, id) {
     //Serial.printf("PeakMeter: %dx%d, %dx%d\n", _x, _y, _height, _width);
 }

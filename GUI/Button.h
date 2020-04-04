@@ -5,18 +5,8 @@ class TouchScreen;
 
 class Button : public Control {
 public:
-    enum ButtonId {
-        none,
-        back,
-        guitar,
-        synth,
-        band,
-        settings
-    };
+    Button(Settings* settings, Window* parent,  uint16_t x, uint16_t y, uint16_t width, uint16_t height, ControlId id);
 
-    Button(Settings* settings, Window* parent,  uint16_t x, uint16_t y, uint16_t width, uint16_t height, int id);
-
-    String _text{};
     int _radius = 7; // Radius of the rectangle rounding
     uint16_t _backColor = ILI9341_NAVY; // Button's background color
     uint16_t _borderColor = ILI9341_WHITE; // Button's border color

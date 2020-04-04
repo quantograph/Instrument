@@ -1,20 +1,23 @@
-#ifndef SetBand_h
-#define SetBand_h
+#ifndef SetEffect_h
+#define SetEffect_h
 
 class PeakMeter;
 class Slider;
 class Button;
 class TextBox;
 class CheckBox;
+class Control;
 
-class SetBand : public Window {
+class SetEffect : public Window {
 public:
-    SetBand();
+    SetEffect();
 
+    EffectSettings* _effectSettings{};
+    TextBox* _effect{};
     Button* _backButton{};
-    char _string[32];
 
     virtual bool init(Settings* settings, Window* parent);
+    void activate(EffectSettings* effectSettings);
     void setupButtons();
 
     void draw() override;

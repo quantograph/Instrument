@@ -18,11 +18,7 @@ public:
     void setupButtons();
 
     void draw() override;
-    bool onTouch(const TS_Point& point) override;
-    bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
-    bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
-    bool onButton(Button* button) override;
-    bool onCheckBox(CheckBox* checkBox) override;
+    bool onControl(Control* control) override;
 };
 
 #endif

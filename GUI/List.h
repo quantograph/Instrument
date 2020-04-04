@@ -1,5 +1,5 @@
-#ifndef SetBand_h
-#define SetBand_h
+#ifndef ListWindow_h
+#define ListWindow_h
 
 class PeakMeter;
 class Slider;
@@ -7,9 +7,9 @@ class Button;
 class TextBox;
 class CheckBox;
 
-class SetBand : public Window {
+class List : public Window {
 public:
-    SetBand();
+    List();
 
     Button* _backButton{};
     char _string[32];
@@ -18,6 +18,9 @@ public:
     void setupButtons();
 
     void draw() override;
+    bool onTouch(const TS_Point& point) override;
+    bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
+    bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
     bool onControl(Control* control) override;
 };
 
