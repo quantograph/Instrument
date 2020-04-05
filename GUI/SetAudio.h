@@ -20,12 +20,12 @@ public:
     Button* _backButton{};
     char _string[32];
 
-    virtual bool init(Settings* settings, Window* parent);
+    bool init(Settings* settings, Window* parent);
     void setupButtons();
-
     void draw() override;
     void updateInput();
     void updateLevel(bool getSlider);
+
     void onPeakMeter(float left, float right) override;
     bool onControl(Control* control) override;
 };

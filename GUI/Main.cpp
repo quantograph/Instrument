@@ -68,18 +68,6 @@ void Main::setupButtons() {
 }
 
 //=================================================================================================
-void Main::draw() {
-    //Serial.printf("Main::draw\n");
-    _settings->_screen->_screen.fillScreen(ILI9341_BLACK);
-
-    _peakMeter->draw();
-
-    for(auto button : _buttons) {
-        button->draw();
-    }
-}
-
-//=================================================================================================
 void Main::onPeakMeter(float left, float right) {
     //Serial.printf("Main::onPeakMeter, _current=\n", _current);
 }

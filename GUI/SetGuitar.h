@@ -20,7 +20,7 @@ public:
     Window* _current{};
     Button* _backButton{};
 
-    virtual bool init(Settings* settings, Window* parent);
+    bool init(Settings* settings, Window* parent);
     void setupButtons();
     void updateNumber();
 

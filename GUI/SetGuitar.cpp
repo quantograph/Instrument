@@ -43,12 +43,14 @@ bool SetGuitar::init(Settings* settings, Window* parent) {
     height = 30;
     _effect1 = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, ControlId::txt_effect1);
     _effect1->_frame = true;
+    _effect1->update("Effect1");
     y += height + 30;
 
     // "Effect 2" box
     height = 30;
     _effect2 = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, ControlId::txt_effect2);
     _effect2->_frame = true;
+    _effect2->update("Effect2");
     y += height + 30;
 
     // Buttons
@@ -68,14 +70,8 @@ void SetGuitar::setupButtons() {
 
 //=================================================================================================
 void SetGuitar::draw() {
-    _settings->_screen->_screen.fillScreen(ILI9341_BLACK);
-
+    Window::draw();
     updateNumber();
-
-    _effect1->update("Effect1");
-    _effect2->update("Effect2");
-
-    _backButton->draw();
 }
 
 //=================================================================================================

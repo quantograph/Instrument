@@ -11,17 +11,28 @@ class List : public Window {
 public:
     List();
 
-    Button* _backButton{};
-    char _string[32];
+    std::vector<std::pair<String, EffectType> > _items;
+    uint16_t _listWidth{};
+    uint16_t _listHeight{};
+    uint16_t _itemHeight{};
+    int16_t _scroll{0};
+    int16_t _lastScroll{-1};
+    int16_t _moveScroll{0};
+    uint16_t _itemsToShow{6};
+    uint16_t _textColor = ILI9341_WHITE;
+    int _textSize = 2;
+    TS_Point _touchPoint{};
+    String _selectedString{};
+    ControlId _selectedId{ControlId::ctl_none};
+    bool _touched{false};
 
-    virtual bool init(Settings* settings, Window* parent);
-    void setupButtons();
+    int16_t getScroll();
 
     void draw() override;
+    bool init(Settings* settings, Window* parent, ControlId id) override;
     bool onTouch(const TS_Point& point) override;
     bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
     bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
-    bool onControl(Control* control) override;
 };
 
 #endif

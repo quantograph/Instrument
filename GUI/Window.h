@@ -15,9 +15,10 @@ public:
     Settings* _settings{};
     Window* _parent{};
     std::list<Control*> _controls{};
+    ControlId _id{ControlId::ctl_none};
 
     virtual void draw();
-    virtual bool init(Settings* settings, Window* parent);
+    virtual bool init(Settings* settings, Window* parent, ControlId id = ControlId::ctl_none);
     virtual bool onTouch(const TS_Point& point);
     virtual bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint);
     virtual bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint);

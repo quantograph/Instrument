@@ -10,8 +10,12 @@ TextBox::TextBox(Settings* settings, Window* parent, uint16_t x, uint16_t y, uin
 
 //=================================================================================================
 void TextBox::update(String text) {
-
     _text = text;
+    draw();
+}
+
+//=================================================================================================
+void TextBox::draw() {
     _settings->_screen->_screen.fillRect(_x, _y, _width, _height, ILI9341_BLACK);
     _settings->_screen->_screen.setCursor(_x, _y);
     _settings->_screen->_screen.setTextColor(_textColor);

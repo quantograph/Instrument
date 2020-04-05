@@ -15,10 +15,8 @@ SetBand::SetBand() {
 
 //=================================================================================================
 bool SetBand::init(Settings* settings, Window* parent) {
-
     Window::init(settings, parent);
 
-    // Buttons
     setupButtons();
 
     return true;
@@ -31,13 +29,6 @@ void SetBand::setupButtons() {
     _backButton = new Button(_settings, this, _settings->_screen->_width - width, 
                              _settings->_screen->_height - width, width, width, ControlId::btn_back);
     _backButton->init();
-}
-
-//=================================================================================================
-void SetBand::draw() {
-    _settings->_screen->_screen.fillScreen(ILI9341_BLACK);
-
-    _backButton->draw();
 }
 
 //=================================================================================================

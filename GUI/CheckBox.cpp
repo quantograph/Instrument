@@ -9,11 +9,16 @@ CheckBox::CheckBox(Settings* settings, Window* parent, uint16_t x, uint16_t y, u
 }
 
 //=================================================================================================
-void CheckBox::update(bool check) {
+void CheckBox::update(bool checked) {
+    _checked = checked;
+    draw();
+}
+
+//=================================================================================================
+void CheckBox::draw() {
     _settings->_screen->_screen.fillRect(_x, _y, _width, _height, ILI9341_BLACK);
 
     // Check box
-    _checked = check;
     _settings->_screen->_screen.fillRect(_x, _y, _height, _height, _checked ? ILI9341_BLUE : ILI9341_BLACK);
     _settings->_screen->_screen.drawRect(_x, _y, _height, _height, ILI9341_WHITE);
 

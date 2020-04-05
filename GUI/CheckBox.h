@@ -9,7 +9,8 @@ public:
     uint16_t _textColor = ILI9341_WHITE;
     int _textSize = 2;
 
-    void update(bool check);
+    void update(bool checked);
+    void draw() override;
     bool onTouch(const TS_Point& point) override;
 };
 

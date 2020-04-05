@@ -11,6 +11,7 @@ public:
     int _textSize = 2;
 
     void update(String text);
+    void draw() override;
     bool onTouch(const TS_Point& point) override;
 };
 

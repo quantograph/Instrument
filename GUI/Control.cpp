@@ -10,24 +10,6 @@ Control::Control(Settings* settings, Window* parent, uint16_t x, uint16_t y, uin
 }
 
 //=================================================================================================
-// Draw this control
-void Control::draw() {
-    switch(_type) {
-        case button:
-            break;
-
-        case edit:
-            break;
-
-        case list:
-            break;
-
-        default:
-            Serial.printf("Unknown control type: %d\n", _type);
-    }
-}
-
-//=================================================================================================
 // Whether the point is inside the control
 bool Control::inside(const TS_Point& point) {
     if(point.x >= _x && point.x <= _x + _width &&

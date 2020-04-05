@@ -22,13 +22,13 @@ public:
     std::vector<Button*> _buttons;
     Storage* _storage{};
 
-    virtual bool init(Storage* storage, Settings* settings);
     void setupButtons();
-    void onPeakMeter(float left, float right);
 
-    void draw() override;
+    void onPeakMeter(float left, float right) override;
+    bool init(Storage* storage, Settings* settings);
+
     bool onControl(Control* control) override;
-    void onBack(Window* window);
+    void onBack(Window* window) override;
 };
 
 #endif // Main_h

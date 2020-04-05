@@ -15,9 +15,10 @@ Window::~Window() {
 }
 
 //=================================================================================================
-bool Window::init(Settings* settings, Window* parent) {
+bool Window::init(Settings* settings, Window* parent, ControlId id /* = ControlId::ctl_none */) {
     _settings = settings;
     _parent = parent;
+    _id = id;
 
     return true;
 }
@@ -29,8 +30,9 @@ void Window::activate() {
 }
 
 //=================================================================================================
-// Draw this window
 void Window::draw() {
+    _settings->_screen->_screen.fillScreen(ILI9341_BLACK);
+
     for(auto control : _controls){
         control->draw();
     }
@@ -58,8 +60,4 @@ bool Window::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
         control->onMove(fromPoint, toPoint);
 
     return false;
-}
-
-//=================================================================================================
-void onPeakMeter(float left, float right) {
 }

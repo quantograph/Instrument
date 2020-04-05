@@ -46,23 +46,23 @@ void Effects::connect(AudioStream* stream) {
 // Update settings for the active effect
 bool Effects::init(EffectType type) {
     switch(type) {
-        case cleanType:
+        case EffectType::eff_clean:
             clean();
             break;
 
-        case chorusType:
+        case EffectType::eff_chorus:
             chorus();
             break;
 
-        case flangeType:
+        case EffectType::eff_flange:
             flange();
             break;
 
-        case reverbType:
+        case EffectType::eff_reverb:
             reverb();
             break;
 
-        case freeverbType:
+        case EffectType::eff_freeverb:
             freeverb();
             break;
 

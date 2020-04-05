@@ -6,6 +6,7 @@ class Slider;
 class Button;
 class TextBox;
 class CheckBox;
+class List;
 class Control;
 
 class SetEffect : public Window {
@@ -14,14 +15,16 @@ public:
 
     EffectSettings* _effectSettings{};
     TextBox* _effect{};
+    List* _effectsList{};
     Button* _backButton{};
 
-    virtual bool init(Settings* settings, Window* parent);
+    bool init(Settings* settings, Window* parent);
+    void showEffectList();
     void activate(EffectSettings* effectSettings);
     void setupButtons();
 
-    void draw() override;
     bool onControl(Control* control) override;
+    void onBack(Window* window) override;
 };
 
 #endif

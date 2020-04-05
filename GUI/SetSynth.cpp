@@ -33,13 +33,6 @@ void SetSynth::setupButtons() {
 }
 
 //=================================================================================================
-void SetSynth::draw() {
-    _settings->_screen->_screen.fillScreen(ILI9341_BLACK);
-
-    _backButton->draw();
-}
-
-//=================================================================================================
 bool SetSynth::onControl(Control* control) {
     //Serial.printf("SetSynth::: %s\n", button->_text.c_str());
 

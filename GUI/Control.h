@@ -27,7 +27,7 @@ public:
     Type _type{Type::none}; // Control type
     ControlId _id{ControlId::ctl_none}; // Control ID
 
-    virtual void draw();
+    virtual void draw() {}
     virtual bool onTouch(const TS_Point& point) { return false; }
     virtual bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) { return false; }
     virtual bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) { return false; }

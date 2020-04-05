@@ -12,12 +12,18 @@ enum Inputs {
 
 // Sound effects
 enum EffectType {
-    noneType,
-    cleanType,
-    chorusType,
-    flangeType,
-    reverbType,
-    freeverbType
+    eff_none,
+    eff_clean,
+    eff_chorus,
+    eff_flange,
+    eff_reverb,
+    eff_freeverb,
+    eff_envelope,
+    eff_delay,
+    eff_bitcrusher,
+    eff_waveshaper,
+    eff_granular,
+    eff_last // Not an effect, for enumeration only. Insert new effects above this line.
 };
 
 enum ControlId {
@@ -38,7 +44,9 @@ enum ControlId {
     txt_effect1,
     txt_effect2,
     // Sliders
-    sld_velel
+    sld_velel,
+    // Windows
+    wnd_effect_list
 };
 
 // Effect settings

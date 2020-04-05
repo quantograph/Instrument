@@ -70,11 +70,7 @@ void SetAudio::setupButtons() {
 
 //=================================================================================================
 void SetAudio::draw() {
-    _settings->_screen->_screen.fillScreen(ILI9341_BLACK);
-
-    _peakMeter->draw();
-    _slider->draw();
-    _backButton->draw();
+    Window::draw();
     updateInput();
 }
 

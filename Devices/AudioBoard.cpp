@@ -218,12 +218,12 @@ void AudioBoard::reset() {
 bool AudioBoard::effects(EffectType type1, EffectType type2) {
     reset();
 
-    if(type1 != EffectType::noneType) {
+    if(type1 != EffectType::eff_none) {
         _effect1 = new Effects(&_settings->_effect1, &_input, 0, &_mixer1, 0);
         _effect1->init(type1);
     }
 
-    if(type2 != EffectType::noneType) {
+    if(type2 != EffectType::eff_none) {
         _effect2 = new Effects(&_settings->_effect2, &_input, 0, &_mixer4, 0);
         _effect2->init(type2);
     }
