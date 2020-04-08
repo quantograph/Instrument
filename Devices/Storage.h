@@ -37,7 +37,7 @@ public:
     bool getValue(char* pair);
 
     // Add new members to the end of this:
-    Settings _settings;
+    Settings _settings{};
 };
 
 #endif

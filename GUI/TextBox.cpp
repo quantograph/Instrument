@@ -17,7 +17,7 @@ void TextBox::update(String text) {
 //=================================================================================================
 void TextBox::draw() {
     _settings->_screen->_screen.fillRect(_x, _y, _width, _height, ILI9341_BLACK);
-    _settings->_screen->_screen.setCursor(_x, _y);
+    _settings->_screen->_screen.setCursor(_x + 7, _y + 7);
     _settings->_screen->_screen.setTextColor(_textColor);
     _settings->_screen->_screen.setTextSize(_textSize);
     _settings->_screen->_screen.print(_text);
@@ -28,9 +28,9 @@ void TextBox::draw() {
     if(_dropDown) {
         _settings->_screen->_screen.drawRect(_x + _width, _y, _height, _height, ILI9341_WHITE);
 
-        int16_t x = _x + _width + 2;
-        int16_t y = _y + 2;
-        int16_t width = _height - 4;
+        int16_t x = _x + _width + 5;
+        int16_t y = _y + 10;
+        int16_t width = _height - 10;
         _settings->_screen->_screen.fillTriangle(x, y, x + width, y, x + width * 0.5, y + width * 0.4, ILI9341_WHITE);
     }
 }

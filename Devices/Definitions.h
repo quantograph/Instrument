@@ -67,11 +67,45 @@ struct Freeverb {
     float _damping{0.1};
 };
 
+struct Envelope {
+	float _delay{0.0};
+	float _attack{10.5}; // Max: 11880
+	float _hold{2.5}; // Max: 11880
+	float _decay{35}; // Max: 11880
+	float _sustain{0.8}; // 0 to 1.0
+	float _release{300}; // Max: 11880
+	float _releaseNoteOn{5};
+};
+
+struct Delay {
+    float _delays[8] = {-1, -1, -1, -1, -1, -1, -1, -1 };
+};
+
+struct Bitcrusher {
+	uint8_t _bits{}; // 1 - 16 (16 - passthough)
+    float _sampleRate{}; // Hz
+};
+
+struct Waveshaper {
+    float* _waveshape{};
+    int _length{};
+};
+
+struct Granular {
+};
+
 struct EffectSettings {
-    Chorus _chorus;
-    Flange _flange;
-    Reverb _reverb;
-    Freeverb _freeverb;
+    EffectType _effectType{EffectType::eff_clean};
+    String _effectName{};
+    Chorus _chorus{};
+    Flange _flange{};
+    Reverb _reverb{};
+    Freeverb _freeverb{};
+    Envelope _envelope{};
+    Delay _delay{};
+    Bitcrusher _bitcrusher{};
+    Waveshaper _waveshaper{};
+    Granular _granular{};
 };
 
 class TouchScreen;
@@ -95,8 +129,8 @@ struct Settings {
     float _lineInLevel{0.5}; // 0 - 15
     // Guitar
     uint16_t _guitarEffects{1}; // Number of guitar effects (single or double)
-    EffectSettings _effect1;
-    EffectSettings _effect2;
+    EffectSettings _effect1{};
+    EffectSettings _effect2{};
 
     // All devices, not saved into EEPROM, just to have them available
     TouchScreen* _screen{};

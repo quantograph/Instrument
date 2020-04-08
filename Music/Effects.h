@@ -16,15 +16,32 @@ public:
             AudioStream* dest, uint8_t destInput);
     ~Effects();
     void reset();
-    bool init(EffectType type);
+    bool init();
     void connect(AudioStream* stream);
     void update();
+    
     void clean();
     void chorus();
     void flange();
     void reverb();
     void freeverb();
+    void envelope();
+    void delay();
+    void bitcrusher();
+    void waveshaper();
+    void granular();
 
+    AudioEffectChorus* _chorus{nullptr};
+    AudioEffectFlange* _flange{nullptr};
+    AudioEffectReverb* _reverb{nullptr};
+    AudioEffectFreeverb* _freeverb{nullptr};
+    AudioEffectEnvelope* _envelope{nullptr};
+    AudioEffectDelay* _delay{nullptr};
+    AudioEffectBitcrusher* _bitcrusher{nullptr};
+    AudioEffectWaveshaper* _waveshaper{nullptr};
+    AudioEffectGranular* _granular{nullptr};
+
+    EffectType _effectType{EffectType::eff_none}; // Current effect type
     EffectSettings* _settings{};
     AudioStream* _source{nullptr};
     uint8_t _sourceOutput{0};
@@ -32,10 +49,7 @@ public:
     uint8_t _destInput{0};
     AudioConnection* _inConnection{nullptr};
     AudioConnection* _outConnection{nullptr};
-    AudioEffectChorus* _chorus{nullptr};
-    AudioEffectFlange* _flange{nullptr};
-    AudioEffectReverb* _reverb{nullptr};
-    AudioEffectFreeverb* _freeverb{nullptr};
+   
 };
 
 #endif

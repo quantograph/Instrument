@@ -19,7 +19,7 @@ public:
     Button* _backButton{};
 
     bool init(Settings* settings, Window* parent);
-    void showEffectList();
+    void showEffect();
     void activate(EffectSettings* effectSettings);
     void setupButtons();
 

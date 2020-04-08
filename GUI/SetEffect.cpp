@@ -35,6 +35,10 @@ bool SetEffect::init(Settings* settings, Window* parent) {
     // Effects list
     _effectsList = new List();
     _effectsList->init(_settings, this, ControlId::wnd_effect_list);
+    for(int type = EffectType::eff_none + 1; type < EffectType::eff_last; ++type) {
+        String name{getEffectName((EffectType)type)};
+        _effectsList->_items.push_back(std::make_pair(name, (EffectType)type));
+    }
 
     // Buttons
     setupButtons();
@@ -45,6 +49,7 @@ bool SetEffect::init(Settings* settings, Window* parent) {
 //=================================================================================================
 void SetEffect::activate(EffectSettings* effectSettings) {
     _effectSettings = effectSettings;
+    showEffect();
     Window::activate();
 }
 
@@ -58,6 +63,45 @@ void SetEffect::setupButtons() {
 }
 
 //=================================================================================================
+void SetEffect::showEffect() {
+    switch(_effectSettings->_effectType) {
+        case EffectType::eff_clean:
+            break;
+
+        case EffectType::eff_chorus:
+            break;
+
+        case EffectType::eff_flange:
+            break;
+
+        case EffectType::eff_reverb:
+            break;
+
+        case EffectType::eff_freeverb:
+            break;
+
+        case EffectType::eff_envelope:
+            break;
+
+        case EffectType::eff_delay:
+            break;
+
+        case EffectType::eff_bitcrusher:
+            break;
+
+        case EffectType::eff_waveshaper:
+            break;
+
+        case EffectType::eff_granular:
+            break;
+
+        default:
+            Serial.printf("##### ERROR, SetEffect::showEffect: unknown effect type %d\n", 
+                          _effectSettings->_effectType);
+    }
+}
+
+//=================================================================================================
 bool SetEffect::onControl(Control* control) {
     switch(control->_id) {
         case ControlId::btn_back:
@@ -66,7 +110,7 @@ bool SetEffect::onControl(Control* control) {
             break;
 
         case ControlId::txt_effect:
-            showEffectList();
+            _effectsList->activate();
             break;
 
         default:
@@ -78,24 +122,20 @@ bool SetEffect::onControl(Control* control) {
 }
 
 //=================================================================================================
-void SetEffect::showEffectList() {
-    Serial.printf("=============== SetEffect::showEffectList\n");
-    for(int type = EffectType::eff_none + 1; type < EffectType::eff_last; ++type) {
-        String name{getEffectName((EffectType)type)};
-        _effectsList->_items.push_back(std::make_pair(name, (EffectType)type));
-    }
-
-    _effectsList->activate();
-}
-
-//=================================================================================================
 void SetEffect::onBack(Window* window) {
     //Serial.printf("SetEffect::onBack: ID=%d\n", window->_id);
 
+    _settings->_gui->_current = this;
+
+    // Effect type selected
     if(window->_id == ControlId::wnd_effect_list) {
-        Serial.printf("SetEffect::onBack, effect: %s (%d)\n", _effectsList->_selectedString.c_str(), _effectsList->_selectedId);
+        _effectSettings->_effectName = _effectsList->_selectedString;
+        _effect->_text = _effectSettings->_effectName;
+        _effectSettings->_effectType = (EffectType)_effectsList->_selectedId;
+        Serial.printf("SetEffect::onBack, effect: %s (%d)\n", _effectSettings->_effectName.c_str(), _effectSettings->_effectType);
+
+        showEffect();
     }
 
-    _settings->_gui->_current = this;
     draw();
 }

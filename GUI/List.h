@@ -11,7 +11,7 @@ class List : public Window {
 public:
     List();
 
-    std::vector<std::pair<String, EffectType> > _items;
+    std::vector<std::pair<String, int> > _items;
     uint16_t _listWidth{};
     uint16_t _listHeight{};
     uint16_t _itemHeight{};
@@ -23,13 +23,14 @@ public:
     int _textSize = 2;
     TS_Point _touchPoint{};
     String _selectedString{};
-    ControlId _selectedId{ControlId::ctl_none};
-    bool _touched{false};
+    int _selectedId{0};
+    bool _ready{false};
 
     int16_t getScroll();
 
     void draw() override;
     bool init(Settings* settings, Window* parent, ControlId id) override;
+    void activate() override;
     bool onTouch(const TS_Point& point) override;
     bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
     bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;

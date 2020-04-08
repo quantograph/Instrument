@@ -23,7 +23,7 @@ void CheckBox::draw() {
     _settings->_screen->_screen.drawRect(_x, _y, _height, _height, ILI9341_WHITE);
 
     // Text
-    _settings->_screen->_screen.setCursor(_x + _height + 3, _y);
+    _settings->_screen->_screen.setCursor(_x + _height + 5, _y + 7);
     _settings->_screen->_screen.setTextColor(_textColor);
     _settings->_screen->_screen.setTextSize(_textSize);
     _settings->_screen->_screen.print(_text);

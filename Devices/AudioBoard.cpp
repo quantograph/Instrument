@@ -37,12 +37,7 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
 
     //notefreq.begin(.15);
 
-    // Effects
-    //passthrough();
-    //flange(0.5);
-    //chorus();
-    //reverb();
-    //freeReverb();
+    setEffects();
 }
 
 //=================================================================================================
@@ -73,12 +68,12 @@ void AudioBoard::setupMixers() {
 
     // Spread the 4 mixers in a stereo panorama
     _outMixer1.gain(0, 1.0f);
-    _outMixer2.gain(0, 0.2f);
+    _outMixer2.gain(0, 0.1f);
     _outMixer1.gain(1, 1.0f);
     _outMixer2.gain(1, 0.5f);
     _outMixer1.gain(2, 0.5f);
     _outMixer2.gain(2, 1.0f);
-    _outMixer1.gain(3, 0.2f);
+    _outMixer1.gain(3, 0.1f);
     _outMixer2.gain(3, 1.0f);
 
     // 2 (stereo) output mixers go to the audio output
@@ -215,18 +210,23 @@ void AudioBoard::reset() {
 }
 
 //=================================================================================================
-bool AudioBoard::effects(EffectType type1, EffectType type2) {
-    reset();
-
-    if(type1 != EffectType::eff_none) {
-        _effect1 = new Effects(&_settings->_effect1, &_input, 0, &_mixer1, 0);
-        _effect1->init(type1);
+bool AudioBoard::createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer) {
+    if(!effect || (effect && effect->_effectType != effectSettings->_effectType)) {
+        delete effect;
+        effect = new Effects(effectSettings, &_input, 0, mixer, 0);
+        effect->init();
     }
 
-    if(type2 != EffectType::eff_none) {
-        _effect2 = new Effects(&_settings->_effect2, &_input, 0, &_mixer4, 0);
-        _effect2->init(type2);
-    }
+    return true;
+}
+
+//=================================================================================================
+bool AudioBoard::setEffects() {
+    createEffect(_effect1, &_settings->_effect1, &_mixer1);
+    createEffect(_effect2, &_settings->_effect2, &_mixer4);
+
+    _effect1->update();
+    _effect2->update();
 
     return true;
 }

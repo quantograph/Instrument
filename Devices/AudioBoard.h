@@ -20,7 +20,8 @@ public:
     static void onPlug();
     static void onVolume();
     void reset();
-    bool effects(EffectType type1, EffectType type2);
+    bool createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer);
+    bool setEffects();
 
     #define GUITAR_PLUG 3 // Teensy pin connected to guitar plug contact
     #define VOLUME_PIN 6 /*AVB - 22 in the last wiring */ // Teensy pin connected to guitar plug contact
