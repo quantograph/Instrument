@@ -11,7 +11,6 @@ class Player {
 #define MAX_DRUMS 128
 
 private:
-    AudioBoard* _audio{nullptr};
     NoteList _notes;
     NoteListIter _iter;
     uint32_t _startTime{};
@@ -22,11 +21,12 @@ private:
     bool setupDrums();
     void testDrums();
     Synth* _instruments[MAX_INSTRUMENT]; // Synthesizers for all instruments (Tracks)
+    Settings* _settings{};
 
 public:
-    Player(AudioBoard* audio);
+    Player();
     virtual ~Player();
-    bool init();
+    bool init(Settings* settings);
     bool play(Song* song);
     void process();
     void testMidiFile();

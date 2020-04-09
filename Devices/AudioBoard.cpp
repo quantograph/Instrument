@@ -37,6 +37,8 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
 
     //notefreq.begin(.15);
 
+    _settings->_effect1._effectType = EffectType::eff_chorus;
+    _settings->_effect2._effectType = EffectType::eff_clean;
     setEffects();
 }
 

@@ -42,7 +42,7 @@ void MidiInput::init(Synth* synth) {
   // more specific ones are not set.
   _midiDevice.setHandleRealTimeSystem(myRealTimeSystem);
 
-  Serial.println("MidiInput::Init");
+  //Serial.println("MidiInput::Init");
 }
 
 void MidiInput::process() {
@@ -89,12 +89,13 @@ void MidiInput::myAfterTouchPoly(byte channel, byte note, byte velocity) {
 }
 
 void MidiInput::myControlChange(byte channel, byte control, byte value) {
-  Serial.print("Control Change, ch=");
+  /*Serial.print("Control Change, ch=");
   Serial.print(channel, DEC);
   Serial.print(", control=");
   Serial.print(control, DEC);
   Serial.print(", value=");
-  Serial.println(value, DEC);
+  Serial.println(value, DEC);*/
+  _synth->controlChange(channel, control, value);
 }
 
 void MidiInput::myProgramChange(byte channel, byte program) {

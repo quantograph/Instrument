@@ -24,7 +24,7 @@ AudioBoard g_audio = AudioBoard();
 SdCard g_sdCard = SdCard();
 MidiInput g_midiInput = MidiInput();
 Bluetooth g_bluetooth = Bluetooth();
-Player g_player = Player(&g_audio);
+Player g_player = Player();
 Synth g_synth = Synth();
 
 //Menu g_menu = Menu();
@@ -58,8 +58,8 @@ void setup() {
     g_audio.init(&g_gui, &g_storage._settings);
 
     // MIDI input
-    //g_synth.init(ELECTRIC_GUITAR_JAZZ, &g_audio);
-    //g_midiInput.init(&g_synth);
+    g_synth.init(TRUMPET, &g_storage._settings);
+    g_midiInput.init(&g_synth);
     
     //g_player.init();
     //g_sdCard.init();
@@ -85,7 +85,7 @@ void loop() {
         g_bluetooth._received = 0;
     }*/
 
-    //g_midiInput.process();
+    g_midiInput.process();
     g_audio.process();
     //g_player.process();
     g_gui.process();
@@ -105,5 +105,5 @@ void loop() {
     //g_led.test();
     //Serial.println("=====> loop()");
 
-    delay(50);
+    //delay(50);
 }

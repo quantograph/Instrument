@@ -21,7 +21,7 @@
 
 //=================================================================================================
 // Default constructor
-Player::Player(AudioBoard* audio) : _audio(audio) {
+Player::Player() {
 }
 
 //=================================================================================================
@@ -49,7 +49,8 @@ Player::~Player() {
 // Mixer4-1 synth2
 // Mixer4-2 
 // Mixer4-3 drumBlock
-bool Player::init() {
+bool Player::init(Settings* settings) {
+    _settings = settings;
     setupDrums();
 
     for(int i = 0; i < MAX_INSTRUMENT; ++i) {
@@ -80,49 +81,49 @@ bool Player::setupDrums() {
     drum = new AudioSynthWavetable();
     drum->setInstrument(drumHat);
     drum->amplitude(1);
-    _cords.push_back(new AudioConnection(*drum, 0, _audio->_mixer1, 1));
+    _cords.push_back(new AudioConnection(*drum, 0, _settings->_audio->_mixer1, 1));
     _drums[DRUM_HIHAT_CLOSED] = drum;
 
     // Bass
     drum = new AudioSynthWavetable();
     drum->setInstrument(drumBass);
     drum->amplitude(1);
-    _cords.push_back(new AudioConnection(*drum, 0, _audio->_mixer3, 1));
+    _cords.push_back(new AudioConnection(*drum, 0, _settings->_audio->_mixer3, 1));
     _drums[DRUM_BASS1] = drum;
 
     // Snare
     drum = new AudioSynthWavetable();
     drum->setInstrument(drumSnare);
     drum->amplitude(1);
-    _cords.push_back(new AudioConnection(*drum, 0, _audio->_mixer2, 2));
+    _cords.push_back(new AudioConnection(*drum, 0, _settings->_audio->_mixer2, 2));
     _drums[DRUM_SNARE] = drum;
 
     // Tom high
     drum = new AudioSynthWavetable();
     drum->setInstrument(drumTomHigh);
     drum->amplitude(1);
-    _cords.push_back(new AudioConnection(*drum, 0, _audio->_mixer2, 2));
+    _cords.push_back(new AudioConnection(*drum, 0, _settings->_audio->_mixer2, 2));
     _drums[DRUM_TOM_HIGH] = drum;
 
     // Crash
     drum = new AudioSynthWavetable();
     drum->setInstrument(drumCrash);
     drum->amplitude(1);
-    _cords.push_back(new AudioConnection(*drum, 0, _audio->_mixer1, 2));
+    _cords.push_back(new AudioConnection(*drum, 0, _settings->_audio->_mixer1, 2));
     _drums[DRUM_CRASH1] = drum;
 
     // Ride
     drum = new AudioSynthWavetable();
     drum->setInstrument(drumRide);
     drum->amplitude(1);
-    _cords.push_back(new AudioConnection(*drum, 0, _audio->_mixer4, 1));
+    _cords.push_back(new AudioConnection(*drum, 0, _settings->_audio->_mixer4, 1));
     _drums[DRUM_RIDE] = drum;
 
     // Wooden block
     drum = new AudioSynthWavetable();
     drum->setInstrument(drumBlock);
     drum->amplitude(1);
-    _cords.push_back(new AudioConnection(*drum, 0, _audio->_mixer4, 3));
+    _cords.push_back(new AudioConnection(*drum, 0, _settings->_audio->_mixer4, 3));
     _drums[DRUM_HI_WOOD_BLOCK] = drum;
 
     return true;
@@ -149,7 +150,7 @@ bool Player::play(Song* song) {
 
         Serial.printf("Making synth for instrument %d\n", instrument);
         Synth* synth = new Synth();
-        if(synth->init(instrument, _audio)) {
+        if(synth->init(instrument, _settings)) {
             _instruments[instrument] = synth;
         }
     }
@@ -190,7 +191,7 @@ bool Player::playNote(Note* note) {
     }
 
     if(note->_volume > 0.0) {
-        synth->noteOn(note->_midiNote, 90/*note->_volume*/);
+        synth->noteOn(note->_midiNote, note->_volume);
     } else {
         synth->noteOff(note->_midiNote);
     }
