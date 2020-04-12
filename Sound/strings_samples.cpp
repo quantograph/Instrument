@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "strings_samples.h"
+
 const AudioSynthWavetable::sample_data strings_samples[3] = {
 	{
 		(int16_t*)sample_0_strings_stringsg2, // sample

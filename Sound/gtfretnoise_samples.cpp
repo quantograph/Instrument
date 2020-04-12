@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "gtfretnoise_samples.h"
+
 const AudioSynthWavetable::sample_data gtfretnoise_samples[1] = {
 	{
 		(int16_t*)sample_0_gtfretnoise_guitarfret, // sample

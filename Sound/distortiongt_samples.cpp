@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "distortiongt_samples.h"
+
 const AudioSynthWavetable::sample_data distortiongt_samples[4] = {
 	{
 		(int16_t*)sample_0_distortiongt_distgtra2, // sample

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data frenchhorn_samples[1];
 const uint8_t frenchhorn_ranges[] = {127, };
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "bassoon_samples.h"
 #include "clarinet_samples.h"
 #include "distortiongt_samples.h"

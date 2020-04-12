@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data glockenspiel_samples[2];
 const uint8_t glockenspiel_ranges[] = {59, 127, };
 

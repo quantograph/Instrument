@@ -1,8 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-#include "../Music/Misc.h"
-
 extern const AudioSynthWavetable::sample_data drumCrash_samples[1];
 const uint8_t drumCrash_ranges[] = {DRUM_CRASH1};
 

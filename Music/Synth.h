@@ -1,9 +1,4 @@
-#ifndef Synth_h
-#define Synth_h
-
-#include <list>
-#include <vector>
-#include "Misc.h"
+#pragma once
 
 class Effects;
 class Settings;
@@ -11,11 +6,16 @@ class Settings;
 // Data for one synth voice
 struct SynthVoice {
     SynthVoice() {}
-    ~SynthVoice() { delete _cord; }
+    ~SynthVoice() {
+        delete _cord;
+        delete _mixer;
+        Serial.printf(">>>>> deleted in SynthVoice\n");
+    }
 
     AudioSynthWavetable _sound; // Sound loaded
     AudioConnection* _cord{nullptr}; // Connection from this voice to one of the voice mixers
     byte _note{0}; // Note currently played
+    AudioMixer4* _mixer{nullptr};
     uint32_t _startTime{0}; // Time this note was started
 };
 
@@ -24,7 +24,8 @@ class Synth {
 public:
     Synth();
     ~Synth();
-    bool init(INSTRUMENT instrument, Settings* settings);
+    bool init(Instrument instrument, Settings* settings);
+    bool setInstrument(Instrument instrument);
     void reset();
     void noteOn(byte note, byte velocity);
     void noteOff(byte note);
@@ -44,5 +45,3 @@ private:
     Effects* _effect2{nullptr};
     float _volume{0.5};
 };
-
-#endif

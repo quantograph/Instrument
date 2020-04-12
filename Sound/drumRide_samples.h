@@ -1,8 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-#include "../Music/Misc.h"
-
 extern const AudioSynthWavetable::sample_data drumRide_samples[1];
 const uint8_t drumRide_ranges[] = {DRUM_RIDE};
 

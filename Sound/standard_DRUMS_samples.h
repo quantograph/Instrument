@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data standard_DRUMS_samples[48];
 const uint8_t standard_DRUMS_ranges[] = {27, 28, 28, 29, 30, 31, 33, 34, 35, 36, 37, 39, 42, 45, 47, 48, 50, 53, 54, 55, 56, 57, 58, 60, 61, 62, 63, 65, 67, 68, 69, 71, 72, 73, 74, 76, 78, 80, 81, 82, 83, 83, 84, 85, 85, 86, 87, 127, };
 

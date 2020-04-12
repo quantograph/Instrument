@@ -1,5 +1,4 @@
-#ifndef SetBand_h
-#define SetBand_h
+#pragma once
 
 class PeakMeter;
 class Slider;
@@ -19,5 +18,3 @@ public:
 
     bool onControl(Control* control) override;
 };
-
-#endif

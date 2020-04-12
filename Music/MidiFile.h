@@ -1,10 +1,4 @@
-#ifndef MidiFile_h
-#define MidiFile_h
-
-#include "Misc.h"
-#include "Note.h"
-#include "Track.h"
-#include "Song.h"
+#pragma once
 
 class MidiFile {
 public:
@@ -161,16 +155,16 @@ protected:
     bool getMidiEvent(uint8_t eventId, char* data, uint32_t dataSize, uint32_t& processed, float trackTime, Track* track);
     bool getNote(uint32_t channel, bool noteOn, char* data, uint32_t dataSize, uint32_t& processed, float trackTime, Track* track);
     bool addNote(Note* pNote, float trackTime, Track* track);
-    uint8_t getProgram(INSTRUMENT instrument);
+    uint8_t getProgram(Instrument instrument);
     bool getProgram(uint32_t channel, char* data, uint32_t dataSize, uint32_t& processed, float trackTime, Track* track);
     bool getControl(uint32_t channel, char* data, uint32_t dataSize, uint32_t& processed, float trackTime, Track* track);
     bool resetNotes();
     bool PutVarLen(int32_t value, char* data, uint32_t dataSize, uint32_t& bytes);
     bool getVarLen(char* data, uint32_t dataSize, int32_t& value, uint32_t& processed);
-    bool getProgramInfo(uint32_t program, String& name, INSTRUMENT& nInstrument);
+    bool getProgramInfo(uint32_t program, String& name, Instrument& nInstrument);
     bool getControlInfo(uint32_t control, String& name);
-    uint8_t getMidiDrumNote(INSTRUMENT instrument);
-    bool getDrumInfo(uint32_t midiNote, String& name, INSTRUMENT& nInstrument);
+    uint8_t getMidiDrumNote(Instrument instrument);
+    bool getDrumInfo(uint32_t midiNote, String& name, Instrument& nInstrument);
     //bool GetMarker(const char* pMarker, float trackTime, Song* song, Track* track);
     //bool GetChord(const char* pMarker, float trackTime, Song* song, Track* track);
     //bool GetSongPart(const char* pMarker, float trackTime, Song* song, Track* track);
@@ -209,5 +203,3 @@ public:
     static uint8_t VolumeToMidi(float volume);
     static float midiToVolume(uint8_t velocity);
 };
-
-#endif // MidiFile_h

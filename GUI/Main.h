@@ -1,5 +1,4 @@
-#ifndef Main_h
-#define Main_h
+#pragma once
 
 class PeakMeter;
 class Button;
@@ -30,5 +29,3 @@ public:
     bool onControl(Control* control) override;
     void onBack(Window* window) override;
 };
-
-#endif // Main_h

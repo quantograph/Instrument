@@ -1,5 +1,4 @@
-#ifndef Staff_h
-#define Staff_h
+#pragma once
 
 class Staff {
 public:
@@ -19,5 +18,3 @@ public:
     void BassClef(int x, int y);
     void test();*/
 };
-
-#endif

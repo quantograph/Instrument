@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data overdrivegt_samples[3];
 const uint8_t overdrivegt_ranges[] = {62, 66, 127, };
 

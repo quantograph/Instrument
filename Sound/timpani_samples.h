@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data timpani_samples[3];
 const uint8_t timpani_ranges[] = {49, 63, 127, };
 

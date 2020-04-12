@@ -1,7 +1,4 @@
-#ifndef Effects_h
-#define Effects_h
-
-#include <Audio.h>
+#pragma once
 
 struct EffectSettings;
 
@@ -51,5 +48,3 @@ public:
     AudioConnection* _outConnection{nullptr};
    
 };
-
-#endif

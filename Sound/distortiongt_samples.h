@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data distortiongt_samples[4];
 const uint8_t distortiongt_ranges[] = {62, 66, 72, 127, };
 

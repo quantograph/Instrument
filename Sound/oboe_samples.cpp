@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "oboe_samples.h"
+
 const AudioSynthWavetable::sample_data oboe_samples[3] = {
 	{
 		(int16_t*)sample_0_oboe_oboecx3, // sample

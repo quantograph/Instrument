@@ -1,5 +1,4 @@
-#ifndef Gui_h
-#define Gui_h
+#pragma once
 
 class TouchScreen;
 class Storage;
@@ -28,6 +27,3 @@ public:
     bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint);
     void onPeakMeter(float left, float right);
 };
-
-#endif // Gui_h
-

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data bassoon_samples[2];
 const uint8_t bassoon_ranges[] = {88, 127, };
 

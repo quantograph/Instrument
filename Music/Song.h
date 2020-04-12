@@ -1,5 +1,4 @@
-#ifndef Song_h
-#define Song_h
+#pragma once
 
 class Song {
 public:
@@ -19,5 +18,3 @@ public:
     void show();
     void getAllNotes(NoteList* notes, InstrumentList* instruments);
 };
-
-#endif // Song_h

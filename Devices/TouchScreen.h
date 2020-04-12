@@ -1,5 +1,4 @@
-#ifndef TouchScreen_h
-#define TouchScreen_h
+#pragma once
 
 // Store: https://www.pjrc.com/store/display_ili9341_touch.html
 // Screen library: https://github.com/PaulStoffregen/ILI9341_t3
@@ -41,5 +40,3 @@ public:
     int16_t _width = 0;
     int16_t _height = 0;
 };
-
-#endif

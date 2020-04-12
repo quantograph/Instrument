@@ -14,21 +14,21 @@ bool Fingers::init(InstrumentInfo* instrument, int x, int y) {
     _y = y;
 
     switch(instrument->_instrument) {
-        case INSTRUMENT::SOPRANO_SAX:
-        case INSTRUMENT::ALTO_SAX:
-        case INSTRUMENT::TENOR_SAX:
-        case INSTRUMENT::BARITONE_SAX:
-        case INSTRUMENT::FLUTE:
+        case Instrument::SOPRANO_SAX:
+        case Instrument::ALTO_SAX:
+        case Instrument::TENOR_SAX:
+        case Instrument::BARITONE_SAX:
+        case Instrument::FLUTE:
             initSaxophone();
             break;
 
-        case INSTRUMENT::TRUMPET:
+        case Instrument::TRUMPET:
             break;
 
-        case INSTRUMENT::NONE:
+        case Instrument::NONE:
             break;
 
-        /*case INSTRUMENT::STEEL_DRUM:
+        /*case Instrument::STEEL_DRUM:
             break;*/
 
         default:

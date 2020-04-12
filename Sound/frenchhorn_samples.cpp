@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "frenchhorn_samples.h"
+
 const AudioSynthWavetable::sample_data frenchhorn_samples[1] = {
 	{
 		(int16_t*)sample_0_frenchhorn_frenchhorng4, // sample

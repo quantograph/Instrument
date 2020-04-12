@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data trumpet_samples[5];
 const uint8_t trumpet_ranges[] = {64, 69, 74, 79, 127, };
 

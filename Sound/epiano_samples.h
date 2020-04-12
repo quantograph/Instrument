@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data epiano_samples[4];
 const uint8_t epiano_ranges[] = {48, 60, 80, 127, };
 

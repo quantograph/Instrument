@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "nylonstrgtr_samples.h"
+
 const AudioSynthWavetable::sample_data nylonstrgtr_samples[3] = {
 	{
 		(int16_t*)sample_0_nylonstrgtr_nguitrf2, // sample

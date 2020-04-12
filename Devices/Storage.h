@@ -1,5 +1,4 @@
-#ifndef Settings_h
-#define Settings_h
+#pragma once
 
 class TouchScreen;
 class Gui;
@@ -39,5 +38,3 @@ public:
     // Add new members to the end of this:
     Settings _settings{};
 };
-
-#endif

@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "glockenspiel_samples.h"
+
 const AudioSynthWavetable::sample_data glockenspiel_samples[2] = {
 	{
 		(int16_t*)sample_0_glockenspiel_sinetick, // sample

@@ -1,5 +1,4 @@
-#ifndef SetGuitar_h
-#define SetGuitar_h
+#pragma once
 
 class PeakMeter;
 class SetEffect;
@@ -19,6 +18,7 @@ public:
     CheckBox* _doubleCheck{};
     Window* _current{};
     Button* _backButton{};
+    InputSettings* _inputSettings{};
 
     bool init(Settings* settings, Window* parent);
     void setupButtons();
@@ -28,5 +28,3 @@ public:
     bool onControl(Control* control) override;
     void onBack(Window* window) override;
 };
-
-#endif

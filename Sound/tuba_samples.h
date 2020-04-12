@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data tuba_samples[2];
 const uint8_t tuba_ranges[] = {86, 127, };
 

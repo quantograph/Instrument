@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data harmonica_samples[1];
 const uint8_t harmonica_ranges[] = {127, };
 

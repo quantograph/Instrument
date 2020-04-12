@@ -1,5 +1,4 @@
-#ifndef SetEffect_h
-#define SetEffect_h
+#pragma once
 
 class PeakMeter;
 class Slider;
@@ -26,5 +25,3 @@ public:
     bool onControl(Control* control) override;
     void onBack(Window* window) override;
 };
-
-#endif

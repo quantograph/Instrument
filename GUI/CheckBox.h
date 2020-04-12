@@ -1,5 +1,4 @@
-#ifndef CheckBox_h
-#define CheckBox_h
+#pragma once
 
 class CheckBox : public Control {
 public:
@@ -13,5 +12,3 @@ public:
     void draw() override;
     bool onTouch(const TS_Point& point) override;
 };
-
-#endif

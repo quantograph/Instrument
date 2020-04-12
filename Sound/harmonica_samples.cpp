@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "harmonica_samples.h"
+
 const AudioSynthWavetable::sample_data harmonica_samples[1] = {
 	{
 		(int16_t*)sample_0_harmonica_harmonicaa3, // sample

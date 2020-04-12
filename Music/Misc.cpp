@@ -1,3 +1,5 @@
+#include "../Devices/Devices.h"
+#include "../Sound/Sound.h"
 #include "Misc.h"
 #include "Synth.h"
 
@@ -68,276 +70,294 @@ void reverse4Bytes(char* data) {
 // 41-48   Strings                  105-112 Ethnic
 // 49-56   Ensemble                 113-120 Percussive
 // 57-64   Brass                    121-128 Sound Effects
-bool getInstrument(INSTRUMENT instrument, AudioBoard* audio, InstrumentInfo& info) {
+bool getInstrument(Instrument instrument, AudioBoard* audio, InstrumentInfo& info) {
     info._instrument = instrument;
+    info._voices = 10;
 
     switch(instrument) {
-        case INSTRUMENT::ACOUSTIC_GRAND_PIANO:
-        case INSTRUMENT::BRIGHT_ACOUSTIC_PIANO:
+        case Instrument::ACOUSTIC_GRAND_PIANO:
+        case Instrument::BRIGHT_ACOUSTIC_PIANO:
+            info._name = "Acc. piano";
             info._sample = &epiano;
-            //info._sample = &piano;
-            info._voices = 10;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 1;
-            Serial.printf("case INSTRUMENT::BRIGHT_ACOUSTIC_PIANO\n");
-            break;
-        case INSTRUMENT::ELECTRIC_GRAND_PIANO:
-        case INSTRUMENT::HONKY_TONK_PIANO:
-        case INSTRUMENT::ELECTRIC_PIANO_1:
-        case INSTRUMENT::ELECTRIC_PIANO_2:
-            info._sample = &epiano;
-            info._voices = 10;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 1;
             break;
-        case INSTRUMENT::HARPSICHORD:
-        case INSTRUMENT::CLAVI:
-        case INSTRUMENT::CELESTA:
-        case INSTRUMENT::GLOCKENSPIEL:
-        case INSTRUMENT::MUSIC_BOX:
-        case INSTRUMENT::VIBRAPHONE:
-        case INSTRUMENT::MARIMBA:
-        case INSTRUMENT::XYLOPHONE:
-        case INSTRUMENT::TUBULAR_BELLS:
-        case INSTRUMENT::DULCIMER:
+        case Instrument::ELECTRIC_GRAND_PIANO:
+        case Instrument::HONKY_TONK_PIANO:
+        case Instrument::ELECTRIC_PIANO_1:
+        case Instrument::ELECTRIC_PIANO_2:
+            info._name = "El. piano";
+            info._sample = &epiano;
+            info._mixer = &audio->_mixer4;
+            info._mixerChannel = 1;
+            break;
+        case Instrument::HARPSICHORD:
+        case Instrument::CLAVI:
+        case Instrument::CELESTA:
+        case Instrument::GLOCKENSPIEL:
+        case Instrument::MUSIC_BOX:
+        case Instrument::VIBRAPHONE:
+        case Instrument::MARIMBA:
+        case Instrument::XYLOPHONE:
+        case Instrument::TUBULAR_BELLS:
+        case Instrument::DULCIMER:
+            info._name = "Vibraphone";
             info._sample = &epiano;
             //info._sample = &vibraphone;
-            info._voices = 10;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 1;
             break;
-        case INSTRUMENT::DRAWBAR_ORGAN:
-        case INSTRUMENT::PERCUSSIVE_ORGAN:
-        case INSTRUMENT::ROCK_ORGAN:
-        case INSTRUMENT::CHURCH_ORGAN:
-        case INSTRUMENT::REED_ORGAN:
-        case INSTRUMENT::ACCORDION:
-        case INSTRUMENT::HARMONICA:
+        case Instrument::DRAWBAR_ORGAN:
+        case Instrument::PERCUSSIVE_ORGAN:
+        case Instrument::ROCK_ORGAN:
+        case Instrument::CHURCH_ORGAN:
+        case Instrument::REED_ORGAN:
+        case Instrument::ACCORDION:
+        case Instrument::HARMONICA:
+        case Instrument::TANGO_ACCORDION:
+            info._name = "Accordion";
             info._sample = &epiano;
             //info._sample = &harmonica;
-            info._voices = 10;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 1;
             break;
-        case INSTRUMENT::TANGO_ACCORDION:
-        case INSTRUMENT::ACOUSTIC_GUITAR_NYLON:
+        case Instrument::ACOUSTIC_GUITAR_NYLON:
+            info._name = "Guitar (nylon)";
             info._sample = &steelstrgtr;
             //info._sample = &nylonstrgtr;
-            info._voices = 6;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 1;
             break;
-        case INSTRUMENT::ACOUSTIC_GUITAR_STEEL:
-        case INSTRUMENT::ELECTRIC_GUITAR_JAZZ:
-        case INSTRUMENT::ELECTRIC_GUITAR_CLEAN:
+        case Instrument::ACOUSTIC_GUITAR_STEEL:
+        case Instrument::ELECTRIC_GUITAR_JAZZ:
+        case Instrument::ELECTRIC_GUITAR_CLEAN:
+            info._name = "Guitar (steel)";
             info._sample = &steelstrgtr;
-            info._voices = 6;
+            //info._voices = 6;
             info._mixer = &audio->_mixer2;
             info._mixerChannel = 1;
             break;
-        case INSTRUMENT::ELECTRIC_GUITAR_MUTED:
+        case Instrument::ELECTRIC_GUITAR_MUTED:
+            info._name = "Guitar (muted)";
             info._sample = &steelstrgtr;
             //info._sample = &mutedgtr;
-            info._voices = 6;
+            //info._voices = 6;
             info._mixer = &audio->_mixer2;
             info._mixerChannel = 1;
             break;
-        case INSTRUMENT::OVERDRIVEN_GUITAR:
+        case Instrument::OVERDRIVEN_GUITAR:
+            info._name = "Guitar (overdr.)";
             info._sample = &distortiongt;
             //info._sample = &overdrivegt;
-            info._voices = 6;
+            //info._voices = 6;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 0;
             break;
-        case INSTRUMENT::DISTORTION_GUITAR:
+        case Instrument::DISTORTION_GUITAR:
+            info._name = "Guitar (dist.)";
             info._sample = &distortiongt;
-            info._voices = 6;
+            //info._voices = 6;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 0;
             break;
-        case INSTRUMENT::GUITAR_HARMONICS:
-        case INSTRUMENT::ACOUSTIC_BASS:
-        case INSTRUMENT::ELECTRIC_BASS_FINGER:
-        case INSTRUMENT::ELECTRIC_BASS_PICK:
-        case INSTRUMENT::FRETLESS_BASS:
-        case INSTRUMENT::SLAP_BASS_1:
-        case INSTRUMENT::SLAP_BASS_2:
-        case INSTRUMENT::SYNTH_BASS_1:
-        case INSTRUMENT::SYNTH_BASS_2:
+        case Instrument::GUITAR_HARMONICS:
+        case Instrument::ACOUSTIC_BASS:
+        case Instrument::ELECTRIC_BASS_FINGER:
+        case Instrument::ELECTRIC_BASS_PICK:
+        case Instrument::FRETLESS_BASS:
+        case Instrument::SLAP_BASS_1:
+        case Instrument::SLAP_BASS_2:
+        case Instrument::SYNTH_BASS_1:
+        case Instrument::SYNTH_BASS_2:
+            info._name = "Bass";
             info._sample = &nylonstrgtr;
-            info._voices = 4;
+            //info._voices = 4;
             info._mixer = &audio->_mixer2;
             info._mixerChannel = 0;
             break;
-        case INSTRUMENT::VIOLIN:
-        case INSTRUMENT::VIOLA:
-        case INSTRUMENT::CELLO:
-        case INSTRUMENT::CONTRABASS:
-        case INSTRUMENT::TREMOLO_STRINGS:
-        case INSTRUMENT::PIZZICATO_STRINGS:
-        case INSTRUMENT::ORCHESTRAL_HARP:
+        case Instrument::VIOLIN:
+        case Instrument::VIOLA:
+        case Instrument::CELLO:
+        case Instrument::CONTRABASS:
+        case Instrument::TREMOLO_STRINGS:
+        case Instrument::PIZZICATO_STRINGS:
+        case Instrument::ORCHESTRAL_HARP:
+            info._name = "Violin";
             info._sample = &steelstrgtr;
             //info._sample = &harp;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::TIMPANI:
+        case Instrument::TIMPANI:
+            info._name = "Timpani";
             info._sample = &steelstrgtr;
             //info._sample = &timpani;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::STRING_ENSEMBLE_1:
-        case INSTRUMENT::STRING_ENSEMBLE_2:
-        case INSTRUMENT::SYNTHSTRINGS_1:
-        case INSTRUMENT::SYNTHSTRINGS_2:
+        case Instrument::STRING_ENSEMBLE_1:
+        case Instrument::STRING_ENSEMBLE_2:
+        case Instrument::SYNTHSTRINGS_1:
+        case Instrument::SYNTHSTRINGS_2:
+            info._name = "Strings";
             info._sample = &strings;
-            info._voices = 10;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 1;
             break;
-        case INSTRUMENT::CHOIR_AAHS:
-        case INSTRUMENT::VOICE_OOHS:
-        case INSTRUMENT::SYNTH_VOICE:
-        case INSTRUMENT::ORCHESTRA_HIT:
-        case INSTRUMENT::TRUMPET:
+        case Instrument::CHOIR_AAHS:
+        case Instrument::VOICE_OOHS:
+        case Instrument::SYNTH_VOICE:
+        case Instrument::ORCHESTRA_HIT:
+        case Instrument::TRUMPET:
+            info._name = "Trumpet";
             info._sample = &trumpet;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::TROMBONE:
+        case Instrument::TROMBONE:
+            info._name = "Trombone";
             info._sample = &trumpet;
             //info._sample = &trombone;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::TUBA:
+        case Instrument::TUBA:
+            info._name = "Tuba";
             info._sample = &trumpet;
             //info._sample = &tuba;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::MUTED_TRUMPET:
-        case INSTRUMENT::FRENCH_HORN:
+        case Instrument::MUTED_TRUMPET:
+        case Instrument::FRENCH_HORN:
+            info._name = "French horn";
             info._sample = &trumpet;
             //info._sample = &frenchhorn;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::BRASS_SECTION:
-        case INSTRUMENT::SYNTHBRASS_1:
-        case INSTRUMENT::SYNTHBRASS_2:
-        case INSTRUMENT::SOPRANO_SAX:
-        case INSTRUMENT::ALTO_SAX:
-        case INSTRUMENT::TENOR_SAX:
-        case INSTRUMENT::BARITONE_SAX:
-        case INSTRUMENT::OBOE:
+        case Instrument::BRASS_SECTION:
+        case Instrument::SYNTHBRASS_1:
+        case Instrument::SYNTHBRASS_2:
+        case Instrument::SOPRANO_SAX:
+        case Instrument::ALTO_SAX:
+        case Instrument::TENOR_SAX:
+        case Instrument::BARITONE_SAX:
+        case Instrument::OBOE:
+            info._name = "Oboe";
             info._sample = &trumpet;
             //info._sample = &oboe;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::ENGLISH_HORN:
-        case INSTRUMENT::BASSOON:
+        case Instrument::ENGLISH_HORN:
+        case Instrument::BASSOON:
+            info._name = "Bassoon";
             info._sample = &trumpet;
             //info._sample = &bassoon;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::CLARINET:
+        case Instrument::CLARINET:
+            info._name = "Clarinet";
             info._sample = &trumpet;
             //info._sample = &clarinet;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::PICCOLO:
-        case INSTRUMENT::FLUTE:
+        case Instrument::PICCOLO:
+        case Instrument::FLUTE:
+            info._name = "Flute";
             info._sample = &flute;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::RECORDER:
+        case Instrument::RECORDER:
+        case Instrument::PAN_FLUTE:
+        case Instrument::BLOWN_BOTTLE:
+            info._name = "Recorder";
             info._sample = &flute;
             //info._sample = &recorder;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::PAN_FLUTE:
-        case INSTRUMENT::BLOWN_BOTTLE:
-        case INSTRUMENT::SHAKUHACHI:
-        case INSTRUMENT::WHISTLE:
-        case INSTRUMENT::OCARINA:
-        case INSTRUMENT::LEAD_1_SQUARE:
-        case INSTRUMENT::LEAD_2_SAWTOOTH:
-        case INSTRUMENT::LEAD_3_CALLIOPE:
-        case INSTRUMENT::LEAD_4_CHIFF:
-        case INSTRUMENT::LEAD_5_CHARANG:
-        case INSTRUMENT::LEAD_6_VOICE:
-        case INSTRUMENT::LEAD_7_FIFTHS:
-        case INSTRUMENT::LEAD_8_BASS_LEAD:
-        case INSTRUMENT::PAD_1_NEW_AGE:
-        case INSTRUMENT::PAD_2_WARM:
-        case INSTRUMENT::PAD_3_POLYSYNTH:
-        case INSTRUMENT::PAD_4_CHOIR:
-        case INSTRUMENT::PAD_5_BOWED:
-        case INSTRUMENT::PAD_6_METALLIC:
-        case INSTRUMENT::PAD_7_HALO:
-        case INSTRUMENT::PAD_8_SWEEP:
-        case INSTRUMENT::FX_1_RAIN:
-        case INSTRUMENT::FX_2_SOUNDTRACK:
-        case INSTRUMENT::FX_3_CRYSTAL:
-        case INSTRUMENT::FX_4_ATMOSPHERE:
-        case INSTRUMENT::FX_5_BRIGHTNESS:
-        case INSTRUMENT::FX_6_GOBLINS:
-        case INSTRUMENT::FX_7_ECHOES:
-        case INSTRUMENT::FX_8_SCIFI:
-        case INSTRUMENT::SITAR:
-        case INSTRUMENT::BANJO:
-        case INSTRUMENT::SHAMISEN:
-        case INSTRUMENT::KOTO:
-        case INSTRUMENT::KALIMBA:
-        case INSTRUMENT::BAG_PIPE:
-        case INSTRUMENT::FIDDLE:
-        case INSTRUMENT::SHANAI:
-        case INSTRUMENT::TINKLE_BELL:
-        case INSTRUMENT::AGOGO:
-        case INSTRUMENT::STEEL_DRUMS:
+        case Instrument::SHAKUHACHI:
+        case Instrument::WHISTLE:
+        case Instrument::OCARINA:
+        case Instrument::LEAD_1_SQUARE:
+        case Instrument::LEAD_2_SAWTOOTH:
+        case Instrument::LEAD_3_CALLIOPE:
+        case Instrument::LEAD_4_CHIFF:
+        case Instrument::LEAD_5_CHARANG:
+        case Instrument::LEAD_6_VOICE:
+        case Instrument::LEAD_7_FIFTHS:
+        case Instrument::LEAD_8_BASS_LEAD:
+        case Instrument::PAD_1_NEW_AGE:
+        case Instrument::PAD_2_WARM:
+        case Instrument::PAD_3_POLYSYNTH:
+        case Instrument::PAD_4_CHOIR:
+        case Instrument::PAD_5_BOWED:
+        case Instrument::PAD_6_METALLIC:
+        case Instrument::PAD_7_HALO:
+        case Instrument::PAD_8_SWEEP:
+        case Instrument::FX_1_RAIN:
+        case Instrument::FX_2_SOUNDTRACK:
+        case Instrument::FX_3_CRYSTAL:
+        case Instrument::FX_4_ATMOSPHERE:
+        case Instrument::FX_5_BRIGHTNESS:
+        case Instrument::FX_6_GOBLINS:
+        case Instrument::FX_7_ECHOES:
+        case Instrument::FX_8_SCIFI:
+        case Instrument::SITAR:
+        case Instrument::BANJO:
+        case Instrument::SHAMISEN:
+        case Instrument::KOTO:
+        case Instrument::KALIMBA:
+        case Instrument::BAG_PIPE:
+        case Instrument::FIDDLE:
+        case Instrument::SHANAI:
+        case Instrument::TINKLE_BELL:
+        case Instrument::AGOGO:
+        case Instrument::STEEL_DRUMS:
+            info._name = "Steel drums";
             info._sample = &trumpet;
             //info._sample = &vibraphone;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::WOODBLOCK:
-        case INSTRUMENT::TAIKO_DRUM:
-        case INSTRUMENT::MELODIC_TOM:
-        case INSTRUMENT::SYNTH_DRUM:
-        case INSTRUMENT::REVERSE_CYMBAL:
-        case INSTRUMENT::GUITAR_FRET_NOISE:
+        case Instrument::WOODBLOCK:
+        case Instrument::TAIKO_DRUM:
+        case Instrument::MELODIC_TOM:
+        case Instrument::SYNTH_DRUM:
+        case Instrument::REVERSE_CYMBAL:
+        case Instrument::GUITAR_FRET_NOISE:
+            info._name = "Melodic tom";
             info._sample = &trumpet;
             //info._sample = &gtfretnoise;
-            info._voices = 1;
+            //info._voices = 1;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 2;
             break;
-        case INSTRUMENT::BREATH_NOISE:
-        case INSTRUMENT::SEASHORE:
-        case INSTRUMENT::BIRD_TWEET:
-        case INSTRUMENT::TELEPHONE_RING:
-        case INSTRUMENT::HELICOPTER:
-        case INSTRUMENT::APPLAUSE:
-        case INSTRUMENT::GUNSHOT:
+        case Instrument::BREATH_NOISE:
+        case Instrument::SEASHORE:
+        case Instrument::BIRD_TWEET:
+        case Instrument::TELEPHONE_RING:
+        case Instrument::HELICOPTER:
+        case Instrument::APPLAUSE:
+        case Instrument::GUNSHOT:
+            info._name = "None";
         default:
             return false;
     }

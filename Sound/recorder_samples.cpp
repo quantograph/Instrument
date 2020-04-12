@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "recorder_samples.h"
+
 const AudioSynthWavetable::sample_data recorder_samples[1] = {
 	{
 		(int16_t*)sample_0_recorder_recorderax2, // sample

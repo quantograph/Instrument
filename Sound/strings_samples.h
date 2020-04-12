@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data strings_samples[3];
 const uint8_t strings_ranges[] = {59, 72, 127, };
 

@@ -1,5 +1,4 @@
-#ifndef PeakMeter_h
-#define PeakMeter_h
+#pragma once
 
 class TouchScreen;
 
@@ -11,6 +10,3 @@ public:
     void update(float left, float right);
     void drawMeterBar(uint16_t y, uint16_t height, float value);
 };
-
-#endif // Gui_h
-

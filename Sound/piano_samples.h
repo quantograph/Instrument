@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data piano_samples[4];
 const uint8_t piano_ranges[] = {54, 74, 88, 127, };
 

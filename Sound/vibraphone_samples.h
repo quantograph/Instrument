@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data vibraphone_samples[2];
 const uint8_t vibraphone_ranges[] = {94, 127, };
 

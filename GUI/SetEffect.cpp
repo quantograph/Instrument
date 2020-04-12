@@ -26,7 +26,8 @@ bool SetEffect::init(Settings* settings, Window* parent) {
 
     // "Effect" box
     height = 30;
-    _effect = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, ControlId::txt_effect);
+    _effect = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, 
+                          ControlId::txt_effect);
     _effect->_frame = true;
     _effect->_dropDown = true;
     _effect->_text = "Effect";

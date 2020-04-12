@@ -1,7 +1,15 @@
-#ifndef Definitions_h
-#define Definitions_h
+#pragma once
 
-#include <Arduino.h>
+class TouchScreen;
+class Gui;
+class AudioBoard;
+class SdCard;
+class MidiInput;
+class Bluetooth;
+class Player;
+class Synth;
+
+#include "../Music/MusicDef.h"
 
 // Audio inputs
 enum Inputs {
@@ -43,10 +51,12 @@ enum ControlId {
     txt_effect,
     txt_effect1,
     txt_effect2,
+    txt_instrument,
     // Sliders
     sld_velel,
     // Windows
-    wnd_effect_list
+    wnd_effect_list,
+    wnd_instrument_list
 };
 
 // Effect settings
@@ -94,6 +104,7 @@ struct Waveshaper {
 struct Granular {
 };
 
+// Settings for all possible effects for one instrument (synth or guitar)
 struct EffectSettings {
     EffectType _effectType{EffectType::eff_clean};
     String _effectName{};
@@ -108,29 +119,35 @@ struct EffectSettings {
     Granular _granular{};
 };
 
-class TouchScreen;
-class Gui;
-class AudioBoard;
-class SdCard;
-class MidiInput;
-class Bluetooth;
-class Player;
-class Synth;
+// Input settings for synth or guitar
+struct InputSettings {
+    uint16_t _effects{1}; // Number of effects (single or double)
+    EffectSettings _effect1{};
+    EffectSettings _effect2{};
+};
+
+// Settings for synth
+struct SynthSettings {
+    uint16_t _instrument{};
+    String _instrumentName{};
+};
 
 struct Settings {
+    // Instrument settings
+    InputSettings _guitarInput;
+    SynthSettings _synthSettings;
+    InputSettings _synthInput;
+
     // GUI
     uint16_t _windowColor{ILI9341_WHITE}; // Window background color
     uint16_t _borderColor{ILI9341_BLACK}; // Control border color
     uint16_t _textColor{ILI9341_NAVY}; // Text color
     int _textSize{2}; // Text size
+
     // Audio
     Inputs _input{Inputs::mic}; // Mic or line in
     float _micGain{0.5}; // Microphone gain (0 - 63)
     float _lineInLevel{0.5}; // 0 - 15
-    // Guitar
-    uint16_t _guitarEffects{1}; // Number of guitar effects (single or double)
-    EffectSettings _effect1{};
-    EffectSettings _effect2{};
 
     // All devices, not saved into EEPROM, just to have them available
     TouchScreen* _screen{};
@@ -145,5 +162,3 @@ struct Settings {
 
 #define MIC_GAIN_MAX 63 // 0 - 63
 #define LINE_IN_MAX 15 // 0 - 15
-
-#endif

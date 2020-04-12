@@ -1,5 +1,4 @@
-#ifndef TextBox_h
-#define TextBox_h
+#pragma once
 
 class TextBox : public Control {
 public:
@@ -14,5 +13,3 @@ public:
     void draw() override;
     bool onTouch(const TS_Point& point) override;
 };
-
-#endif

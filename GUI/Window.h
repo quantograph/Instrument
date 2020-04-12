@@ -1,5 +1,4 @@
-#ifndef Window_h
-#define Window_h
+#pragma once
 
 class Gui;
 class Control;
@@ -27,5 +26,3 @@ public:
     virtual void activate();
     virtual void onBack(Window* window) {}
 };
-
-#endif // Window_h

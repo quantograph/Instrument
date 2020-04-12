@@ -23,8 +23,9 @@ bool SetGuitar::init(Settings* settings, Window* parent) {
     uint16_t width;
 
     Window::init(settings, parent);
+    _inputSettings = &_settings->_guitarInput;
 
-    // "SetEffect window
+    // "SetEffect" window
     _setEffect = new SetEffect();
     _setEffect->init(_settings, this);
 
@@ -35,22 +36,25 @@ bool SetGuitar::init(Settings* settings, Window* parent) {
     _singleCheck->_text = "Single";
 
     // "Double" check box
-    _doubleCheck = new CheckBox(_settings, this, _settings->_screen->_width / 2, y, width, height, ControlId::chk_doubleEffect);
+    _doubleCheck = new CheckBox(_settings, this, _settings->_screen->_width / 2, y, width, height, 
+                                ControlId::chk_doubleEffect);
     _doubleCheck->_text = "Double";
     y += height + 30;
 
     // "Effect 1" box
     height = 30;
-    _effect1 = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, ControlId::txt_effect1);
+    _effect1 = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, 
+                           ControlId::txt_effect1);
     _effect1->_frame = true;
-    _effect1->_text = _settings->_effect1._effectName;
+    _effect1->_text = _inputSettings->_effect1._effectName;
     y += height + 30;
 
     // "Effect 2" box
     height = 30;
-    _effect2 = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, ControlId::txt_effect2);
+    _effect2 = new TextBox(_settings, this, 10, y, _settings->_screen->_width * 0.8, height, 
+                           ControlId::txt_effect2);
     _effect2->_frame = true;
-    _effect1->_text = _settings->_effect2._effectName;
+    _effect1->_text = _inputSettings->_effect2._effectName;
     y += height + 30;
 
     // Buttons
@@ -71,18 +75,18 @@ void SetGuitar::setupButtons() {
 //=================================================================================================
 void SetGuitar::draw() {
     updateNumber();
-    _effect1->_text = _settings->_effect1._effectName;
-    _effect2->_text = _settings->_effect2._effectName;
+    _effect1->_text = _inputSettings->_effect1._effectName;
+    _effect2->_text = _inputSettings->_effect2._effectName;
     Window::draw();
 }
 
 //=================================================================================================
 void SetGuitar::updateNumber() {
-    //Serial.printf("SetGuitar::updateNumber: %d\n", _settings->_guitarEffects);
-    if(_settings->_guitarEffects == 1) { // Single
+    //Serial.printf("SetGuitar::updateNumber: %d\n", _inputSettings);
+    if(_inputSettings->_effects == 1) { // Single
         _singleCheck->update(true);
         _doubleCheck->update(false);
-    } else if(_settings->_guitarEffects == 2) { // Double
+    } else if(_inputSettings->_effects == 2) { // Double
         _singleCheck->update(false);
         _doubleCheck->update(true);
     }
@@ -92,21 +96,21 @@ void SetGuitar::updateNumber() {
 bool SetGuitar::onControl(Control* control) {
     switch(control->_id) {
         case ControlId::chk_singleEffect:
-            _settings->_guitarEffects = 1;
+            _inputSettings->_effects = 1;
             updateNumber();
             break;
 
         case ControlId::chk_doubleEffect:
-            _settings->_guitarEffects = 2;
+            _inputSettings->_effects = 2;
             updateNumber();
             break;
 
         case ControlId::txt_effect1:
-            _setEffect->activate(&_settings->_effect1);
+            _setEffect->activate(&_inputSettings->_effect1);
             break;
 
         case ControlId::txt_effect2:
-            _setEffect->activate(&_settings->_effect2);
+            _setEffect->activate(&_inputSettings->_effect2);
             break;
 
         case ControlId::btn_back:

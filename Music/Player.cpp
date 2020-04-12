@@ -1,4 +1,4 @@
-#include <Audio.h>
+#include "../Devices/Devices.h"
 #include "../Sound/drumHat_samples.h"
 #include "../Sound/drumBass_samples.h"
 #include "../Sound/drumSnare_samples.h"
@@ -17,6 +17,7 @@
 #include "Note.h"
 #include "Track.h"
 #include "Song.h"
+#include "Synth.h"
 #include "Player.h"
 
 //=================================================================================================
@@ -166,7 +167,7 @@ void Player::process() {
     // See if it's time to play the current note
     while(time > _iter->_start && _iter != _notes.end()) {
         Note* note{&(*_iter++)};
-        if(note->_instrument == INSTRUMENT::PERCUSSION) {
+        if(note->_instrument == Instrument::PERCUSSION) {
             Serial.printf("Play drum (%6.3f): ", time); note->show();
             AudioSynthWavetable* drum = _drums[note->_midiNote];
             if(drum) {

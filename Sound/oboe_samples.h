@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data oboe_samples[3];
 const uint8_t oboe_ranges[] = {63, 68, 127, };
 

@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "overdrivegt_samples.h"
+
 const AudioSynthWavetable::sample_data overdrivegt_samples[3] = {
 	{
 		(int16_t*)sample_0_overdrivegt_distgtra2, // sample

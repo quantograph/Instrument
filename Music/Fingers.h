@@ -1,8 +1,4 @@
-#ifndef Fingers_h
-#define Fingers_h
-
-#include <Arduino.h>
-#include "Misc.h"
+#pragma once
 
 class Fingers {
     struct Key {
@@ -30,5 +26,3 @@ public:
     void initSaxophone();
     void showSaxophone(uint32_t keys, bool error);
 };
-
-#endif

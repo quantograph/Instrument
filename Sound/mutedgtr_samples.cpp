@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "mutedgtr_samples.h"
+
 const AudioSynthWavetable::sample_data mutedgtr_samples[1] = {
 	{
 		(int16_t*)sample_0_mutedgtr_mgtr, // sample

@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "bassoon_samples.h"
+
 const AudioSynthWavetable::sample_data bassoon_samples[2] = {
 	{
 		(int16_t*)sample_0_bassoon_bassoonc2, // sample

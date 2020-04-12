@@ -1,5 +1,4 @@
-#ifndef ListWindow_h
-#define ListWindow_h
+#pragma once
 
 class PeakMeter;
 class Slider;
@@ -35,5 +34,3 @@ public:
     bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
     bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
 };
-
-#endif

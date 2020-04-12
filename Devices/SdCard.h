@@ -1,5 +1,4 @@
-#ifndef SdCard_h
-#define SdCard_h
+#pragma once
 
 class SdCard {
 public:
@@ -9,5 +8,3 @@ public:
     bool readFile(const char* path, char*& data, uint32_t& dataSize);
     void printDirectory(File dir, int numTabs);
 };
-
-#endif

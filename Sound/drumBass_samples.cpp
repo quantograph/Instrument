@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "drumBass_samples.h"
+
 const AudioSynthWavetable::sample_data drumBass_samples[1] = {
 	{
 		(int16_t*)sample_drumBass, // sample

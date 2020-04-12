@@ -1,5 +1,4 @@
-#ifndef SetAudio_h
-#define SetAudio_h
+#pragma once
 
 class PeakMeter;
 class Slider;
@@ -29,5 +28,3 @@ public:
     void onPeakMeter(float left, float right) override;
     bool onControl(Control* control) override;
 };
-
-#endif

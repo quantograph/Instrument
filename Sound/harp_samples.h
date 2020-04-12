@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data harp_samples[1];
 const uint8_t harp_ranges[] = {127, };
 

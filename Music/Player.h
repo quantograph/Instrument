@@ -1,11 +1,4 @@
-#ifndef Player_h
-#define Player_h
-
-#include <list>
-#include <Audio.h>
-#include "../Devices/AudioBoard.h"
-#include "Song.h"
-#include "Synth.h"
+#pragma once
 
 class Player {
 #define MAX_DRUMS 128
@@ -32,5 +25,3 @@ public:
     void testMidiFile();
     bool playNote(Note* note);
 };
-
-#endif // Player_h

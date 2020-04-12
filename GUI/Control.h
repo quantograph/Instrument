@@ -1,6 +1,3 @@
-#ifndef Conrol_h
-#define Conrol_h
-
 class Window;
 
 class Control {
@@ -33,5 +30,3 @@ public:
     virtual bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) { return false; }
     bool inside(const TS_Point& point);
 };
-
-#endif // Conrol_h

@@ -58,7 +58,7 @@ void setup() {
     g_audio.init(&g_gui, &g_storage._settings);
 
     // MIDI input
-    g_synth.init(TRUMPET, &g_storage._settings);
+    g_synth.init(ACOUSTIC_GRAND_PIANO, &g_storage._settings);
     g_midiInput.init(&g_synth);
     
     //g_player.init();

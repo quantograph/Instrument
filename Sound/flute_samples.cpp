@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "flute_samples.h"
+
 const AudioSynthWavetable::sample_data flute_samples[1] = {
 	{
 		(int16_t*)sample_0_flute_flutec4, // sample

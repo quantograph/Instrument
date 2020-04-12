@@ -620,7 +620,7 @@ bool MidiFile::getNote(uint32_t channel, bool noteOn, char* data, uint32_t dataS
 
 //=================================================================================================
 bool MidiFile::addNote(Note* note, float trackTime, Track* track) {
-    INSTRUMENT instrument{NONE}; // Instrument type
+    Instrument instrument{NONE}; // Instrument type
     String instrumentName{}; // Instrument name
 
     // Set note's instrument
@@ -644,7 +644,7 @@ bool MidiFile::addNote(Note* note, float trackTime, Track* track) {
 //=================================================================================================
 // Get MIDI program (instrument or patch)
 bool MidiFile::getProgram(uint32_t channel, char* data, uint32_t dataSize, uint32_t& processed, float trackTime, Track* track) {
-    INSTRUMENT instrument{NONE}; // Instrument ID for this program
+    Instrument instrument{NONE}; // Instrument ID for this program
     uint32_t program{0}; // Program number. 0-127 in the file, but 1-128 in the specifications
     String programName{}; // Program name
     String string{}; // General string
@@ -877,7 +877,7 @@ float MidiFile::midiToVolume(uint8_t velocity) {
 
 //=================================================================================================
 // Get program info by it's number
-bool MidiFile::getProgramInfo(uint32_t program, String& name, INSTRUMENT& instrument) {
+bool MidiFile::getProgramInfo(uint32_t program, String& name, Instrument& instrument) {
     switch(program) {
         case 0:     name = "Acoustic Grand Piano";      instrument = ACOUSTIC_GRAND_PIANO; break; // Piano
         case 1:     name = "Bright Acoustic Piano";     instrument = BRIGHT_ACOUSTIC_PIANO; break;
@@ -1156,7 +1156,7 @@ bool MidiFile::getControlInfo(uint32_t control, String& name) {
 
 //=================================================================================================
 // Gets MIDI note number for a drum set instrument (thing) type
-uint8_t MidiFile::getMidiDrumNote(INSTRUMENT instrument) {
+uint8_t MidiFile::getMidiDrumNote(Instrument instrument) {
     switch(instrument) {
         /*case DRUM_BASS_DRUM_2:
             return 35; // Bass Drum 2
@@ -1219,7 +1219,7 @@ uint8_t MidiFile::getMidiDrumNote(INSTRUMENT instrument) {
 // 49 Orchestra Kit - a collection of concert drums and timpani
 // 57 Sound FX Kit - a collection of sound effects
 // 128 CM-64/CM-32L - the standard MT-32 Drum Kit
-bool MidiFile::getDrumInfo(uint32_t midiNote, String& name, INSTRUMENT& instrument) {
+bool MidiFile::getDrumInfo(uint32_t midiNote, String& name, Instrument& instrument) {
     switch(midiNote) {
         /*case 27: name = "High Q";         instrument = NONE; break;
         case 28: name = "Slap";           instrument = NONE; break;
@@ -1229,29 +1229,29 @@ bool MidiFile::getDrumInfo(uint32_t midiNote, String& name, INSTRUMENT& instrume
         case 32: name = "Square";         instrument = NONE; break;
         case 33: name = "Metronome1";     instrument = NONE; break;
         case 34: name = "Metronome2";     instrument = NONE; break;
-        case 35: name = "Bass Drum 2";    instrument = (INSTRUMENT)DRUM_BASS_DRUM_2; break;
-        case 36: name = "Bass Drum 1";    instrument = (INSTRUMENT)DRUM_BASS_DRUM_1; break;
-        case 37: name = "Side Stick";     instrument = (INSTRUMENT)NONE; break;
-        case 38: name = "Snare 1";        instrument = (INSTRUMENT)DRUM_SNARE; break;
+        case 35: name = "Bass Drum 2";    instrument = (Instrument)DRUM_BASS_DRUM_2; break;
+        case 36: name = "Bass Drum 1";    instrument = (Instrument)DRUM_BASS_DRUM_1; break;
+        case 37: name = "Side Stick";     instrument = (Instrument)NONE; break;
+        case 38: name = "Snare 1";        instrument = (Instrument)DRUM_SNARE; break;
         case 39: name = "Hand Clap";      instrument = NONE; break;
-        case 40: name = "Snare 2";        instrument = (INSTRUMENT)DRUM_SNARE; break;
-        case 41: name = "Low Tom 2";      instrument = (INSTRUMENT)DRUM_TOM_6; break;
-        case 42: name = "Closed Hi-Hat";  instrument = (INSTRUMENT)DRUM_HIHAT_CLOSED; break;
-        case 43: name = "Low Tom 1";      instrument = (INSTRUMENT)DRUM_TOM_5; break;
-        case 44: name = "Pedal Hi-Hat";   instrument = (INSTRUMENT)DRUM_HIHAT_FOOT; break;
-        case 45: name = "Mid Tom 2";      instrument = (INSTRUMENT)DRUM_TOM_4; break;
-        case 46: name = "Open Hi-Hat";    instrument = (INSTRUMENT)DRUM_HIHAT_OPEN; break;
-        case 47: name = "Mid Tom 1";      instrument = (INSTRUMENT)DRUM_TOM_3; break;
-        case 48: name = "High Tom 2";     instrument = (INSTRUMENT)DRUM_TOM_2; break;
-        case 49: name = "Crash Cymbal 1"; instrument = (INSTRUMENT)DRUM_CRASH_1; break;
-        case 50: name = "High Tom 1";     instrument = (INSTRUMENT)DRUM_TOM_1; break;
-        case 51: name = "Ride Cymbal 1";  instrument = (INSTRUMENT)DRUM_RIDE_CYMBAL; break;
-        case 52: name = "Chinese Cymbal"; instrument = (INSTRUMENT)DRUM_CHINESE_1; break;
-        case 53: name = "Ride Bell";      instrument = (INSTRUMENT)DRUM_RIDE_BELL; break;
+        case 40: name = "Snare 2";        instrument = (Instrument)DRUM_SNARE; break;
+        case 41: name = "Low Tom 2";      instrument = (Instrument)DRUM_TOM_6; break;
+        case 42: name = "Closed Hi-Hat";  instrument = (Instrument)DRUM_HIHAT_CLOSED; break;
+        case 43: name = "Low Tom 1";      instrument = (Instrument)DRUM_TOM_5; break;
+        case 44: name = "Pedal Hi-Hat";   instrument = (Instrument)DRUM_HIHAT_FOOT; break;
+        case 45: name = "Mid Tom 2";      instrument = (Instrument)DRUM_TOM_4; break;
+        case 46: name = "Open Hi-Hat";    instrument = (Instrument)DRUM_HIHAT_OPEN; break;
+        case 47: name = "Mid Tom 1";      instrument = (Instrument)DRUM_TOM_3; break;
+        case 48: name = "High Tom 2";     instrument = (Instrument)DRUM_TOM_2; break;
+        case 49: name = "Crash Cymbal 1"; instrument = (Instrument)DRUM_CRASH_1; break;
+        case 50: name = "High Tom 1";     instrument = (Instrument)DRUM_TOM_1; break;
+        case 51: name = "Ride Cymbal 1";  instrument = (Instrument)DRUM_RIDE_CYMBAL; break;
+        case 52: name = "Chinese Cymbal"; instrument = (Instrument)DRUM_CHINESE_1; break;
+        case 53: name = "Ride Bell";      instrument = (Instrument)DRUM_RIDE_BELL; break;
         case 54: name = "Tambourine";     instrument = NONE; break;
-        case 55: name = "Splash Cymbal";  instrument = (INSTRUMENT)DRUM_SPLASH_1; break;
-        case 56: name = "Cowbell";        instrument = (INSTRUMENT)NONE; break;
-        case 57: name = "Crash Cymbal 2"; instrument = (INSTRUMENT)DRUM_CRASH_2; break;
+        case 55: name = "Splash Cymbal";  instrument = (Instrument)DRUM_SPLASH_1; break;
+        case 56: name = "Cowbell";        instrument = (Instrument)NONE; break;
+        case 57: name = "Crash Cymbal 2"; instrument = (Instrument)DRUM_CRASH_2; break;
         case 58: name = "Vibra Slap";     instrument = NONE;  break;
         case 59: name = "Ride Cymbal 2";  instrument = NONE;  break;
         case 60: name = "Hi Bongo";       instrument = NONE;  break;
@@ -2576,7 +2576,7 @@ bool MidiFile::SaveEvent(int32_t timeDiff, MIDI_EVENT eventId, int32_t channel, 
 
 //=================================================================================================
 // Gets MIDI program number for an instrument (thing) type
-uint8_t MidiFile::getProgram(INSTRUMENT instrument) {
+uint8_t MidiFile::getProgram(Instrument instrument) {
     switch(instrument) {
         case ELECTRIC_BASS_FINGER:
             return PROGRAM_FINGER_BASS;

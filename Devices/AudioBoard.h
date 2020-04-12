@@ -1,5 +1,4 @@
-#ifndef AudioBoard_h
-#define AudioBoard_h
+#pragma once
 
 class Effects;
 class Gui;
@@ -54,5 +53,3 @@ public:
     AudioAnalyzePeak _peakLeft;
     AudioAnalyzePeak _peakRight;
 };
-
-#endif

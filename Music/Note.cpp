@@ -1,4 +1,5 @@
 #include <algorithm>
+#include "../Devices/Devices.h"
 #include "Misc.h"
 #include "Note.h"
 

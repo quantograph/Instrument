@@ -1,7 +1,3 @@
-#ifndef GuiMisc_h
-#define GuiMisc_h
+#pragma once
 
 String getEffectName(EffectType type);
-
-#endif
-

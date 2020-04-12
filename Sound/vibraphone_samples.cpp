@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "vibraphone_samples.h"
+
 const AudioSynthWavetable::sample_data vibraphone_samples[2] = {
 	{
 		(int16_t*)sample_0_vibraphone_vibese2, // sample

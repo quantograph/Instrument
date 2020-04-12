@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "standard_DRUMS_samples.h"
+
 const AudioSynthWavetable::sample_data standard_DRUMS_samples[48] = {
 	{
 		(int16_t*)sample_0_standard_DRUMS_filtersnap, // sample

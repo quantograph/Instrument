@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data trombone_samples[4];
 const uint8_t trombone_ranges[] = {52, 59, 64, 127, };
 

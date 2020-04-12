@@ -1,5 +1,4 @@
-#ifndef Slider_h
-#define Slider_h
+#pragma once
 
 class TouchScreen;
 
@@ -22,5 +21,3 @@ public:
     bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
     bool onMove(const TS_Point& fromPoint, const TS_Point& toPoint) override;
 };
-
-#endif

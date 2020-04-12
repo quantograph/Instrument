@@ -115,27 +115,27 @@ bool Effects::init() {
 // Update settings for the active effect
 void Effects::update() {
     if(_effectType == EffectType::eff_clean) {
-        Serial.printf("Effects::update: clean\n");
+        //Serial.printf("Effects::update: clean\n");
         return;
     }
 
     if(_chorus) {
-        Serial.printf("Effects::update: _chorus=%p\n", _chorus);
+        //Serial.printf("Effects::update: _chorus=%p\n", _chorus);
         _chorus->voices(_settings->_chorus._chorus);
     } else if(_flange) {
-        Serial.printf("Effects::update: _flange._rate: %0.2f\n", _settings->_flange._rate);
+        //Serial.printf("Effects::update: _flange._rate: %0.2f\n", _settings->_flange._rate);
         int idx = FLANGE_DELAY_LENGTH/4;
         int depth = FLANGE_DELAY_LENGTH/4;
         _flange->voices(idx, depth, _settings->_flange._rate);
     } else if(_reverb) {
-        Serial.printf("Effects::update: _reverb._reverbTime: %0.2f\n", _settings->_reverb._reverbTime);
+        //Serial.printf("Effects::update: _reverb._reverbTime: %0.2f\n", _settings->_reverb._reverbTime);
         _reverb->reverbTime(_settings->_reverb._reverbTime);
     } else if(_freeverb) {
-        Serial.printf("Effects::update: _freeverb._roomsize: %0.2f, _damping: %0.2f\n", _settings->_freeverb._roomsize, _settings->_freeverb._damping);
+        //Serial.printf("Effects::update: _freeverb._roomsize: %0.2f, _damping: %0.2f\n", _settings->_freeverb._roomsize, _settings->_freeverb._damping);
         _freeverb->roomsize(_settings->_freeverb._roomsize);
         _freeverb->damping(_settings->_freeverb._damping);
     } else if(_envelope) {
-        Serial.printf("Effects::update: _envelope\n");
+        //Serial.printf("Effects::update: _envelope\n");
 	    _envelope->delay(_settings->_envelope._delay);
 	    _envelope->attack(_settings->_envelope._attack);
 	    _envelope->hold(_settings->_envelope._hold);
@@ -144,20 +144,20 @@ void Effects::update() {
 	    _envelope->release(_settings->_envelope._release);
 	    _envelope->releaseNoteOn(_settings->_envelope._releaseNoteOn);
     } else if(_delay) {
-        Serial.printf("Effects::update: _envelope\n");
+        //Serial.printf("Effects::update: _envelope\n");
         for(int i = 0; i < 8; ++i) {
             if(_settings->_delay._delays[i] > 0)
                 _delay->delay(i, _settings->_delay._delays[i]);
         }
     } else if(_bitcrusher) {
-        Serial.printf("Effects::update: _bitcrusher\n");
+        //Serial.printf("Effects::update: _bitcrusher\n");
     	_bitcrusher->bits(_settings->_bitcrusher._bits);
         _bitcrusher->sampleRate(_settings->_bitcrusher._sampleRate);
     } else if(_waveshaper) {
-        Serial.printf("Effects::update: _waveshaper\n");
+        //Serial.printf("Effects::update: _waveshaper\n");
         _waveshaper->shape(_settings->_waveshaper._waveshape, _settings->_waveshaper._length);
     } else if(_granular) {
-        Serial.printf("Effects::update: _granular\n");
+        //Serial.printf("Effects::update: _granular\n");
     } else {
         Serial.printf("##### ERROR, Effects::update: no effect to update\n");
     }
@@ -165,14 +165,14 @@ void Effects::update() {
 
 //=================================================================================================
 void Effects::clean() {
-    Serial.printf("Effect: clean\n");
+    //Serial.printf("Effect: clean\n");
     reset();
     _outConnection = new AudioConnection(*_source, _sourceOutput, *_dest, _destInput);
 }
 
 //=================================================================================================
 void Effects::chorus() {
-    Serial.printf("Effect: chorus\n");
+    //Serial.printf("Effect: chorus\n");
     reset();
 
     _chorus = new AudioEffectChorus();
@@ -183,7 +183,7 @@ void Effects::chorus() {
 
 //=================================================================================================
 void Effects::flange() {
-    Serial.printf("Effect: flange\n");
+    //Serial.printf("Effect: flange\n");
     reset();
 
     _flange = new AudioEffectFlange();
@@ -197,7 +197,7 @@ void Effects::flange() {
 
 //=================================================================================================
 void Effects::reverb() {
-    Serial.printf("Effect: reverb\n");
+    //Serial.printf("Effect: reverb\n");
     reset();
 
     _reverb = new AudioEffectReverb();
@@ -207,7 +207,7 @@ void Effects::reverb() {
 
 //=================================================================================================
 void Effects::freeverb() {
-    Serial.printf("Effect: freeverb\n");
+    //Serial.printf("Effect: freeverb\n");
     reset();
 
     _freeverb = new AudioEffectFreeverb();
@@ -217,7 +217,7 @@ void Effects::freeverb() {
 
 //=================================================================================================
 void Effects::envelope() {
-    Serial.printf("Effect: envelope\n");
+    //Serial.printf("Effect: envelope\n");
     reset();
 
     _envelope = new AudioEffectEnvelope();
@@ -227,7 +227,7 @@ void Effects::envelope() {
 
 //=================================================================================================
 void Effects::delay() {
-    Serial.printf("Effect: delay\n");
+    //Serial.printf("Effect: delay\n");
     reset();
 
     _delay = new AudioEffectDelay();
@@ -237,7 +237,7 @@ void Effects::delay() {
 
 //=================================================================================================
 void Effects::bitcrusher() {
-    Serial.printf("Effect: bitcrusher\n");
+    //Serial.printf("Effect: bitcrusher\n");
     reset();
 
     _bitcrusher = new AudioEffectBitcrusher();
@@ -247,7 +247,7 @@ void Effects::bitcrusher() {
 
 //=================================================================================================
 void Effects::waveshaper() {
-    Serial.printf("Effect: waveshaper\n");
+    //Serial.printf("Effect: waveshaper\n");
     reset();
 
     _waveshaper = new AudioEffectWaveshaper();
@@ -257,7 +257,7 @@ void Effects::waveshaper() {
 
 //=================================================================================================
 void Effects::granular() {
-    Serial.printf("Effect: granular\n");
+    //Serial.printf("Effect: granular\n");
     reset();
 
     _granular = new AudioEffectGranular();

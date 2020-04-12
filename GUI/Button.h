@@ -1,5 +1,4 @@
-#ifndef Button_h
-#define Button_h
+#pragma once
 
 class TouchScreen;
 
@@ -19,5 +18,3 @@ public:
     bool onTouch(const TS_Point& point) override;
     bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) override;
 };
-
-#endif

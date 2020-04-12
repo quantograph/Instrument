@@ -1,5 +1,4 @@
-#ifndef Bluetooth_h
-#define Bluetooth_h
+#pragma once
 
 class Bluetooth {
 public:
@@ -14,5 +13,3 @@ public:
     int _received = 0; // Received
     char _string[64];
 };
-
-#endif // #ifndef Bluetooth_h

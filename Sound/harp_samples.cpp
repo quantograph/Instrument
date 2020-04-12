@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "harp_samples.h"
+
 const AudioSynthWavetable::sample_data harp_samples[1] = {
 	{
 		(int16_t*)sample_0_harp_pluckharp, // sample

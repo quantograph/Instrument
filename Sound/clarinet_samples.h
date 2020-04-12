@@ -1,7 +1,5 @@
 #pragma once
 
-#include <Audio.h>
-
 extern const AudioSynthWavetable::sample_data clarinet_samples[2];
 const uint8_t clarinet_ranges[] = {69, 127, };
 

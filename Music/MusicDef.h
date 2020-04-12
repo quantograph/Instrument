@@ -1,10 +1,6 @@
-#ifndef MusicDef_h
-#define MusicDef_h
+#pragma once
 
-#include <Arduino.h>
-#include <list>
-#include <vector>
-#include <float.h>
+class Synth;
 
 #define NO_INT INT32_MAX
 #define NO_MIDI_NOTE 255
@@ -62,7 +58,7 @@ enum KEY_SIGNATURE {
 // 41-48   Strings                  105-112 Ethnic
 // 49-56   Ensemble                 113-120 Percussive
 // 57-64   Brass                    121-128 Sound Effects
-enum INSTRUMENT {
+enum Instrument {
     ACOUSTIC_GRAND_PIANO,
     BRIGHT_ACOUSTIC_PIANO,
     ELECTRIC_GRAND_PIANO,
@@ -196,7 +192,7 @@ enum INSTRUMENT {
     MAX_INSTRUMENT
 };
 
-typedef std::list<INSTRUMENT> InstrumentList;
+typedef std::list<Instrument> InstrumentList;
 
 // MIDI notes for drums
 enum DRUM_NOTES {
@@ -368,4 +364,36 @@ enum SCALE {
 #define SCALE_NAME_Cb_MAJOR "Cb maj"
 #define SCALE_NAME_Ab_MINOR "Ab min"
 
-#endif
+// Saxophone fingering
+struct Fingering {
+    Fingering(const char* buttons) : _buttonString(buttons) {} // List of button numbers
+    String _buttonString;
+    uint32_t _keys; // Bitmask with key numbers
+    uint32_t _mappedKeys; // Keys mapped to sensors
+    bool _mapped;
+    uint16_t _note; // Note number, starting with 1 for the lowest
+    int _buttons[24]; // Button numbers pressed
+    int _buttonCount; // Number of buttons in the list
+};
+
+struct InstrumentInfo {
+    ~InstrumentInfo();
+    const AudioSynthWavetable::instrument_data* _sample{nullptr};
+    Instrument _instrument = Instrument::NONE;
+    String _name = "";
+    //uint8_t _midiInstrument = 0;
+    int _startNote = 0; // MIDI note number for the first fingering
+    int _fingeringCount = 0; // Number of fingerings in _fingerings
+    Fingering* _fingerings = nullptr;
+    int _buttonCount = 0; // Number of buttons mapped
+    int* _buttonMap = nullptr; // Touch sensors, array
+    int* _keyMap = nullptr; // Instrument keys, array
+    uint8_t* _noteMap = nullptr; // MIDI notes, array
+    uint32_t _keyMask = 0; // Bitmask for the 'unwanted' keys
+    AudioMixer4* _mixer{nullptr};
+    uint8_t _mixerChannel{0};
+    Synth* _synth{nullptr}; // Synthesizer for this instrument
+    int _voices = 0; // Number of simultaneous voices for the synthesizer
+};
+
+typedef std::list<InstrumentInfo> InstrumentInfoList;

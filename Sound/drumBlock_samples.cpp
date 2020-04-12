@@ -1,3 +1,4 @@
+#include "../Devices/Devices.h"
 #include "drumBlock_samples.h"
 
 const AudioSynthWavetable::sample_data drumBlock_samples[1] = {

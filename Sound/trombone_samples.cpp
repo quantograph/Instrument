@@ -1,4 +1,6 @@
+#include "../Devices/Devices.h"
 #include "trombone_samples.h"
+
 const AudioSynthWavetable::sample_data trombone_samples[4] = {
 	{
 		(int16_t*)sample_0_trombone_tromb2, // sample
