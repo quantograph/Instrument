@@ -27,6 +27,8 @@ public:
     static void putValue(String& string, const char* parent, const char* parent2, const char* tag, const char* value);
     bool getValue(char* pair);
     bool split(char* pair, const char*& parent, const char*& parent2, const char*& tag, const char*& value);
+    bool getInputSettings(InputSettings& settings, const char* parent, const char* parent2, const char* tag, const char* value);
+    bool getEffectsSettings(EffectSettings& settings, const char* parent, const char* parent2, const char* tag, const char* value);
 
     // Add new members to the end of this:
     Settings _settings{};

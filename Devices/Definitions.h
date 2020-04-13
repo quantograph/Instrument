@@ -70,7 +70,7 @@ struct Chorus {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s Chorus -----\n", title.c_str());
+        Serial.printf("---------- %s Chorus\n", title.c_str());
         Serial.printf("delay=%d\n", _delay);
         Serial.printf("voices=%d\n", _voices);
     }
@@ -90,7 +90,7 @@ struct Flange {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s Flange -----\n", title.c_str());
+        Serial.printf("---------- %s Flange\n", title.c_str());
         Serial.printf("delay=%d\n", _delay);
         Serial.printf("offset=%d\n", _offset);
         Serial.printf("depth=%d\n", _depth);
@@ -106,7 +106,7 @@ struct Reverb {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s Reverb -----\n", title.c_str());
+        Serial.printf("---------- %s Reverb\n", title.c_str());
         Serial.printf("time=%0.2f\n", _time);
     }
 };
@@ -121,7 +121,7 @@ struct Freeverb {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s Freeverb -----\n", title.c_str());
+        Serial.printf("---------- %s Freeverb\n", title.c_str());
         Serial.printf("roomSize=%0.2f\n", _roomSize);
         Serial.printf("damping=%0.2f\n", _damping);
     }
@@ -147,7 +147,7 @@ struct Envelope {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s Envelope -----\n", title.c_str());
+        Serial.printf("---------- %s Envelope\n", title.c_str());
         Serial.printf("delay=%0.2f\n", _delay);
         Serial.printf("attack=%0.2f\n", _attack);
         Serial.printf("hold=%0.2f\n", _hold);
@@ -164,7 +164,7 @@ struct Delay {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s Delay -----\n", title.c_str());
+        Serial.printf("---------- %s Delay \n", title.c_str());
         char tag[32];
         for(int i = 0; i < 8; ++i) {
             sprintf(tag, "delay%d", i);
@@ -183,7 +183,7 @@ struct Bitcrusher {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s Bitcrusher -----\n", title.c_str());
+        Serial.printf("---------- %s Bitcrusher\n", title.c_str());
         Serial.printf("bits=%0.2f\n", _bits);
         Serial.printf("rate=%0.2f\n", _rate);
     }
@@ -196,7 +196,7 @@ struct Waveshaper {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s Waveshaper -----\n", title.c_str());
+        Serial.printf("---------- %s Waveshaper\n", title.c_str());
     }
 };
 
@@ -213,7 +213,7 @@ struct Granular {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s Granular -----\n", title.c_str());
+        Serial.printf("---------- %s Granular\n", title.c_str());
         Serial.printf("ratio=%0.2f\n", _ratio);
         Serial.printf("freeze=%0.2f\n", _freeze);
         Serial.printf("shift=%0.2f\n", _shift);
@@ -240,7 +240,7 @@ struct EffectSettings {
     void putValues(String& string, const char* parent, const char* parent2);
 
     void show(String title) {
-        Serial.printf("%s -----\n", title.c_str());
+        Serial.printf("---------- %s\n", title.c_str());
         Serial.printf("effectType=%d\n", _effectType);
         Serial.printf("effectName=%s\n", _effectName.c_str());
         _chorus.show(title);
@@ -271,7 +271,7 @@ struct InputSettings {
 
     void show(String title) {
         String title2 = title + " input";
-        Serial.printf("%s -----\n", title2.c_str());
+        Serial.printf("---------- %s\n", title2.c_str());
         Serial.printf("effects=%d\n", _effects);
         _effect1.show(title2 + " effect1");
         _effect2.show(title2 + " effect2");
@@ -292,7 +292,7 @@ struct AudioSettings {
     void putValues(String& string);
 
     void show() {
-        Serial.printf("Audio -----\n");
+        Serial.printf("---------- Audio\n");
         Serial.printf("input=%d\n", _input);
         Serial.printf("micGain=%0.2f\n", _micGain);
         Serial.printf("lineInLevel=%0.2f\n", _lineInLevel);
@@ -315,7 +315,7 @@ struct GuiSettings {
     void putValues(String& string);
 
     void show() {
-        Serial.printf("GUI -----\n");
+        Serial.printf("---------- GUI\n");
         Serial.printf("windowColor=%d\n", _windowColor);
         Serial.printf("borderColor=%d\n", _borderColor);
         Serial.printf("textColor=%d\n", _textColor);
@@ -337,7 +337,7 @@ struct SynthSettings {
     void putValues(String& string);
 
     void show() {
-        Serial.printf("Synth -----\n");
+        Serial.printf("---------- Synth\n");
         Serial.printf("instrument=%d\n", _instrument);
         Serial.printf("instrumentName=%s\n", _instrumentName.c_str());
     }
