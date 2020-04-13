@@ -4,8 +4,9 @@ struct EffectSettings;
 
 class Effects {
     #define CHORUS_DELAY_LENGTH (16*AUDIO_BLOCK_SAMPLES)
-    #define DELAY_LINE_LENGTH (16*AUDIO_BLOCK_SAMPLES)
     #define FLANGE_DELAY_LENGTH (6*AUDIO_BLOCK_SAMPLES)
+
+    #define DELAY_LINE_LENGTH (64*AUDIO_BLOCK_SAMPLES)
     short _delayLine[DELAY_LINE_LENGTH];
 
 public:
@@ -46,5 +47,5 @@ public:
     uint8_t _destInput{0};
     AudioConnection* _inConnection{nullptr};
     AudioConnection* _outConnection{nullptr};
-   
+    int16_t* _granularMemory{nullptr};
 };

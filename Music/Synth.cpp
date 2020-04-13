@@ -19,11 +19,16 @@ Synth::~Synth() {
 void Synth::reset() {
     //Serial.printf("Synth::reset\n");
 
+    // Delete the effects
+    delete _effect1;
+    _effect1 = nullptr;
+    delete _effect2;
+    _effect2 = nullptr;
+
     // Delete all voices
     for(auto voice : _synthVoices) {
         delete voice;
     }
-
     _synthVoices.clear();
 
     // Delete all mixer connections
@@ -36,14 +41,8 @@ void Synth::reset() {
     for(auto mixer : _voiceMixers) {
         delete mixer;
     }
-
-    // Delete the effects
-    delete _effect1;
-    _effect1 = nullptr;
-    delete _effect2;
-    _effect2 = nullptr;
-
     _voiceMixers.clear();
+
     delete _outCord;
 }
 

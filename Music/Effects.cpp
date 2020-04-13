@@ -49,6 +49,9 @@ void Effects::reset() {
 
     delete _granular;
     _granular = nullptr;
+
+    free(_granularMemory);
+    _granularMemory = nullptr;
 }
 
 //=================================================================================================
@@ -108,6 +111,8 @@ bool Effects::init() {
             return false;
     }
 
+    update(); // Set all parameters
+
     return true;
 }
 
@@ -121,18 +126,22 @@ void Effects::update() {
 
     if(_chorus) {
         //Serial.printf("Effects::update: _chorus=%p\n", _chorus);
-        _chorus->voices(_settings->_chorus._chorus);
+        _chorus->begin(_delayLine, max(DELAY_LINE_LENGTH, _settings->_chorus._delay * AUDIO_BLOCK_SAMPLES), 
+                       _settings->_chorus._voices);
+        _chorus->voices(_settings->_chorus._voices);
     } else if(_flange) {
         //Serial.printf("Effects::update: _flange._rate: %0.2f\n", _settings->_flange._rate);
-        int idx = FLANGE_DELAY_LENGTH/4;
-        int depth = FLANGE_DELAY_LENGTH/4;
-        _flange->voices(idx, depth, _settings->_flange._rate);
+        _flange->begin(_delayLine, max(DELAY_LINE_LENGTH, _settings->_flange._delay * AUDIO_BLOCK_SAMPLES), 
+                       max(DELAY_LINE_LENGTH, _settings->_flange._offset * AUDIO_BLOCK_SAMPLES), 
+                       max(DELAY_LINE_LENGTH, _settings->_flange._depth * AUDIO_BLOCK_SAMPLES), 
+                       _settings->_flange._rate);
+        //_flange->voices(idx, depth, _settings->_flange._rate);
     } else if(_reverb) {
         //Serial.printf("Effects::update: _reverb._reverbTime: %0.2f\n", _settings->_reverb._reverbTime);
-        _reverb->reverbTime(_settings->_reverb._reverbTime);
+        _reverb->reverbTime(_settings->_reverb._time);
     } else if(_freeverb) {
         //Serial.printf("Effects::update: _freeverb._roomsize: %0.2f, _damping: %0.2f\n", _settings->_freeverb._roomsize, _settings->_freeverb._damping);
-        _freeverb->roomsize(_settings->_freeverb._roomsize);
+        _freeverb->roomsize(_settings->_freeverb._roomSize);
         _freeverb->damping(_settings->_freeverb._damping);
     } else if(_envelope) {
         //Serial.printf("Effects::update: _envelope\n");
@@ -144,20 +153,25 @@ void Effects::update() {
 	    _envelope->release(_settings->_envelope._release);
 	    _envelope->releaseNoteOn(_settings->_envelope._releaseNoteOn);
     } else if(_delay) {
-        //Serial.printf("Effects::update: _envelope\n");
+        //Serial.printf("Effects::update: _delay\n");
         for(int i = 0; i < 8; ++i) {
-            if(_settings->_delay._delays[i] > 0)
-                _delay->delay(i, _settings->_delay._delays[i]);
+            float delay = _settings->_delay._delays[i];
+            if(delay > 0.0)
+                _delay->delay(i, delay);
         }
     } else if(_bitcrusher) {
         //Serial.printf("Effects::update: _bitcrusher\n");
     	_bitcrusher->bits(_settings->_bitcrusher._bits);
-        _bitcrusher->sampleRate(_settings->_bitcrusher._sampleRate);
+        _bitcrusher->sampleRate(_settings->_bitcrusher._rate);
     } else if(_waveshaper) {
         //Serial.printf("Effects::update: _waveshaper\n");
         _waveshaper->shape(_settings->_waveshaper._waveshape, _settings->_waveshaper._length);
     } else if(_granular) {
         //Serial.printf("Effects::update: _granular\n");
+        _granular->begin(_granularMemory, GRANULAR_MEMORY_SIZE);
+	    _granular->setSpeed(_settings->_granular._ratio);
+	    _granular->beginFreeze(_settings->_granular._freeze);
+	    _granular->beginPitchShift(_settings->_granular._shift);
     } else {
         Serial.printf("##### ERROR, Effects::update: no effect to update\n");
     }
@@ -176,7 +190,6 @@ void Effects::chorus() {
     reset();
 
     _chorus = new AudioEffectChorus();
-    _chorus->begin(_delayLine, CHORUS_DELAY_LENGTH, _settings->_chorus._chorus);
 
     connect(_chorus);
 }
@@ -187,10 +200,6 @@ void Effects::flange() {
     reset();
 
     _flange = new AudioEffectFlange();
-
-    int idx = FLANGE_DELAY_LENGTH/4;
-    int depth = FLANGE_DELAY_LENGTH/4;
-    _flange->begin(_delayLine, FLANGE_DELAY_LENGTH, idx, depth, _settings->_flange._rate);
 
     connect(_flange);
 }
@@ -261,6 +270,7 @@ void Effects::granular() {
     reset();
 
     _granular = new AudioEffectGranular();
+    _granularMemory = (int16_t*)malloc(GRANULAR_MEMORY_SIZE);
 
     connect(_granular);
 }

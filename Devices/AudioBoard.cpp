@@ -21,10 +21,10 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
     _audioControl.volume(0.6);
 
     // Input
-    if(_settings->_input == Inputs::mic) {
+    if(_settings->_audioSettings._input == Inputs::mic) {
         _audioControl.inputSelect(AUDIO_INPUT_MIC);
         setMicGain();
-    } else if(_settings->_input == Inputs::line) {
+    } else if(_settings->_audioSettings._input == Inputs::line) {
         _audioControl.inputSelect(AUDIO_INPUT_LINEIN);
         setLineInLevel();
     }
@@ -44,14 +44,14 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
 
 //=================================================================================================
 void AudioBoard::setLineInLevel() {
-    uint16_t value = (uint16_t)(_settings->_lineInLevel * LINE_IN_MAX + 0.5);
+    uint16_t value = (uint16_t)(_settings->_audioSettings._lineInLevel * LINE_IN_MAX + 0.5);
     _settings->_audio->_audioControl.lineInLevel(value);
     //Serial.printf("AudioBoard::setLineInLevel: %0.2f (%d)\n", _settings->_lineInLevel, value);
 }
 
 //=================================================================================================
 void AudioBoard::setMicGain() {
-    uint16_t value = (uint16_t)(_settings->_micGain * MIC_GAIN_MAX + 0.5);
+    uint16_t value = (uint16_t)(_settings->_audioSettings._micGain * MIC_GAIN_MAX + 0.5);
     _settings->_audio->_audioControl.micGain(value);
     //Serial.printf("AudioBoard::setMicGain: %0.2f (%d)\n", _settings->_micGain, value);
 }

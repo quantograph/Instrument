@@ -42,6 +42,7 @@ void setup() {
     Serial.println("=====> setup");
 
     // Get the settings
+    g_storage.write();
     g_storage.read();
     g_storage._settings._screen = &g_screen;
     g_storage._settings._gui = &g_gui;

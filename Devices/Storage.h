@@ -11,18 +11,9 @@ class Synth;
 
 class Storage {
 public:
-    // Markers ----------
     #define startTag "ACDC|" // Start marker
-    // Audio
-    #define inputTag "aud-inpt"  // _input
-    #define micGainTag  "aud-mcgn" // _micGain
-    #define lineInLevelTag "au-inlv"  // _lineInLevel
-    // Guitar
-    #define effect1Tag "gtr-eff1"  // _guitarEffect1
-    #define effect2Tag "gtr-eff2"  // _guitarEffect2
-    #define endTag "####"
-
     char _marker[6] = "ACDC|";
+    #define endTag "####" // End marker
     uint16_t _size = 0;
     
     Storage();
@@ -31,9 +22,11 @@ public:
     void show(const char* title);
     bool readBuffer(int address, uint8_t* buffer, int size);
     bool writeBuffer(int address, const uint8_t* buffer, int size);
-    void putValue(String& string, const char* tag, int16_t value);
-    void putValue(String& string, const char* tag, float value);
+    static void putValue(String& string, const char* parent, const char* parent2, const char* tag, int16_t value);
+    static void putValue(String& string, const char* parent, const char* parent2, const char* tag, float value);
+    static void putValue(String& string, const char* parent, const char* parent2, const char* tag, const char* value);
     bool getValue(char* pair);
+    bool split(char* pair, const char*& parent, const char*& parent2, const char*& tag, const char*& value);
 
     // Add new members to the end of this:
     Settings _settings{};
