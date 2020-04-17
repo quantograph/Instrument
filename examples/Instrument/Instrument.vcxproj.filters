@@ -208,6 +208,9 @@
     <ClInclude Include="..\..\GUI\SetEffect.h">
       <Filter>GUI</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Devices\SettingsFile.h">
+      <Filter>Devices</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.md" />
@@ -426,6 +429,9 @@
     </ClCompile>
     <ClCompile Include="..\..\GUI\SetEffect.cpp">
       <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Devices\SettingsFile.cpp">
+      <Filter>Devices</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

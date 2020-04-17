@@ -6,7 +6,7 @@ class SetGuitar;
 class SetSynth;
 class SetBand;
 class SetAudio;
-class Storage;
+class SettingsFile;
 
 class Main : public Window {
 public:
@@ -19,12 +19,12 @@ public:
     SetBand* _setBand{};
     PeakMeter* _peakMeter{};
     std::vector<Button*> _buttons;
-    Storage* _storage{};
+    SettingsFile* _settingsFile{};
 
     void setupButtons();
 
     void onPeakMeter(float left, float right) override;
-    bool init(Storage* storage, Settings* settings);
+    bool init(SettingsFile* settingsFile, Settings* settings);
 
     bool onControl(Control* control) override;
     void onBack(Window* window) override;

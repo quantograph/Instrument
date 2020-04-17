@@ -27,5 +27,6 @@
 #include "SdCard.h"
 #include "TouchScreen.h"
 #include "Storage.h"
+#include "SettingsFile.h"
 
 #endif

@@ -4,13 +4,13 @@ class TouchScreen;
 class Storage;
 class Window;
 class Main;
-class Storage;
+class SettingsFile;
 
 class Gui {
 public:
     Gui();
 
-    Storage* _storage{};
+    SettingsFile* _settingsFile{};
     Settings* _settings{};
     Window* _current{};
     Main* _main{};
@@ -20,7 +20,7 @@ public:
     TS_Point _firstTouchPoint{}; // Point of the first touch
     TS_Point _lastTouchPoint{}; // Last touch point before the current touch
 
-    bool init(Storage* storage, Settings* settings);
+    bool init(SettingsFile* settingsFile, Settings* settings);
     bool process();
     bool onTouch(const TS_Point& point);
     bool onRelease(const TS_Point& fromPoint, const TS_Point& toPoint);

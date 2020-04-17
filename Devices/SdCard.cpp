@@ -15,6 +15,34 @@ void SdCard::init() {
 }
 
 //=================================================================================================
+bool SdCard::makeDir(const char* path) {
+  return SD.mkdir(path);
+}
+
+//=================================================================================================
+bool SdCard::writeFile(const char* path, const char* data, uint32_t dataSize) {
+    File file;
+    size_t written;
+
+    // Open the file
+    file = SD.open(path, FILE_WRITE);
+    if(!file) {
+        Serial.printf("Can't open '%s' file for writing\n", path);
+        return false;
+    }
+
+    // Write the data 
+    written = file.write(data, dataSize);
+    if(written != dataSize)
+        Serial.printf("Wrote only %d out of %\n", written, dataSize);
+
+	// close the file:
+    file.close();
+
+    return true;
+}
+
+//=================================================================================================
 bool SdCard::readFile(const char* path, char*& data, uint32_t& dataSize) {
     File file;
     uint32_t bytesRead = 0;
@@ -25,13 +53,13 @@ bool SdCard::readFile(const char* path, char*& data, uint32_t& dataSize) {
     // Open the file
     file = SD.open(path);
     if(!file) {
-        Serial.printf("Can't open '%s' file\n", path);
+        Serial.printf("Can't open '%s' file for reading\n", path);
         return false;
     }
     
     // Get the file size and read if its all bytes, one at a time
     dataSize = file.size();
-    Serial.printf("Opened '%s' file, size=%d\n", path, dataSize);
+    //Serial.printf("Opened '%s' file, size=%d\n", path, dataSize);
     data = (char*)malloc(dataSize);
     if(data == nullptr) {
         Serial.printf("Can't allocate %d bytes\n", dataSize);
@@ -53,7 +81,7 @@ bool SdCard::readFile(const char* path, char*& data, uint32_t& dataSize) {
 void SdCard::printDirectory(File dir, int numTabs) {
     //Serial.println("SdCard::PrintDirectory");
     while(true) {
-        File entry =  dir.openNextFile();
+        File entry = dir.openNextFile();
         if(!entry) {
             // no more files
             //Serial.println("**nomorefiles**");

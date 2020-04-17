@@ -17,7 +17,7 @@
 #include <USBHost_t36.h>
 #include <QuantoGraph.h>
 
-Storage g_storage = Storage();
+SettingsFile g_settingsFile = SettingsFile();
 TouchScreen g_screen = TouchScreen();
 Gui g_gui = Gui();
 AudioBoard g_audio = AudioBoard();
@@ -41,29 +41,30 @@ void setup() {
     while (!Serial && (millis() <= 1000));
     Serial.println("=====> setup");
 
+    g_sdCard.init();
+
     // Get the settings
-    g_storage.write();
-    g_storage.read();
-    g_storage._settings._screen = &g_screen;
-    g_storage._settings._gui = &g_gui;
-    g_storage._settings._audio = &g_audio;
-    g_storage._settings._sdCard = &g_sdCard;
-    g_storage._settings._midiInput = &g_midiInput;
-    g_storage._settings._bluetooth = &g_bluetooth;
-    g_storage._settings._player = &g_player;
-    g_storage._settings._synth = &g_synth;
+    g_sdCard.makeDir("system");
+    g_settingsFile.read();
+    g_settingsFile._settings._screen = &g_screen;
+    g_settingsFile._settings._gui = &g_gui;
+    g_settingsFile._settings._audio = &g_audio;
+    g_settingsFile._settings._sdCard = &g_sdCard;
+    g_settingsFile._settings._midiInput = &g_midiInput;
+    g_settingsFile._settings._bluetooth = &g_bluetooth;
+    g_settingsFile._settings._player = &g_player;
+    g_settingsFile._settings._synth = &g_synth;
 
     // Initialize everything
     g_screen.init();
-    g_gui.init(&g_storage, &g_storage._settings);
-    g_audio.init(&g_gui, &g_storage._settings);
+    g_gui.init(&g_settingsFile, &g_settingsFile._settings);
+    g_audio.init(&g_gui, &g_settingsFile._settings);
 
     // MIDI input
-    g_synth.init(ACOUSTIC_GRAND_PIANO, &g_storage._settings);
+    g_synth.init(g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
     g_midiInput.init(&g_synth);
     
     //g_player.init();
-    //g_sdCard.init();
     //g_bluetooth.init();
 
     //g_cap.init();

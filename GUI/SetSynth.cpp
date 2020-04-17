@@ -162,11 +162,10 @@ void SetSynth::onBack(Window* window) {
     // Instrument selected
     if(window->_id == ControlId::wnd_instrument_list) {
         _settings->_synthSettings._instrumentName = _instrumentList->_selectedString;
-        _instrument->_text = _instrumentList->_selectedString;
         _settings->_synthSettings._instrument = (Instrument)_instrumentList->_selectedId;
-        //Serial.printf("SetSynth::onBack, instrument: %s (%d)\n", _settings->_synthSettings._instrumentName.c_str(), _settings->_synthSettings._instrument);
-
         _settings->_synth->setInstrument((Instrument)_settings->_synthSettings._instrument);
+        _instrument->_text = _settings->_synthSettings._instrumentName;
+        //Serial.printf("##########> SetSynth::onBack, instrument: %s (%d)\n", _settings->_synthSettings._instrumentName.c_str(), _settings->_synthSettings._instrument);
     }
 
     draw();

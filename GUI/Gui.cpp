@@ -10,8 +10,8 @@ Gui::Gui() {
 }
 
 //=================================================================================================
-bool Gui::init(Storage* storage, Settings* settings) {
-    _storage = storage;
+bool Gui::init(SettingsFile* settingsFile, Settings* settings) {
+    _settingsFile = settingsFile;
     _settings = settings;
     //Serial.printf("Gui::init\n");
     //_settings->show("GUI");
@@ -19,7 +19,7 @@ bool Gui::init(Storage* storage, Settings* settings) {
     _settings->_screen->light(1.0);
     
     _main = new Main();
-    _main->init(_storage, _settings);
+    _main->init(_settingsFile, _settings);
     _main->draw();
     _current = _main;
 

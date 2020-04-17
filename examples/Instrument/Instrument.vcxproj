@@ -98,6 +98,7 @@
     <ClInclude Include="..\..\Devices\Devices.h" />
     <ClInclude Include="..\..\Devices\MidiInput.h" />
     <ClInclude Include="..\..\Devices\SdCard.h" />
+    <ClInclude Include="..\..\Devices\SettingsFile.h" />
     <ClInclude Include="..\..\Devices\Storage.h" />
     <ClInclude Include="..\..\Devices\TouchScreen.h" />
     <ClInclude Include="..\..\GUI\Button.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="..\..\Devices\Bluetooth.cpp" />
     <ClCompile Include="..\..\Devices\MidiInput.cpp" />
     <ClCompile Include="..\..\Devices\SdCard.cpp" />
+    <ClCompile Include="..\..\Devices\SettingsFile.cpp" />
     <ClCompile Include="..\..\Devices\Storage.cpp" />
     <ClCompile Include="..\..\Devices\TouchScreen.cpp" />
     <ClCompile Include="..\..\GUI\Button.cpp" />

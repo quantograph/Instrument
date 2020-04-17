@@ -23,8 +23,8 @@ Main::~Main() {
 }
 
 //=================================================================================================
-bool Main::init(Storage* storage, Settings* settings) {
-    _storage = storage;
+bool Main::init(SettingsFile* settingsFile, Settings* settings) {
+    _settingsFile = settingsFile;
     //Serial.printf("Main::init: this=%p\n", this);
     Window::init(settings, nullptr);
 
@@ -105,7 +105,7 @@ bool Main::onControl(Control* control) {
 void Main::onBack(Window* window) {
     //Serial.printf("Main::onBack: window=%p\n", window);
 
-    _storage->write();
+    _settingsFile->write();
     _settings->_gui->_current = this;
     draw();
 }

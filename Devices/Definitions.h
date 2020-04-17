@@ -59,15 +59,92 @@ enum ControlId {
     wnd_instrument_list
 };
 
+// Tag numbers
+enum Tags {
+    no_tag = 0,
+    // Chorus
+    ch_start = 100,
+    ch_delayTag,
+    ch_voicesTag,
+    // Flange
+    fl_start = 200,
+    fl_delayTag,
+    fl_offsetTag,
+    fl_depthTag,
+    fl_rateTag,
+    // Reverb
+    rv_start = 300,
+    rv_timeTag,
+    // Freeverb
+    fr_sizeTag,
+    fr_dampingTag,
+    // Envelope
+    en_start = 400,
+    en_delayTag,
+    en_attackTag,
+    en_holdTag,
+    en_decayTag,
+    en_sustainTag,
+    en_releaseTag,
+    en_releaseNoteOnTag,
+    // Delay
+    dl_start = 500,
+    dl_1Tag,
+    dl_2Tag,
+    dl_3Tag,
+    dl_4Tag,
+    dl_5Tag,
+    dl_6Tag,
+    dl_7Tag,
+    dl_8Tag,
+    // Bitcrusher
+    bc_start = 600,
+    bc_bitsTag,
+    bc_rateTag,
+    // Waveshaper
+    ws_start = 700,
+    // Granular
+    gr_start = 800,
+    gr_ratioTag,
+    gr_freezeTag,
+    gr_shiftTag,
+    // EffectSettings
+    ef_start = 900,
+    ef_effectTypeTag,
+    ef_effectNameTag,
+    // InputSettings
+    in_start = 1000,
+    in_guitarInputTag,
+    in_synthInputTag,
+    in_effectsTag,
+    in_effect1Tag,
+    in_effect2Tag,
+    // AudioSettings
+    au_start = 1100,
+    au_audioTag,
+    au_inputTag,
+    au_micGainTag,
+    au_lineInLevelTag,
+    // GuiSettings
+    gu_start = 1200,
+    gu_guiTag,
+    gu_windowColorTag,
+    gu_borderColorTag,
+    gu_textColorTag,
+    gu_textSizeTag,
+    // SynthSettings
+    sn_start = 1300,
+    sn_synthTag,
+    sn_instrumentTag,
+    sn_instrumentNameTag,
+};
+
 // Effect settings
 struct Chorus {
-    #define ch_delayTag "crdl"
-    #define ch_voicesTag "crvs"
-
     int _delay{16}; // Delay length, in AUDIO_BLOCK_SAMPLES, max 64
     int _voices{2}; // Number of voices
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s Chorus\n", title.c_str());
@@ -77,17 +154,12 @@ struct Chorus {
 };
 
 struct Flange {
-    #define fl_delayTag "fldl"
-    #define fl_offsetTag "flof"
-    #define fl_depthTag "fldp"
-    #define fl_rateTag "flrt"
-
     int _delay{16}; // Delay length, in AUDIO_BLOCK_SAMPLES, max 64
     int _offset{16}; // how far back the flanged sample is from the original voice, in AUDIO_BLOCK_SAMPLES, max 64
     int _depth{16}; // modulation depth (larger values give a greater variation), in AUDIO_BLOCK_SAMPLES, max 64
     float _rate{0.5}; // modulation frequency, in Hertz.
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s Flange\n", title.c_str());
@@ -99,11 +171,9 @@ struct Flange {
 };
 
 struct Reverb {
-    #define rv_timeTag "rvtm"
-
     float _time{0.3};
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s Reverb\n", title.c_str());
@@ -112,13 +182,10 @@ struct Reverb {
 };
 
 struct Freeverb {
-    #define fr_sizeTag "frsz"
-    #define fr_dampingTag "frdp"
-
     float _roomSize{0.7}; // 0.0 - 1.0
     float _damping{0.1}; // 0.0 - 1.0
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s Freeverb\n", title.c_str());
@@ -128,14 +195,6 @@ struct Freeverb {
 };
 
 struct Envelope {
-    #define en_delayTag "endl"
-    #define en_attackTag "enat"
-    #define en_holdTag "enhl"
-    #define en_decayTag "endc"
-    #define en_sustainTag "ensu"
-    #define en_releaseTag "enrl"
-    #define en_releaseNoteOnTag "enrn"
-
 	float _delay{0.0};
 	float _attack{10.5}; // Max: 11880
 	float _hold{2.5}; // Max: 11880
@@ -144,7 +203,7 @@ struct Envelope {
 	float _release{300}; // Max: 11880
 	float _releaseNoteOn{5};
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s Envelope\n", title.c_str());
@@ -161,26 +220,21 @@ struct Envelope {
 struct Delay {
     float _delays[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s Delay \n", title.c_str());
-        char tag[32];
         for(int i = 0; i < 8; ++i) {
-            sprintf(tag, "delay%d", i);
-            Serial.printf("%s=%0.2f\n", tag, _delays[i]);
+            Serial.printf("%d=%0.2f\n", i, _delays[i]);
         }
     }
 };
 
 struct Bitcrusher {
-    #define bc_bitsTag "bcbt"
-    #define bc_rateTag "bcrt"
-
 	uint8_t _bits{1}; // 1 - 16 (16 - passthough)
     float _rate{}; // Hz, 1 - 44100Hz
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s Bitcrusher\n", title.c_str());
@@ -193,7 +247,7 @@ struct Waveshaper {
     float* _waveshape{};
     int _length{};
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s Waveshaper\n", title.c_str());
@@ -202,15 +256,11 @@ struct Waveshaper {
 
 struct Granular {
     #define GRANULAR_MEMORY_SIZE 12800  // enough for 290 ms at 44.1 kHz
-    #define gr_ratioTag "grrt"
-    #define gr_freezeTag "grfr"
-    #define gr_shiftTag "grsh"
-
     float _ratio{1.0}; // 0.125 - 8.0
     float _freeze{100.0}; // milliseconds
     float _shift{200.0}; // milliseconds
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s Granular\n", title.c_str());
@@ -222,9 +272,6 @@ struct Granular {
 
 // Settings for all possible effects for one instrument (synth or guitar)
 struct EffectSettings {
-    #define ef_effectTypeTag "eft"
-    #define ef_effectNameTag "efn"
-
     EffectType _effectType{EffectType::eff_clean};
     String _effectName{};
     Chorus _chorus{};
@@ -237,7 +284,7 @@ struct EffectSettings {
     Waveshaper _waveshaper{};
     Granular _granular{};
 
-    void putValues(String& string, const char* parent, const char* parent2);
+    void putValues(String& string, uint16_t parent, uint16_t parent2);
 
     void show(String title) {
         Serial.printf("---------- %s\n", title.c_str());
@@ -257,17 +304,11 @@ struct EffectSettings {
 
 // Input settings for synth or guitar
 struct InputSettings {
-    #define in_guitarInputTag "gin"
-    #define in_synthInputTag "sin"
-    #define in_effect1Tag "ef1"
-    #define in_effect2Tag "ef2"
-    #define in_effectsTag "efs"
-
     uint16_t _effects{1}; // Number of effects (single or double)
     EffectSettings _effect1{};
     EffectSettings _effect2{};
 
-    void putValues(String& string, const char* parent);
+    void putValues(String& string, uint16_t parent);
 
     void show(String title) {
         String title2 = title + " input";
@@ -280,11 +321,6 @@ struct InputSettings {
 
 // Audio setting
 struct AudioSettings {
-    #define au_audioTag "aud"
-    #define au_inputTag "inpt"
-    #define au_micGainTag "mcgn"
-    #define au_lineInLevelTag "inlv"
-
     Inputs _input{Inputs::mic}; // Mic or line in
     float _micGain{0.5}; // Microphone gain (0 - 63)
     float _lineInLevel{0.5}; // 0 - 15
@@ -301,12 +337,6 @@ struct AudioSettings {
 
 // GUI settings
 struct GuiSettings {
-    #define gu_guiTag "gui"
-    #define gu_windowColorTag "wncl"
-    #define gu_borderColorTag "bdcl"
-    #define gu_textColorTag "txcl"
-    #define gu_textSizeTag "txsz"
-
     uint16_t _windowColor{ILI9341_WHITE}; // Window background color
     uint16_t _borderColor{ILI9341_BLACK}; // Control border color
     uint16_t _textColor{ILI9341_NAVY}; // Text color
@@ -325,12 +355,6 @@ struct GuiSettings {
 
 // Settings for synth
 struct SynthSettings {
-    #define sn_synthTag "syn"
-    #define sn_instrumentTag "snit"
-    #define sn_instrumentNameTag "snin"
-
-    #define synthTag "snth"
-
     uint16_t _instrument{};
     String _instrumentName{};
 
