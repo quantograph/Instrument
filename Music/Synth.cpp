@@ -104,8 +104,8 @@ bool Synth::init(Instrument instrument, Settings* settings) {
     // Connect the synth output mixer to one of the main audio mixers
     _outCord = new AudioConnection(_outMixer, 0, *_instrumentInfo._mixer, _instrumentInfo._mixerChannel);
 
-    _settings->_synthInput._effect1._effectType = EffectType::eff_freeverb;
-    _settings->_synthInput._effect2._effectType = EffectType::eff_reverb;
+    //_settings->_synthInput._effect1._effectType = EffectType::eff_freeverb;
+    //_settings->_synthInput._effect2._effectType = EffectType::eff_reverb;
     setEffects();
 
     //Serial.printf("========================== Synth::init end \n");
@@ -143,6 +143,14 @@ bool Synth::setEffects() {
     createEffect(_effect1, &_settings->_synthInput._effect1, &_settings->_audio->_mixer1, 1);
     createEffect(_effect2, &_settings->_synthInput._effect2, &_settings->_audio->_mixer4, 1);
 
+    updateEffects();
+
+    return true;
+}
+
+//=================================================================================================
+bool Synth::updateEffects() {
+    Serial.printf("----- Synth::updateEffects\n");
     _effect1->update();
     _effect2->update();
 

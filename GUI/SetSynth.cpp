@@ -19,13 +19,13 @@ SetSynth::SetSynth() {
 }
 
 //=================================================================================================
-bool SetSynth::init(Settings* settings, Window* parent) {
+bool SetSynth::init(Settings* settings, Window* parent, ControlId id) {
     //Serial.printf("SetSynth::init: this=%p, parent=%p\n", this, parent);
     uint16_t y = 20;
     uint16_t height;
     uint16_t width;
 
-    Window::init(settings, parent);
+    Window::init(settings, parent, id);
     _inputSettings = &_settings->_synthInput;
 
     // "Instrument" text box
@@ -155,7 +155,7 @@ bool SetSynth::onControl(Control* control) {
 
 //=================================================================================================
 void SetSynth::onBack(Window* window) {
-    //Serial.printf("SetSynth::onBack: ID=%d\n", window->_id);
+    Serial.printf("SetSynth::onBack: ID=%d\n", window->_id);
 
     _settings->_gui->_current = this;
 

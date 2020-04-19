@@ -21,6 +21,7 @@ public:
     void reset();
     bool createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer);
     bool setEffects();
+    bool updateEffects();
 
     #define GUITAR_PLUG 3 // Teensy pin connected to guitar plug contact
     #define VOLUME_PIN 6 /*AVB - 22 in the last wiring */ // Teensy pin connected to guitar plug contact

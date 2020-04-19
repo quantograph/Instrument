@@ -37,8 +37,8 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
 
     //notefreq.begin(.15);
 
-    _settings->_guitarInput._effect1._effectType = EffectType::eff_chorus;
-    _settings->_guitarInput._effect2._effectType = EffectType::eff_clean;
+    //_settings->_guitarInput._effect1._effectType = EffectType::eff_chorus;
+    //_settings->_guitarInput._effect2._effectType = EffectType::eff_clean;
     setEffects();
 }
 
@@ -227,6 +227,13 @@ bool AudioBoard::setEffects() {
     createEffect(_effect1, &_settings->_guitarInput._effect1, &_mixer1);
     createEffect(_effect2, &_settings->_guitarInput._effect2, &_mixer4);
 
+    updateEffects();
+
+    return true;
+}
+
+//=================================================================================================
+bool AudioBoard::updateEffects() {
     _effect1->update();
     _effect2->update();
 

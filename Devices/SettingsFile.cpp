@@ -1,14 +1,18 @@
 #include "Devices.h"
 
+uint16_t SettingsFile::_count{0};
+
 //=================================================================================================
 SettingsFile::SettingsFile() {
 }
 
 //=================================================================================================
 // Read all settings
-bool SettingsFile::read() {
+bool SettingsFile::read(Settings& settings) {
     char* fileData;
     char* buffer;
+
+    _readValues.clear();
 
     // Read the file data
     if(!_sdCard.readFile(_path.c_str(), fileData, _size))
@@ -21,26 +25,28 @@ bool SettingsFile::read() {
     buffer[_size] = 0;
 
     // Parse the "tag=value\n" pairs
-    Serial.printf("\n(%d) %s\n", _size, buffer);
+    //Serial.printf("\n\nRead %d\n%s\n", _size, buffer);
     char* start = buffer;
     char* end;
+    _count = 0;
     do {
         end = strchr(start, '\n');
         if(!end)
             break;
 
         *end = 0;
-        getValue(start);
+        Serial.printf("Pair %3d: %s\n", _count++, start);
+        getValue(settings, start);
         start = end + 1;
 
-        if(start >= buffer + _size) {
-            Serial.printf("Processed all: %p %p", buffer, buffer + _size);
+        if(end >= buffer + _size) {
+            Serial.printf("Processed all: %d (size=%d)", _size, end - buffer);
             break;
         }
 
     } while(end);
 
-    show("Reading");
+    //show("Reading");
 
     free(buffer);
 
@@ -49,23 +55,27 @@ bool SettingsFile::read() {
 
 //=================================================================================================
 // Writes all settings
-bool SettingsFile::write() {
+bool SettingsFile::write(Settings& settings) {
     String string{};
 
+    _writtenValues.clear();
+
     // Put all values into a string
-    _settings._audioSettings.putValues(string);
-    _settings._guiSettings.putValues(string);
-    _settings._guitarInput.putValues(string, in_guitarInputTag);
-    _settings._synthInput.putValues(string, in_synthInputTag);
-    _settings._synthSettings.putValues(string);
+    _count = 0;
+    settings._audioSettings.putValues(string);
+    settings._guiSettings.putValues(string);
+    settings._guitarInput.putValues(string, in_guitarInputTag);
+    settings._synthInput.putValues(string, in_synthInputTag);
+    settings._synthSettings.putValues(string);
 
     // Save the string
     _sdCard.makeDir("/system");
+    SD.remove(_path.c_str());
     if(!_sdCard.writeFile(_path.c_str(), string.c_str(), string.length()))
         return false;
 
-    show("Saving");
-    Serial.printf("\n(%d)\n%s\n", _size, string.c_str());
+    //show("Saving");
+    //Serial.printf("\n\nWrite %d\n%s\n", string.length(), string.c_str());
 
     return true;
 }
@@ -74,7 +84,8 @@ bool SettingsFile::write() {
 void SettingsFile::putValue(String& string, uint16_t parent, uint16_t parent2, uint16_t tag, 
                        int16_t value) {
     char temp[64];
-    sprintf(temp, "%d_%d-%d=%d\n", parent, parent2, tag, value);
+    sprintf(temp, "%04d_%04d-%04d=%d\n", parent, parent2, tag, value);
+    Serial.printf("Pair %3d: %s", _count++, temp);
     string += temp;
 }
 
@@ -82,7 +93,8 @@ void SettingsFile::putValue(String& string, uint16_t parent, uint16_t parent2, u
 void SettingsFile::putValue(String& string, uint16_t parent, uint16_t parent2, uint16_t tag, 
                        float value) {
     char temp[64];
-    sprintf(temp, "%d_%d-%d=%0.2f\n", parent, parent2, tag, value);
+    sprintf(temp, "%04d_%04d-%04d=%0.2f\n", parent, parent2, tag, value);
+    Serial.printf("Pair %3d: %s", _count++, temp);
     string += temp;
 }
 
@@ -90,18 +102,20 @@ void SettingsFile::putValue(String& string, uint16_t parent, uint16_t parent2, u
 void SettingsFile::putValue(String& string, uint16_t parent, uint16_t parent2, uint16_t tag, 
                        const char* value) {
     char temp[64];
-    sprintf(temp, "%d_%d-%d=%s\n", parent, parent2, tag, value);
+    sprintf(temp, "%04d_%04d-%04d=%s\n", parent, parent2, tag, value);
+    Serial.printf("Pair %3d: %s", _count++, temp);
     string += temp;
 }
 
 //=================================================================================================
-bool SettingsFile::getValue(char* pair) {
+bool SettingsFile::getValue(Settings& settings, char* pair) {
     String pairCopy = pair;
     uint16_t parent;
     uint16_t parent2;
     uint16_t tag;
     const char* value;
 
+    _readValues.push_back(pair);
     split(pair, parent, parent2, tag, value);
     //Serial.printf("Pair: %s -> %d_%d-%d=%s\n", pairCopy.c_str(), parent, parent2, tag, value);
 
@@ -110,9 +124,9 @@ bool SettingsFile::getValue(char* pair) {
             switch(parent2) {
                 case no_tag:
                     switch(tag) {
-                        case au_inputTag: _settings._audioSettings._input = (Inputs)atoi(value); break;
-                        case au_micGainTag: _settings._audioSettings._micGain = atof(value); break;
-                        case au_lineInLevelTag: _settings._audioSettings._lineInLevel = atof(value); break;
+                        case au_inputTag: settings._audioSettings._input = (Inputs)atoi(value); break;
+                        case au_micGainTag: settings._audioSettings._micGain = atof(value); break;
+                        case au_lineInLevelTag: settings._audioSettings._lineInLevel = atof(value); break;
                         default: Serial.printf("##### ERROR: Unknown Audio tag: %s\n", pair); break;
                     }
                     break;
@@ -123,10 +137,10 @@ bool SettingsFile::getValue(char* pair) {
             switch(parent2) {
                 case no_tag:
                     switch(tag) {
-                        case gu_windowColorTag: _settings._guiSettings._windowColor = (uint16_t)atoi(value); break;
-                        case gu_borderColorTag: _settings._guiSettings._borderColor = (uint16_t)atoi(value); break;
-                        case gu_textColorTag: _settings._guiSettings._textColor = (uint16_t)atoi(value); break;
-                        case gu_textSizeTag: _settings._guiSettings._textSize = (int)atoi(value); break;
+                        case gu_windowColorTag: settings._guiSettings._windowColor = (uint16_t)atoi(value); break;
+                        case gu_borderColorTag: settings._guiSettings._borderColor = (uint16_t)atoi(value); break;
+                        case gu_textColorTag: settings._guiSettings._textColor = (uint16_t)atoi(value); break;
+                        case gu_textSizeTag: settings._guiSettings._textSize = (int)atoi(value); break;
                         default: Serial.printf("##### ERROR: Unknown GUI tag: %s\n", pair); break;
                     }
                     break;
@@ -134,19 +148,19 @@ bool SettingsFile::getValue(char* pair) {
             break;
 
         case in_guitarInputTag: // Guitar input
-            getInputSettings(_settings._guitarInput, parent, parent2, tag, value);
+            getInputSettings(settings._guitarInput, parent, parent2, tag, value);
             break;
 
         case in_synthInputTag: // Synth input
-            getInputSettings(_settings._synthInput, parent, parent2, tag, value);
+            getInputSettings(settings._synthInput, parent, parent2, tag, value);
             break;
 
         case sn_synthTag: // Synth settings
-            getSynthSettings(_settings._synthSettings, parent, parent2, tag, value);
+            getSynthSettings(settings._synthSettings, parent, parent2, tag, value);
             break;
 
         default:
-            Serial.printf("##### ERROR (SettingsFile::getValue): Unknown parent tag: %s\n", parent);
+            Serial.printf("##### ERROR: Unknown parent tag: %s\n", pair);
             break;
     }
 
@@ -155,7 +169,8 @@ bool SettingsFile::getValue(char* pair) {
 
 //=================================================================================================
 bool SettingsFile::getInputSettings(InputSettings& settings, uint16_t parent, uint16_t parent2, 
-                               uint16_t tag, const char* value) {
+                                    uint16_t tag, const char* value) {
+    Serial.printf("   getInputSettings: %d_%d-%d=%s\n", parent, parent2, tag, value);
     switch(parent2) {
         case no_tag:
             switch(tag) {
@@ -163,18 +178,21 @@ bool SettingsFile::getInputSettings(InputSettings& settings, uint16_t parent, ui
                     settings._effects = (uint16_t)atoi(value); 
                     break;
 
-                case in_effect1Tag: 
-                    getEffectsSettings(settings._effect1, parent, parent2, tag, value);
-                    break;
-
-                case in_effect2Tag:
-                    getEffectsSettings(settings._effect2, parent, parent2, tag, value);
-                    break;
-
                 default:
-                    Serial.printf("##### ERROR (SettingsFile::getValue): Unknown parent tag: %s\n", parent);
+                    Serial.printf("##### ERROR: Unknown InputSettings tag: %d\n", tag);
                     break;
             }
+
+        case in_effect1Tag: 
+            getEffectsSettings(settings._effect1, parent, parent2, tag, value);
+            break;
+
+        case in_effect2Tag:
+            getEffectsSettings(settings._effect2, parent, parent2, tag, value);
+            break;
+
+        default:
+            Serial.printf("##### ERROR: Unknown InputSettings parent2 tag: %d\n", parent2);
             break;
     }
 
@@ -183,7 +201,8 @@ bool SettingsFile::getInputSettings(InputSettings& settings, uint16_t parent, ui
 
 //=================================================================================================
 bool SettingsFile::getEffectsSettings(EffectSettings& settings, uint16_t parent, uint16_t parent2, 
-                                 uint16_t tag, const char* value) {
+                                      uint16_t tag, const char* value) {
+    Serial.printf("      getEffectsSettings: %d_%d-%d=%s\n", parent, parent2, tag, value);
     switch(tag) {
         case ef_effectTypeTag: settings._effectType = (EffectType)atoi(value); break;
         case ef_effectNameTag: settings._effectName = value; break;
@@ -225,7 +244,7 @@ bool SettingsFile::getEffectsSettings(EffectSettings& settings, uint16_t parent,
         case gr_ratioTag: settings._granular._ratio = (float)atof(value); break;
         case gr_freezeTag: settings._granular._freeze = (float)atof(value); break;
         case gr_shiftTag: settings._granular._shift = (float)atof(value); break;
-        default: Serial.printf("##### ERROR: Unknown Effects tag: %s\n", tag); break;
+        default: Serial.printf("##### ERROR: Unknown Effects tag: %d\n", tag); break;
     }
 
     return true;
@@ -233,11 +252,11 @@ bool SettingsFile::getEffectsSettings(EffectSettings& settings, uint16_t parent,
 
 //=================================================================================================
 bool SettingsFile::getSynthSettings(SynthSettings& settings, uint16_t& parent, uint16_t& parent2,
-                               uint16_t& tag, const char*& value) {
+                                    uint16_t& tag, const char*& value) {
     switch(tag) {
         case sn_instrumentTag: settings._instrument = (uint16_t)atoi(value); break;
         case sn_instrumentNameTag: settings._instrumentName = value; break;
-        default: Serial.printf("##### ERROR: Unknown Synth tag: %s\n", tag); break;
+        default: Serial.printf("##### ERROR: Unknown Synth tag: %d\n", tag); break;
     }
 
     return true;
@@ -282,7 +301,7 @@ bool SettingsFile::split(char* pair, uint16_t& parent, uint16_t& parent2, uint16
 void SettingsFile::show(const char* title) {
     Serial.printf("\n\n===== %s settings\n", title);
     Serial.printf("Size=%d\n", _size);
-    _settings.show();
+    _settings.show(title);
     Serial.printf("\n\n");
 }
 
@@ -388,4 +407,32 @@ void Granular::putValues(String& string, uint16_t parent, uint16_t parent2) {
     SettingsFile::putValue(string, parent, parent2, gr_ratioTag, _ratio);
     SettingsFile::putValue(string, parent, parent2, gr_freezeTag, _freeze);
     SettingsFile::putValue(string, parent, parent2, gr_shiftTag, _shift);
+}
+
+//=================================================================================================
+bool SettingsFile::test() {
+    Settings settings1;
+    Settings settings2;
+
+    //Serial.printf(">>> Random\n");
+    settings1.random();
+    settings2.random();
+
+    Serial.printf("\n\n\n>>> Write\n");
+    write(settings1);
+    settings1.show("");
+    Serial.printf("\n\n\n>>> Read\n");
+    read(settings2);
+    settings2.show("");
+
+    Serial.printf("\n\n\n>>> Compare\n");
+    if(settings1.compare(settings2)) {
+        Serial.printf("Settings match\n");
+        return true;
+    } else {
+        Serial.printf("##### ERROR: Settings DON'T match\n");
+        return false;
+    }
+
+    return true;
 }

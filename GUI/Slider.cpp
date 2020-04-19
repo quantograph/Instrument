@@ -4,32 +4,46 @@
 #include "Slider.h"
 
 //=================================================================================================
-Slider::Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, ControlId id) : 
+Slider::Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, 
+               uint16_t height, ControlId id) : 
     Control(settings, parent, x, y, width, height, id) {
-    _left = _x + 3;
-    _right = _x + _width - 4;
+    _barTop = _y + _titleHeight;
+    _barLeft = _x + 3;
+    _barRight = _x + _width - 4;
+    _barHeight = _height - _titleHeight;
+}
+
+//=================================================================================================
+void Slider::setTitle(const char* title) {
+    _title = title;
+
+    _settings->_screen->_screen.fillRect(_x, _y, _width, _titleHeight, ILI9341_BLACK);
+    _settings->_screen->_screen.setCursor(_x, _y);
+    _settings->_screen->_screen.setTextColor(_textColor);
+    _settings->_screen->_screen.setTextSize(_textSize);
+    _settings->_screen->_screen.print(_title);
 }
 
 //=================================================================================================
 void Slider::draw() {
-    _settings->_screen->_screen.drawRect(_x, _y, _width, _height, ILI9341_WHITE);
+    _settings->_screen->_screen.drawRect(_x, _barTop, _width, _barHeight, ILI9341_WHITE);
 }
 
 //=================================================================================================
 void Slider::drawBar(uint16_t x, uint16_t color) {
     for(uint16_t i = x - 2; i <= x + 2; ++i) {
-	    _settings->_screen->_screen.drawFastVLine(i, _y + 1, _height - 2, color);
+	    _settings->_screen->_screen.drawFastVLine(i, _barTop + 1, _barHeight - 2, color);
     }
 }
 
 //=================================================================================================
 void Slider::update(TS_Point point) {
-    uint16_t width = _right - _left;
+    uint16_t width = _barRight - _barLeft;
     uint16_t x = point.x;
 
     // Limit within the control
-    x = max(_left, x);
-    x = min(_right, x);
+    x = max(_barLeft, x);
+    x = min(_barRight, x);
 
     // Erase the old bar
     if(_lastX > 0)
@@ -39,7 +53,7 @@ void Slider::update(TS_Point point) {
     _lastX = x;
 
     // Get the bar's value
-    _value = (float)(x - _left) / width;
+    _value = (float)(x - _barLeft) / width;
     //Serial.printf("value=%0.2f\n", _value);
 
     _parent->onControl(this);
@@ -49,7 +63,7 @@ void Slider::update(TS_Point point) {
 void Slider::setValue(float value) {
     TS_Point point;
     
-    point.x = _left + (_right - _left) * value;
+    point.x = _barLeft + (_barRight - _barLeft) * value;
     point.y = 0;
     ///Serial.printf("Slider::setValue: value=%0.2f, x=%d\n", value, point.x);
     

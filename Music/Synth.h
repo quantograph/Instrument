@@ -32,6 +32,7 @@ public:
     void controlChange(byte channel, byte control, byte value);
     bool createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer, uint8_t mixerInput);
     bool setEffects();
+    bool updateEffects();
 
 private:
     Settings* _settings{};

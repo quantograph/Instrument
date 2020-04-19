@@ -29,9 +29,9 @@ void TextBox::draw() {
         _settings->_screen->_screen.drawRect(_x + _width, _y, _height, _height, ILI9341_WHITE);
 
         int16_t x = _x + _width + 5;
-        int16_t y = _y + 10;
+        int16_t y = _y + 8;
         int16_t width = _height - 10;
-        _settings->_screen->_screen.fillTriangle(x, y, x + width, y, x + width * 0.5, y + width * 0.4, ILI9341_WHITE);
+        _settings->_screen->_screen.fillTriangle(x, y, x + width, y, x + width * 0.5, y + width * 0.6, ILI9341_WHITE);
     }
 }
 

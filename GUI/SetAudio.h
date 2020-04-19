@@ -11,8 +11,6 @@ public:
     SetAudio();
 
     PeakMeter* _peakMeter{};
-    TextBox* _level{};
-    TextBox* _inputText{};
     CheckBox* _micCheck{};
     CheckBox* _lineCheck{};
     Slider* _slider{};

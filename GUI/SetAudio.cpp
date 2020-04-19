@@ -26,12 +26,6 @@ bool SetAudio::init(Settings* settings, Window* parent) {
     _peakMeter = new PeakMeter(_settings, this, 0, y, _settings->_screen->_width, height);
     y += height + 30;
 
-    // "Input" static text
-    /*height = 30;
-    _inputText = new TextBox(_settings, this, 10, y, _settings->_screen->_width, height);
-    _inputText->update("Input:");
-    y += height + 10;*/
-
     // "Mic" check box
     height = 30;
     width = (_settings->_screen->_width / 2) - 10;
@@ -43,13 +37,8 @@ bool SetAudio::init(Settings* settings, Window* parent) {
     _lineCheck->_text = "Line";
     y += height + 30;
 
-    // Mic/line level box
-    height = 30;
-    _level = new TextBox(_settings, this, 10, y, _settings->_screen->_width, height);
-    y += height + 30;
-
     // Slider
-    height = 40;
+    height = 50;
     _slider = new Slider(_settings, this, 30, y, _settings->_screen->_width - 60, height, ControlId::sld_velel);
     y += height + 30;
 
@@ -102,18 +91,18 @@ void SetAudio::updateLevel(bool getSlider) {
             _settings->_audioSettings._micGain = _slider->_value;
 
         _settings->_audio->setMicGain();
-        sprintf(_string, "Mic gain: %d", (uint16_t)(_settings->_audioSettings._micGain * 100 + 0.5));
+        sprintf(_string, "Mic: %d", (uint16_t)(_settings->_audioSettings._micGain * 100 + 0.5));
         //Serial.printf("SetAudio::updateLevel: MicGain=%0.2f (%d)\n", _settings->_micGain, value);
     } else if(_settings->_audioSettings._input == Inputs::line) { // Line in
         if(getSlider)
             _settings->_audioSettings._lineInLevel = _slider->_value;
     
         _settings->_audio->setLineInLevel();
-        sprintf(_string, "Line in level: %d", (uint16_t)(_settings->_audioSettings._lineInLevel * 100 + 0.5));
+        sprintf(_string, "Line in: %d", (uint16_t)(_settings->_audioSettings._lineInLevel * 100 + 0.5));
         //Serial.printf("SetAudio::updateLevel: LineLevel=%0.2f (%d)\n", _settings->_lineInLevel, value);
     }
 
-    _level->update(_string);
+    _slider->setTitle(_string);
 }
 
 //=================================================================================================

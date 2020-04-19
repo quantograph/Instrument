@@ -125,7 +125,8 @@ void Effects::update() {
     }
 
     if(_chorus) {
-        //Serial.printf("Effects::update: _chorus=%p\n", _chorus);
+        Serial.printf("Chorus update: delay=%d, voices=%d\n", 
+                      _settings->_chorus._delay, _settings->_chorus._voices);
         _chorus->begin(_delayLine, max(DELAY_LINE_LENGTH, _settings->_chorus._delay * AUDIO_BLOCK_SAMPLES), 
                        _settings->_chorus._voices);
         _chorus->voices(_settings->_chorus._voices);

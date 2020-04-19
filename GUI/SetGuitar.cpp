@@ -16,13 +16,13 @@ SetGuitar::SetGuitar() {
 }
 
 //=================================================================================================
-bool SetGuitar::init(Settings* settings, Window* parent) {
+bool SetGuitar::init(Settings* settings, Window* parent, ControlId id) {
     //Serial.printf("SetGuitar::init: this=%p, parent=%p\n", this, parent);
     uint16_t y = 20;
     uint16_t height;
     uint16_t width;
 
-    Window::init(settings, parent);
+    Window::init(settings, parent, id);
     _inputSettings = &_settings->_guitarInput;
 
     // "SetEffect" window

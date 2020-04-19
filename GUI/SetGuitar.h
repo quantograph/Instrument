@@ -20,7 +20,7 @@ public:
     Button* _backButton{};
     InputSettings* _inputSettings{};
 
-    bool init(Settings* settings, Window* parent);
+    bool init(Settings* settings, Window* parent, ControlId id);
     void setupButtons();
     void updateNumber();
 

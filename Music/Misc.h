@@ -3,6 +3,9 @@
 extern const char* _instrumentNames[];
 extern const char* _drumNames[];
 
+String randomString();
+uint8_t randomInt();
+float randomFloat();
 void reverse2Bytes(char* data);
 void reverse4Bytes(char* data);
 //void ShowBits(uint32_t value, String& s);

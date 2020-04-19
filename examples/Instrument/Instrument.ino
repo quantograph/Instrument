@@ -41,11 +41,15 @@ void setup() {
     while (!Serial && (millis() <= 1000));
     Serial.println("=====> setup");
 
+    randomSeed(analogRead(0));
     g_sdCard.init();
 
     // Get the settings
     g_sdCard.makeDir("system");
-    g_settingsFile.read();
+    g_settingsFile.test();
+    
+    
+    /*g_settingsFile.read();
     g_settingsFile._settings._screen = &g_screen;
     g_settingsFile._settings._gui = &g_gui;
     g_settingsFile._settings._audio = &g_audio;
@@ -62,7 +66,7 @@ void setup() {
 
     // MIDI input
     g_synth.init(g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
-    g_midiInput.init(&g_synth);
+    g_midiInput.init(&g_synth);*/
     
     //g_player.init();
     //g_bluetooth.init();
@@ -87,10 +91,10 @@ void loop() {
         g_bluetooth._received = 0;
     }*/
 
-    g_midiInput.process();
+    /*g_midiInput.process();
     g_audio.process();
     //g_player.process();
-    g_gui.process();
+    g_gui.process();*/
 
     // Get the sensors touched
     /*uint32_t touched = 0;
@@ -107,5 +111,5 @@ void loop() {
     //g_led.test();
     //Serial.println("=====> loop()");
 
-    //delay(50);
+    delay(50);
 }
