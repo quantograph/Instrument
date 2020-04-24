@@ -4,6 +4,7 @@ extern const char* _instrumentNames[];
 extern const char* _drumNames[];
 
 String randomString();
+float scale(float value, float fromMin, float fromMax, float toMin, float toMax);
 uint8_t randomInt();
 float randomFloat();
 void reverse2Bytes(char* data);

@@ -6,11 +6,14 @@ class Slider;
 class Button;
 class TextBox;
 class CheckBox;
+class SettingsFile;
 
 class SetGuitar : public Window {
 public:
     SetGuitar();
 
+    SettingsFile* _settingsFile{};
+    InputSettings* _inputSettings{};
     SetEffect* _setEffect{};
     TextBox* _effect1{};
     TextBox* _effect2{};
@@ -18,9 +21,8 @@ public:
     CheckBox* _doubleCheck{};
     Window* _current{};
     Button* _backButton{};
-    InputSettings* _inputSettings{};
 
-    bool init(Settings* settings, Window* parent, ControlId id);
+    bool init(SettingsFile* settingsFile, Settings* settings, Window* parent, ControlId id);
     void setupButtons();
     void updateNumber();
 

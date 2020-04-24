@@ -6,11 +6,14 @@ class Button;
 class TextBox;
 class CheckBox;
 class List;
+class SettingsFile;
 
 class SetSynth : public Window {
 public:
     SetSynth();
 
+    SettingsFile* _settingsFile{};
+    InputSettings* _inputSettings{};
     SetEffect* _setEffect{};
     TextBox* _instrument{};
     List* _instrumentList{};
@@ -20,9 +23,8 @@ public:
     CheckBox* _doubleCheck{};
     Window* _current{};
     Button* _backButton{};
-    InputSettings* _inputSettings{};
 
-    bool init(Settings* settings, Window* parent, ControlId id);
+    bool init(SettingsFile* settingsFile, Settings* settings, Window* parent, ControlId id);
     void setupButtons();
     void updateNumber();
 

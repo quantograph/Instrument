@@ -48,7 +48,7 @@ void Synth::reset() {
 
 //=================================================================================================
 bool Synth::init(Instrument instrument, Settings* settings) {
-    //Serial.printf("Synth::init ==================================\n");
+    Serial.printf("Synth::init ==================================\n");
     _settings = settings;
     reset();
 
@@ -58,7 +58,7 @@ bool Synth::init(Instrument instrument, Settings* settings) {
         return false;
     }
 
-    //Serial.printf("Synch loaded instrument %d: %s (%d)\n", instrument, _instrumentInfo._name.c_str(), _instrumentInfo._instrument);
+    Serial.printf("Synch loaded instrument %d: %s (%d)\n", instrument, _instrumentInfo._name.c_str(), _instrumentInfo._instrument);
 
     // Synth has only 4 mixers with 4 channels each
     if(_instrumentInfo._voices > 16) {
@@ -104,11 +104,9 @@ bool Synth::init(Instrument instrument, Settings* settings) {
     // Connect the synth output mixer to one of the main audio mixers
     _outCord = new AudioConnection(_outMixer, 0, *_instrumentInfo._mixer, _instrumentInfo._mixerChannel);
 
-    //_settings->_synthInput._effect1._effectType = EffectType::eff_freeverb;
-    //_settings->_synthInput._effect2._effectType = EffectType::eff_reverb;
     setEffects();
 
-    //Serial.printf("========================== Synth::init end \n");
+    Serial.printf("========================== Synth::init end \n");
     return true;
 }
 
@@ -116,8 +114,10 @@ bool Synth::init(Instrument instrument, Settings* settings) {
 bool Synth::setInstrument(Instrument instrument) {
     // Load the sound sample for the selected instrument
     if(!getInstrument(instrument, _settings->_audio, _instrumentInfo)) {
-        Serial.printf("ERROR: Can't load instrument %d\n", instrument);
+        Serial.printf("##### ERROR: Can't load instrument %d\n", instrument);
         return false;
+    } else {
+        Serial.printf("Synth::setInstrument: %s\n", _instrumentInfo._name.c_str());
     }
 
     for(auto voice : _synthVoices) {
@@ -128,11 +128,17 @@ bool Synth::setInstrument(Instrument instrument) {
 }
 
 //=================================================================================================
-bool Synth::createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer, uint8_t mixerInput) {
+bool Synth::createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer, 
+                         uint8_t mixerInput) {
     if(!effect || (effect && effect->_effectType != effectSettings->_effectType)) {
+        Serial.printf("Synth::createEffect: creating effect '%s'\n", 
+                      effectSettings->_effectName.c_str());
         delete effect;
         effect = new Effects(effectSettings, &_outMixer, 0, mixer, mixerInput);
         effect->init();
+    } else {
+        Serial.printf("Synth::createEffect: effect '%s' already created\n", 
+                      effectSettings->_effectName.c_str());
     }
 
     return true;

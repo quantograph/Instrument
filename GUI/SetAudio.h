@@ -5,11 +5,13 @@ class Slider;
 class Button;
 class TextBox;
 class CheckBox;
+class SettingsFile;
 
 class SetAudio : public Window {
 public:
     SetAudio();
 
+    SettingsFile* _settingsFile{};
     PeakMeter* _peakMeter{};
     CheckBox* _micCheck{};
     CheckBox* _lineCheck{};
@@ -17,7 +19,7 @@ public:
     Button* _backButton{};
     char _string[32];
 
-    bool init(Settings* settings, Window* parent);
+    bool init(SettingsFile* settingsFile, Settings* settings, Window* parent);
     void setupButtons();
     void draw() override;
     void updateInput();

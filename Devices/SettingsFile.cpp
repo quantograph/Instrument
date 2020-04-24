@@ -35,12 +35,12 @@ bool SettingsFile::read(Settings& settings) {
             break;
 
         *end = 0;
-        Serial.printf("Pair %3d: %s\n", _count++, start);
+        //Serial.printf("Pair %3d: %s\n", _count++, start);
         getValue(settings, start);
         start = end + 1;
 
         if(end >= buffer + _size) {
-            Serial.printf("Processed all: %d (size=%d)", _size, end - buffer);
+            Serial.printf(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Processed all: %d (size=%d)", _size, end - buffer);
             break;
         }
 
@@ -85,7 +85,7 @@ void SettingsFile::putValue(String& string, uint16_t parent, uint16_t parent2, u
                        int16_t value) {
     char temp[64];
     sprintf(temp, "%04d_%04d-%04d=%d\n", parent, parent2, tag, value);
-    Serial.printf("Pair %3d: %s", _count++, temp);
+    //Serial.printf("Pair %3d: %s", _count++, temp);
     string += temp;
 }
 
@@ -94,7 +94,7 @@ void SettingsFile::putValue(String& string, uint16_t parent, uint16_t parent2, u
                        float value) {
     char temp[64];
     sprintf(temp, "%04d_%04d-%04d=%0.2f\n", parent, parent2, tag, value);
-    Serial.printf("Pair %3d: %s", _count++, temp);
+    //Serial.printf("Pair %3d: %s", _count++, temp);
     string += temp;
 }
 
@@ -103,7 +103,7 @@ void SettingsFile::putValue(String& string, uint16_t parent, uint16_t parent2, u
                        const char* value) {
     char temp[64];
     sprintf(temp, "%04d_%04d-%04d=%s\n", parent, parent2, tag, value);
-    Serial.printf("Pair %3d: %s", _count++, temp);
+    //Serial.printf("Pair %3d: %s", _count++, temp);
     string += temp;
 }
 
@@ -170,7 +170,7 @@ bool SettingsFile::getValue(Settings& settings, char* pair) {
 //=================================================================================================
 bool SettingsFile::getInputSettings(InputSettings& settings, uint16_t parent, uint16_t parent2, 
                                     uint16_t tag, const char* value) {
-    Serial.printf("   getInputSettings: %d_%d-%d=%s\n", parent, parent2, tag, value);
+    //Serial.printf("   getInputSettings: %d_%d-%d=%s\n", parent, parent2, tag, value);
     switch(parent2) {
         case no_tag:
             switch(tag) {
@@ -182,6 +182,7 @@ bool SettingsFile::getInputSettings(InputSettings& settings, uint16_t parent, ui
                     Serial.printf("##### ERROR: Unknown InputSettings tag: %d\n", tag);
                     break;
             }
+            break;
 
         case in_effect1Tag: 
             getEffectsSettings(settings._effect1, parent, parent2, tag, value);
@@ -202,7 +203,7 @@ bool SettingsFile::getInputSettings(InputSettings& settings, uint16_t parent, ui
 //=================================================================================================
 bool SettingsFile::getEffectsSettings(EffectSettings& settings, uint16_t parent, uint16_t parent2, 
                                       uint16_t tag, const char* value) {
-    Serial.printf("      getEffectsSettings: %d_%d-%d=%s\n", parent, parent2, tag, value);
+    //Serial.printf("      getEffectsSettings: %d_%d-%d=%s\n", parent, parent2, tag, value);
     switch(tag) {
         case ef_effectTypeTag: settings._effectType = (EffectType)atoi(value); break;
         case ef_effectNameTag: settings._effectName = value; break;
@@ -415,6 +416,7 @@ bool SettingsFile::test() {
     Settings settings2;
 
     //Serial.printf(">>> Random\n");
+    randomSeed(analogRead(0));
     settings1.random();
     settings2.random();
 

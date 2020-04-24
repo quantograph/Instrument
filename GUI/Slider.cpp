@@ -17,6 +17,7 @@ Slider::Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint1
 void Slider::setTitle(const char* title) {
     _title = title;
 
+    Serial.printf("Slider::setTitle: %s\n", title);
     _settings->_screen->_screen.fillRect(_x, _y, _width, _titleHeight, ILI9341_BLACK);
     _settings->_screen->_screen.setCursor(_x, _y);
     _settings->_screen->_screen.setTextColor(_textColor);
@@ -55,14 +56,15 @@ void Slider::update(TS_Point point) {
     // Get the bar's value
     _value = (float)(x - _barLeft) / width;
     //Serial.printf("value=%0.2f\n", _value);
-
-    _parent->onControl(this);
 }
 
 //=================================================================================================
-void Slider::setValue(float value) {
+void Slider::setValue(float value, float min, float max) {
     TS_Point point;
+    float scaled;
     
+    scaled = scale(value, min, max, 0.0, 1.0);
+    _value = scaled;
     point.x = _barLeft + (_barRight - _barLeft) * value;
     point.y = 0;
     ///Serial.printf("Slider::setValue: value=%0.2f, x=%d\n", value, point.x);
@@ -82,6 +84,7 @@ bool Slider::onTouch(const TS_Point& point) {
 
     //Serial.printf("Slider::onTouch: %dx%d\n", point.x, point.y);
     update(point);
+    _parent->onControl(this);
 
     return true;
 }
@@ -93,6 +96,7 @@ bool Slider::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
 
     //Serial.printf("Slider::onRelease: from %dx%d to %dx%d\n\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
     update(toPoint);
+    _parent->onControl(this);
 
     return true;
 }
@@ -104,6 +108,7 @@ bool Slider::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
 
     //Serial.printf("Slider::onMove: from %dx%d to %dx%d\n", fromPoint.x, fromPoint.y, toPoint.x, toPoint.y);
     update(toPoint);
+    _parent->onControl(this);
 
     return true;
 }

@@ -19,8 +19,9 @@ SetSynth::SetSynth() {
 }
 
 //=================================================================================================
-bool SetSynth::init(Settings* settings, Window* parent, ControlId id) {
-    //Serial.printf("SetSynth::init: this=%p, parent=%p\n", this, parent);
+bool SetSynth::init(SettingsFile* settingsFile, Settings* settings, Window* parent, ControlId id) {
+    _settingsFile = settingsFile;
+    //Serial.printf("SetSynth::init\n");
     uint16_t y = 20;
     uint16_t height;
     uint16_t width;
@@ -79,7 +80,7 @@ bool SetSynth::init(Settings* settings, Window* parent, ControlId id) {
     // Buttons
     setupButtons();
 
-    // "SetEffect" window
+    // "SetEffect" window, activated for one of the effects
     _setEffect = new SetEffect();
     _setEffect->init(_settings, this);
 
@@ -109,9 +110,11 @@ void SetSynth::updateNumber() {
     if(_inputSettings->_effects == 1) { // Single
         _singleCheck->update(true);
         _doubleCheck->update(false);
+        _effect2->_hidden = true;
     } else if(_inputSettings->_effects == 2) { // Double
         _singleCheck->update(false);
         _doubleCheck->update(true);
+        _effect2->_hidden = false;
     }
 }
 
@@ -137,7 +140,9 @@ bool SetSynth::onControl(Control* control) {
             break;
 
         case ControlId::txt_effect2:
-            _setEffect->activate(&_inputSettings->_effect2);
+            if(!_effect2->_hidden)
+                _setEffect->activate(&_inputSettings->_effect2);
+
             break;
 
         case ControlId::btn_back:
@@ -157,6 +162,7 @@ bool SetSynth::onControl(Control* control) {
 void SetSynth::onBack(Window* window) {
     Serial.printf("SetSynth::onBack: ID=%d\n", window->_id);
 
+    _settingsFile->write(_settingsFile->_settings);
     _settings->_gui->_current = this;
 
     // Instrument selected
@@ -165,7 +171,6 @@ void SetSynth::onBack(Window* window) {
         _settings->_synthSettings._instrument = (Instrument)_instrumentList->_selectedId;
         _settings->_synth->setInstrument((Instrument)_settings->_synthSettings._instrument);
         _instrument->_text = _settings->_synthSettings._instrumentName;
-        //Serial.printf("##########> SetSynth::onBack, instrument: %s (%d)\n", _settings->_synthSettings._instrumentName.c_str(), _settings->_synthSettings._instrument);
     }
 
     draw();

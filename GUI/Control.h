@@ -23,6 +23,7 @@ public:
     String _text{""}; // Control text
     Type _type{Type::none}; // Control type
     ControlId _id{ControlId::ctl_none}; // Control ID
+    bool _hidden{}; // Whether to draw this control
 
     virtual void draw() {}
     virtual bool onTouch(const TS_Point& point) { return false; }

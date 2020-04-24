@@ -152,7 +152,11 @@ enum Tags {
 //=================================================================================================
 // Effect settings
 struct Chorus {
+    #define ChorusDelayMin 1
+    #define ChorusDelayMax 64
     int _delay{16}; // Delay length, in AUDIO_BLOCK_SAMPLES, max 64
+    #define ChorusVoicesMin 2
+    #define ChorusVoicesMax 5
     int _voices{2}; // Number of voices
 
     void putValues(String& string, uint16_t parent, uint16_t parent2);

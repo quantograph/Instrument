@@ -14,7 +14,8 @@ SetAudio::SetAudio() {
 }
 
 //=================================================================================================
-bool SetAudio::init(Settings* settings, Window* parent) {
+bool SetAudio::init(SettingsFile* settingsFile, Settings* settings, Window* parent) {
+    _settingsFile = settingsFile;
     uint16_t y = 0;
     uint16_t height;
     uint16_t width;

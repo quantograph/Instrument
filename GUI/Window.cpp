@@ -34,7 +34,8 @@ void Window::draw() {
     _settings->_screen->_screen.fillScreen(ILI9341_BLACK);
 
     for(auto control : _controls){
-        control->draw();
+        if(!control->_hidden)
+            control->draw();
     }
 }
 

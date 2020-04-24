@@ -7,6 +7,7 @@
 #include <float.h>
 
 #include <Arduino.h>
+#include <Math.h>
 #include <Audio.h>
 #include <Wire.h>
 #include <EEPROM.h>

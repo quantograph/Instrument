@@ -14,7 +14,8 @@ SetBand::SetBand() {
 }
 
 //=================================================================================================
-bool SetBand::init(Settings* settings, Window* parent, ControlId id) {
+bool SetBand::init(SettingsFile* settingsFile, Settings* settings, Window* parent, ControlId id) {
+    _settingsFile = settingsFile;
     Window::init(settings, parent, id);
 
     setupButtons();

@@ -21,7 +21,7 @@ public:
            uint16_t height, ControlId id = ControlId::ctl_none);
     void update(TS_Point point);
     void drawBar(uint16_t x, uint16_t color);
-    void setValue(float value);
+    void setValue(float value, float min = 0.0, float max = 1.0);
     bool inside(const TS_Point& point);
     // Virtuals
     void draw() override;

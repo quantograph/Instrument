@@ -14,6 +14,21 @@ String randomString() {
 }
 
 //=================================================================================================
+float scale(float value, float fromMin, float fromMax, float toMin, float toMax) {
+    float ret;
+    float temp;
+
+    if(fromMin == toMin && fromMax == toMax)
+        return value;
+
+    temp = (value - fromMin) / (fromMax - fromMin);
+    //Serial.printf("temp=%0.2f\n", temp);
+    ret = (toMax - toMin) * temp + toMin;
+
+    return ret;
+}
+
+//=================================================================================================
 uint8_t randomInt() {
     return (uint8_t)random(0, 100);
 }

@@ -16,7 +16,8 @@ SetGuitar::SetGuitar() {
 }
 
 //=================================================================================================
-bool SetGuitar::init(Settings* settings, Window* parent, ControlId id) {
+bool SetGuitar::init(SettingsFile* settingsFile, Settings* settings, Window* parent, ControlId id) {
+    _settingsFile = settingsFile;
     //Serial.printf("SetGuitar::init: this=%p, parent=%p\n", this, parent);
     uint16_t y = 20;
     uint16_t height;
@@ -129,9 +130,11 @@ bool SetGuitar::onControl(Control* control) {
 //=================================================================================================
 void SetGuitar::onBack(Window* window) {
     //Serial.printf("SetGuitar::onBack: window=%p\n", window);
+    _settingsFile->write(_settingsFile->_settings);
 
     _settings->_audio->setEffects();
 
     _settings->_gui->_current = this;
+
     draw();
 }

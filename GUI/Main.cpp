@@ -29,16 +29,16 @@ bool Main::init(SettingsFile* settingsFile, Settings* settings) {
     Window::init(settings, nullptr);
 
     _setGuitar = new SetGuitar();
-    _setGuitar->init(_settings, this, wnd_set_guitar);
+    _setGuitar->init(_settingsFile, _settings, this, wnd_set_guitar);
 
     _setSynth = new SetSynth();
-    _setSynth->init(_settings, this, wnd_set_synth);
+    _setSynth->init(_settingsFile, _settings, this, wnd_set_synth);
 
     _setBand = new SetBand();
-    _setBand->init(_settings, this, wnd_set_band);
+    _setBand->init(_settingsFile, _settings, this, wnd_set_band);
 
     _setAudio = new SetAudio();
-    _setAudio->init(_settings, this);
+    _setAudio->init(_settingsFile, _settings, this);
 
     _peakMeter = new PeakMeter(settings, this, 0, 0, 10, _settings->_screen->_height / 2);
 
@@ -103,7 +103,7 @@ bool Main::onControl(Control* control) {
 
 //=================================================================================================
 void Main::onBack(Window* window) {
-    Serial.printf("##### Main::onBack: window=%p\n", window);
+    //Serial.printf("##### Main::onBack: window=%p\n", window);
     _settingsFile->write(_settingsFile->_settings);
     _settings->_gui->_current = this;
     draw();

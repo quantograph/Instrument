@@ -125,12 +125,12 @@ void MidiInput::myPitchChange(byte channel, int pitch) {
 // 3rd parameter to tell you which is the last chunk.  This function is
 // a Teensy extension, not available in the Arduino MIDI library.
 void MidiInput::mySystemExclusiveChunk(const byte *data, uint16_t length, bool last) {
-  Serial.print("SysEx Message: ");
-  printBytes(data, length);
+  //Serial.print("SysEx Message: ");
+  //printBytes(data, length);
   if (last) {
-    Serial.println(" (end)");
+    //Serial.println(" (end)");
   } else {
-    Serial.println(" (to be continued)");
+    //Serial.println(" (to be continued)");
   }
 }
 
@@ -139,7 +139,7 @@ void MidiInput::mySystemExclusiveChunk(const byte *data, uint16_t length, bool l
 // no way to receive the data which did not fit in the buffer.  If both types
 // of SysEx functions are set, the 3-input version will be called by _midiDevice.
 void MidiInput::mySystemExclusive(byte *data, unsigned int length) {
-  Serial.print("SysEx Message: ");
+  //Serial.print("SysEx Message: ");
   printBytes(data, length);
   Serial.println();
 }

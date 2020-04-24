@@ -23,10 +23,10 @@ bool List::init(Settings* settings, Window* parent, ControlId id) {
 
 //=================================================================================================
 void List::activate() {
+    //Serial.printf("List::activate\n");
     _ready = false;
     _lastScroll = -1;
     Window::activate();
-    //Serial.printf("List::activate\n");
 }
 
 //=================================================================================================

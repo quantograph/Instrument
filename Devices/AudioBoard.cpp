@@ -234,6 +234,7 @@ bool AudioBoard::setEffects() {
 
 //=================================================================================================
 bool AudioBoard::updateEffects() {
+    Serial.printf("----- AudioBoard::updateEffects\n");
     _effect1->update();
     _effect2->update();
 
