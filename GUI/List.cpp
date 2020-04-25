@@ -23,7 +23,7 @@ bool List::init(Settings* settings, Window* parent, ControlId id) {
 
 //=================================================================================================
 void List::activate() {
-    //Serial.printf("List::activate\n");
+    Serial.printf("List::activate\n");
     _ready = false;
     _lastScroll = -1;
     Window::activate();
@@ -79,33 +79,26 @@ void List::draw() {
 
 //=================================================================================================
 bool List::onTouch(const TS_Point& point) {
-    if(!_ready)
+    if(!_ready) {
+        Serial.printf("List::onTouch: NOT READY\n");
         return false;
+    }
 
     Window::onTouch(point);
 
+    Serial.printf("List::onTouch\n");
     _touchPoint = point;
-    //Serial.printf("List::onTouch\n");
 
     return true;
 }
 
 //=================================================================================================
 bool List::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
-    _scroll = getScroll();
-    //Serial.printf("List::onRelease: _scroll=%d\n", _scroll);
-    _lastScroll = _scroll;
-
-    uint16_t move = abs(fromPoint.y - toPoint.y);
-    if(move < _itemHeight && _ready) {
-        int16_t index = _scroll + toPoint.y / _itemHeight;
-        index = std::max(index, (int16_t)0);
-        index = std::min(index, (int16_t)(_items.size() - 1));
-        _selectedString = _items[index].first;
-        _selectedId = (ControlId)_items[index].second;
-        //Serial.printf("List::onRelease, selected: %s (%d)\n", _selectedString.c_str(), _selectedId);
-        _parent->onBack(this);
-    }
+    if(_ready) {
+        Serial.printf("List::onRelease: ready\n");
+        checkRelease(fromPoint, toPoint);
+    } else
+        Serial.printf("List::onRelease: NOT READY\n");
 
     _ready = true;
     return true;
@@ -121,4 +114,23 @@ bool List::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
     draw();
 
     return true;
+}
+
+//=================================================================================================
+void List::checkRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
+    Serial.printf("List::checkRelease\n");
+
+    _scroll = getScroll();
+    _lastScroll = _scroll;
+
+    uint16_t move = abs(fromPoint.y - toPoint.y);
+    if(move < _itemHeight) {
+        int16_t index = _scroll + toPoint.y / _itemHeight;
+        index = std::max(index, (int16_t)0);
+        index = std::min(index, (int16_t)(_items.size() - 1));
+        _selectedString = _items[index].first;
+        _selectedId = (ControlId)_items[index].second;
+        Serial.printf("List::onRelease, selected: %s (%d)\n", _selectedString.c_str(), _selectedId);
+        _parent->onBack(this);
+    }
 }

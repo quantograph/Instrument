@@ -14,32 +14,9 @@ public:
             AudioStream* dest, uint8_t destInput);
     ~Effects();
     void reset();
-    bool init();
+    bool init(bool reset);
     void connect(AudioStream* stream);
-    void update();
-    
-    void clean();
-    void chorus();
-    void flange();
-    void reverb();
-    void freeverb();
-    void envelope();
-    void delay();
-    void bitcrusher();
-    void waveshaper();
-    void granular();
 
-    AudioEffectChorus* _chorus{nullptr};
-    AudioEffectFlange* _flange{nullptr};
-    AudioEffectReverb* _reverb{nullptr};
-    AudioEffectFreeverb* _freeverb{nullptr};
-    AudioEffectEnvelope* _envelope{nullptr};
-    AudioEffectDelay* _delay{nullptr};
-    AudioEffectBitcrusher* _bitcrusher{nullptr};
-    AudioEffectWaveshaper* _waveshaper{nullptr};
-    AudioEffectGranular* _granular{nullptr};
-
-    EffectType _effectType{EffectType::eff_none}; // Current effect type
     EffectSettings* _settings{};
     AudioStream* _source{nullptr};
     uint8_t _sourceOutput{0};
@@ -48,4 +25,14 @@ public:
     AudioConnection* _inConnection{nullptr};
     AudioConnection* _outConnection{nullptr};
     int16_t* _granularMemory{nullptr};
+    // Effects
+    AudioEffectChorus _chorus;
+    AudioEffectFlange _flange;
+    AudioEffectReverb _reverb;
+    AudioEffectFreeverb _freeverb;
+    AudioEffectEnvelope _envelope;
+    AudioEffectDelay _delay;
+    AudioEffectBitcrusher _bitcrusher;
+    AudioEffectWaveshaper _waveshaper;
+    AudioEffectGranular _granular;
 };

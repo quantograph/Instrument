@@ -58,11 +58,12 @@ bool Synth::init(Instrument instrument, Settings* settings) {
         return false;
     }
 
-    Serial.printf("Synch loaded instrument %d: %s (%d)\n", instrument, _instrumentInfo._name.c_str(), _instrumentInfo._instrument);
+    Serial.printf("Synch loaded instrument %d: %s (%d)\n", instrument, _instrumentInfo._name.c_str(), 
+                  _instrumentInfo._instrument);
 
     // Synth has only 4 mixers with 4 channels each
     if(_instrumentInfo._voices > 16) {
-        Serial.printf("ERROR: Synth can't have more than 16 voices\n");
+        Serial.printf("##### ERROR: Synth can't have more than 16 voices\n");
         return false;
     }
 
@@ -130,16 +131,11 @@ bool Synth::setInstrument(Instrument instrument) {
 //=================================================================================================
 bool Synth::createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer, 
                          uint8_t mixerInput) {
-    if(!effect || (effect && effect->_effectType != effectSettings->_effectType)) {
-        Serial.printf("Synth::createEffect: creating effect '%s'\n", 
-                      effectSettings->_effectName.c_str());
-        delete effect;
-        effect = new Effects(effectSettings, &_outMixer, 0, mixer, mixerInput);
-        effect->init();
-    } else {
-        Serial.printf("Synth::createEffect: effect '%s' already created\n", 
-                      effectSettings->_effectName.c_str());
-    }
+    Serial.printf("Synth::createEffect: creating effect '%s'\n", 
+                  effectSettings->_effectName.c_str());
+    delete effect;
+    effect = new Effects(effectSettings, &_outMixer, 0, mixer, mixerInput);
+    effect->init(true);
 
     return true;
 }
@@ -156,9 +152,14 @@ bool Synth::setEffects() {
 
 //=================================================================================================
 bool Synth::updateEffects() {
-    Serial.printf("----- Synth::updateEffects\n");
-    _effect1->update();
-    _effect2->update();
+    Serial.printf("----- Synth::updateEffects: Effect1 (%p): %s (%d). Effect2 (%p): %s (%d). \n", 
+                  &_settings->_synthInput._effect1, _settings->_synthInput._effect1._effectName.c_str(), 
+                  _settings->_synthInput._effect1._effectType,
+                  &_settings->_synthInput._effect2, _settings->_synthInput._effect2._effectName.c_str(), 
+                  _settings->_synthInput._effect2._effectType);
+
+    _effect1->init(false);
+    _effect2->init(false);
 
     return true;
 }

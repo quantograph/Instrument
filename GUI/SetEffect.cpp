@@ -13,6 +13,8 @@
 #include "CheckBox.h"
 #include "SetEffect.h"
 
+// Windows for selecting one effect type and/or changing its parameters
+
 //=================================================================================================
 SetEffect::SetEffect() {
 
@@ -49,14 +51,14 @@ bool SetEffect::init(Settings* settings, Window* parent) {
     }
 
     // Sliders
-    int id{sld_1};
+    /*int id{sld_1};
     height = 50;
     for(int i = 0; i < 4; ++i) {
         Slider* slider = new Slider(_settings, this, 30, y, _settings->_screen->_width - 60, height, (ControlId)id++);
         slider->_hidden = true;
         _sliders.push_back(slider);
         y += height + 20;
-    }
+    }*/
 
     // Buttons
     setupButtons();
@@ -94,8 +96,8 @@ void SetEffect::reset() {
 void SetEffect::showEffect() {
     Slider* slider;
     float value;
-    Serial.printf("SetEffect::showEffect, effect: %s (%d)\n", 
-                  _effectSettings->_effectName.c_str(), _effectSettings->_effectType);
+    Serial.printf("SetEffect::showEffect (%p), effect: %s (%d)\n", 
+                  _effectSettings, _effectSettings->_effectName.c_str(), _effectSettings->_effectType);
 
     _effect->_text = _effectSettings->_effectName;
 
@@ -104,7 +106,7 @@ void SetEffect::showEffect() {
             break;
 
         case EffectType::eff_chorus:
-            showSliders(2);
+            /*showSliders(2);
             // Delay
             slider = _sliders[0];
             value = scale(_effectSettings->_chorus._delay, ChorusDelayMin, ChorusDelayMax, 0.0, 1.0);
@@ -112,7 +114,7 @@ void SetEffect::showEffect() {
             // Voices
             slider = _sliders[1];
             value = scale(_effectSettings->_chorus._voices, ChorusVoicesMin, ChorusVoicesMax, 0.0, 1.0);
-            slider->setValue(value);
+            slider->setValue(value);*/
             break;
 
         case EffectType::eff_flange:
@@ -158,14 +160,14 @@ void SetEffect::showTitles() {
             break;
 
         case EffectType::eff_chorus:
-            // Delay
+            /*// Delay
             slider = _sliders[0];
             sprintf(buffer, "Delay: %d", _effectSettings->_chorus._delay);
             slider->setTitle(buffer);
             // Voices
             slider = _sliders[1];
             sprintf(buffer, "Voices: %d", _effectSettings->_chorus._voices);
-            slider->setTitle(buffer);
+            slider->setTitle(buffer);*/
             break;
 
         case EffectType::eff_flange:
@@ -200,30 +202,36 @@ void SetEffect::showTitles() {
 
 //=================================================================================================
 void SetEffect::showSliders(int number) {
-    Slider* slider;
+    /*Slider* slider;
     for(int i = 0; i < 4; ++i) {
         slider = (Slider*)_sliders[i];
         if(i < number)
             slider->_hidden = false;
         else
             slider->_hidden = true;
-    }
+    }*/
 }
 
 //=================================================================================================
 bool SetEffect::onControl(Control* control) {
     Slider* slider;
+    bool update{true};
 
     switch(control->_id) {
+        // Going back to the parent
         case ControlId::btn_back:
             //Serial.printf("SetEffect::onButton %s, parent=%p\n", control->_text.c_str(), _parent);
+            update = false;
             _parent->onBack(this);
             break;
 
+        // Effect type list is activated
         case ControlId::txt_effect:
+            update = false;
             _effectsList->activate();
             break;
 
+        // Slider 1 for the effect parameters was moved
         case ControlId::sld_1:
             slider = (Slider*)_sliders[0];
             switch(_effectSettings->_effectType) {
@@ -237,9 +245,9 @@ bool SetEffect::onControl(Control* control) {
                 default:
                     break;
             }
-            showTitles();
             break;
             
+        // Slider 2 for the effect parameters was moved
         case ControlId::sld_2:
             slider = (Slider*)_sliders[1];
             switch(_effectSettings->_effectType) {
@@ -253,17 +261,14 @@ bool SetEffect::onControl(Control* control) {
                 default:
                     break;
             }
-            showTitles();
             break;
             
+        // Slider 3 for the effect parameters was moved
         case ControlId::sld_3:
-
-            showTitles();
             break;
             
+        // Slider 4 for the effect parameters was moved
         case ControlId::sld_4:
-
-            showTitles();
             break;
 
         default:
@@ -272,17 +277,21 @@ bool SetEffect::onControl(Control* control) {
     }
 
     // Set the updated effect parameters
-    switch(_parent->_id) {
-        case wnd_set_guitar:
-            _settings->_audio->updateEffects();
-            break;
+    if(update)
+    {
+        showTitles();
+        switch(_parent->_id) {
+            case wnd_set_guitar:
+                _settings->_audio->updateEffects();
+                break;
 
-        case wnd_set_synth:
-            _settings->_synth->updateEffects();
-            break;
+            case wnd_set_synth:
+                _settings->_synth->updateEffects();
+                break;
 
-        default:
-            break;
+            default:
+                break;
+        }
     }
 
     return true;
@@ -294,12 +303,27 @@ void SetEffect::onBack(Window* window) {
 
     _settings->_gui->_current = this;
 
-    // Effect type selected
     switch(window->_id) {
-        case ControlId::wnd_effect_list:
+        case ControlId::wnd_effect_list: // Effect type selected
             _effectSettings->_effectType = (EffectType)_effectsList->_selectedId;
             _effectSettings->_effectName = _effectsList->_selectedString;
             _effect->_text = _effectSettings->_effectName;
+
+            // Set new effect types either for the guitar (audio input) or for the synth
+            switch(_parent->_id) {
+                case wnd_set_guitar:
+                    _settings->_audio->setEffects();
+                    break;
+
+                case wnd_set_synth:
+                    _settings->_synth->setEffects();
+                    break;
+
+                default:
+                    Serial.printf("SetEffect::onBack: unknown parent id %d\n", _parent->_id);
+                    break;
+            }
+
             showEffect();
             break;
 

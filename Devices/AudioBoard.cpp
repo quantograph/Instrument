@@ -213,10 +213,10 @@ void AudioBoard::reset() {
 
 //=================================================================================================
 bool AudioBoard::createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer) {
-    if(!effect || (effect && effect->_effectType != effectSettings->_effectType)) {
+    if(!effect) {
         delete effect;
         effect = new Effects(effectSettings, &_input, 0, mixer, 0);
-        effect->init();
+        effect->init(true);
     }
 
     return true;
@@ -235,8 +235,8 @@ bool AudioBoard::setEffects() {
 //=================================================================================================
 bool AudioBoard::updateEffects() {
     Serial.printf("----- AudioBoard::updateEffects\n");
-    _effect1->update();
-    _effect2->update();
+    _effect1->init(false);
+    _effect2->init(false);
 
     return true;
 }

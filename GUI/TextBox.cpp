@@ -4,7 +4,8 @@
 #include "TextBox.h"
 
 //=================================================================================================
-TextBox::TextBox(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, uint16_t height, ControlId id) : 
+TextBox::TextBox(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, 
+                 uint16_t height, ControlId id) : 
     Control(settings, parent, x, y, width, height, id) {
 }
 
@@ -32,7 +33,7 @@ void TextBox::draw() {
         int16_t y = _y + 8;
         int16_t width = _height - 10;
         _settings->_screen->_screen.fillTriangle(x, y, x + width, y, x + width * 0.5, 
-                                                 y + width * 0.7, ILI9341_WHITE);
+                                                 y + width * 0.55, ILI9341_WHITE);
     }
 }
 

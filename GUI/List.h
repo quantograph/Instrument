@@ -26,7 +26,8 @@ public:
     bool _ready{false};
 
     int16_t getScroll();
-
+    void checkRelease(const TS_Point& fromPoint, const TS_Point& toPoint);
+    // Virtuals
     void draw() override;
     bool init(Settings* settings, Window* parent, ControlId id) override;
     void activate() override;
