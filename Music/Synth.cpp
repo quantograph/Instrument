@@ -19,12 +19,6 @@ Synth::~Synth() {
 void Synth::reset() {
     //Serial.printf("Synth::reset\n");
 
-    // Delete the effects
-    delete _effect1;
-    _effect1 = nullptr;
-    delete _effect2;
-    _effect2 = nullptr;
-
     // Delete all voices
     for(auto voice : _synthVoices) {
         delete voice;
@@ -50,16 +44,14 @@ void Synth::reset() {
 bool Synth::init(Instrument instrument, Settings* settings) {
     Serial.printf("Synth::init ==================================\n");
     _settings = settings;
-    reset();
 
     // Load the sound sample for the selected instrument
-    if(!getInstrument(instrument, _settings->_audio, _instrumentInfo)) {
-        Serial.printf("ERROR: Can't load instrument %d\n", instrument);
+    if(!getInstrument(instrument, _settings->_audioBoard, _instrumentInfo)) {
+        Serial.printf("##### ERROR: Can't load instrument %d\n", instrument);
         return false;
     }
 
-    Serial.printf("Synch loaded instrument %d: %s (%d)\n", instrument, _instrumentInfo._name.c_str(), 
-                  _instrumentInfo._instrument);
+    //Serial.printf("Synch loaded instrument %d: %s (%d)\n", instrument, _instrumentInfo._name.c_str(), _instrumentInfo._instrument);
 
     // Synth has only 4 mixers with 4 channels each
     if(_instrumentInfo._voices > 16) {
@@ -102,19 +94,38 @@ bool Synth::init(Instrument instrument, Settings* settings) {
         voice->_mixer = voiceMixer;
     }
 
-    // Connect the synth output mixer to one of the main audio mixers
-    _outCord = new AudioConnection(_outMixer, 0, *_instrumentInfo._mixer, _instrumentInfo._mixerChannel);
-
-    setEffects();
+    // Make effects
+    _effect1 = new Effects(&_settings->_synthInput._effect1, &_outMixer, 0, &_settings->_audioBoard->_mixer1, 1);
+    _effect1->init();
+    /*AVB _effect2 = new Effects(&_settings->_synthInput._effect2, &_outMixer, 0, &_settings->_audioBoard->_mixer4, 1);
+    _effect2->init();*/
+    updateEffects();
 
     Serial.printf("========================== Synth::init end \n");
     return true;
 }
 
 //=================================================================================================
+bool Synth::updateEffects() {
+    Serial.printf("----- Synth::updateEffects: Effect1: %s (%d).\n", 
+                  _settings->_synthInput._effect1._effectName.c_str(), 
+                  _settings->_synthInput._effect1._effectType);
+    /*AVB Serial.printf("----- Synth::updateEffects: Effect1: %s (%d). Effect2: %s (%d)\n", 
+                  _settings->_synthInput._effect1._effectName.c_str(), 
+                  _settings->_synthInput._effect1._effectType,
+                  _settings->_synthInput._effect2._effectName.c_str(), 
+                  _settings->_synthInput._effect2._effectType);*/
+
+    _effect1->update();
+    //_effect2->update();
+
+    return true;
+}
+
+//=================================================================================================
 bool Synth::setInstrument(Instrument instrument) {
     // Load the sound sample for the selected instrument
-    if(!getInstrument(instrument, _settings->_audio, _instrumentInfo)) {
+    if(!getInstrument(instrument, _settings->_audioBoard, _instrumentInfo)) {
         Serial.printf("##### ERROR: Can't load instrument %d\n", instrument);
         return false;
     } else {
@@ -124,42 +135,6 @@ bool Synth::setInstrument(Instrument instrument) {
     for(auto voice : _synthVoices) {
         voice->_sound.setInstrument(*_instrumentInfo._sample);
     }
-
-    return true;
-}
-
-//=================================================================================================
-bool Synth::createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer, 
-                         uint8_t mixerInput) {
-    Serial.printf("Synth::createEffect: creating effect '%s'\n", 
-                  effectSettings->_effectName.c_str());
-    delete effect;
-    effect = new Effects(effectSettings, &_outMixer, 0, mixer, mixerInput);
-    effect->init(true);
-
-    return true;
-}
-
-//=================================================================================================
-bool Synth::setEffects() {
-    createEffect(_effect1, &_settings->_synthInput._effect1, &_settings->_audio->_mixer1, 1);
-    createEffect(_effect2, &_settings->_synthInput._effect2, &_settings->_audio->_mixer4, 1);
-
-    updateEffects();
-
-    return true;
-}
-
-//=================================================================================================
-bool Synth::updateEffects() {
-    Serial.printf("----- Synth::updateEffects: Effect1 (%p): %s (%d). Effect2 (%p): %s (%d). \n", 
-                  &_settings->_synthInput._effect1, _settings->_synthInput._effect1._effectName.c_str(), 
-                  _settings->_synthInput._effect1._effectType,
-                  &_settings->_synthInput._effect2, _settings->_synthInput._effect2._effectName.c_str(), 
-                  _settings->_synthInput._effect2._effectType);
-
-    _effect1->init(false);
-    _effect2->init(false);
 
     return true;
 }

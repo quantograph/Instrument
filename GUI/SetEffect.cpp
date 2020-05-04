@@ -27,7 +27,7 @@ SetEffect::~SetEffect() {
 
 //=================================================================================================
 bool SetEffect::init(Settings* settings, Window* parent) {
-    Serial.printf("SetEffect::init: parentID=%d\n", parent->_id);
+    //Serial.printf("SetEffect::init: parentID=%d\n", parent->_id);
     uint16_t y = 20;
     uint16_t height;
 
@@ -68,7 +68,7 @@ bool SetEffect::init(Settings* settings, Window* parent) {
 
 //=================================================================================================
 void SetEffect::activate(EffectSettings* effectSettings) {
-    Serial.printf("SetEffect::activate\n");
+    //Serial.printf("SetEffect::activate\n");
     _effectSettings = effectSettings;
     showEffect();
     Window::activate();
@@ -94,10 +94,10 @@ void SetEffect::reset() {
 
 //=================================================================================================
 void SetEffect::showEffect() {
-    Slider* slider;
+    //Slider* slider;
     float value;
-    Serial.printf("SetEffect::showEffect (%p), effect: %s (%d)\n", 
-                  _effectSettings, _effectSettings->_effectName.c_str(), _effectSettings->_effectType);
+    Serial.printf("SetEffect::showEffect: %s (%d)\n", 
+                  _effectSettings->_effectName.c_str(), _effectSettings->_effectType);
 
     _effect->_text = _effectSettings->_effectName;
 
@@ -282,7 +282,7 @@ bool SetEffect::onControl(Control* control) {
         showTitles();
         switch(_parent->_id) {
             case wnd_set_guitar:
-                _settings->_audio->updateEffects();
+                _settings->_audioBoard->updateEffects();
                 break;
 
             case wnd_set_synth:
@@ -299,7 +299,7 @@ bool SetEffect::onControl(Control* control) {
 
 //=================================================================================================
 void SetEffect::onBack(Window* window) {
-    Serial.printf("SetEffect::onBack: ID=%d\n", window->_id);
+    //Serial.printf("SetEffect::onBack: ID=%d\n", window->_id);
 
     _settings->_gui->_current = this;
 
@@ -312,11 +312,11 @@ void SetEffect::onBack(Window* window) {
             // Set new effect types either for the guitar (audio input) or for the synth
             switch(_parent->_id) {
                 case wnd_set_guitar:
-                    _settings->_audio->setEffects();
+                    _settings->_audioBoard->updateEffects();
                     break;
 
                 case wnd_set_synth:
-                    _settings->_synth->setEffects();
+                    _settings->_synth->updateEffects();
                     break;
 
                 default:

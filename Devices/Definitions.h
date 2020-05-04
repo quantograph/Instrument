@@ -693,7 +693,7 @@ struct Settings {
     // All devices, not saved into EEPROM, just to have them available
     TouchScreen* _screen{};
     Gui* _gui{};
-    AudioBoard* _audio{};
+    AudioBoard* _audioBoard{};
     SdCard* _sdCard{};
     MidiInput* _midiInput{};
     Bluetooth* _bluetooth{};

@@ -67,14 +67,14 @@ void SetAudio::draw() {
 //=================================================================================================
 void SetAudio::updateInput() {
     if(_settings->_audioSettings._input == Inputs::mic) { // Mic
-        _settings->_audio->_audioControl.inputSelect(AUDIO_INPUT_MIC);
+        _settings->_audioBoard->_audioControl.inputSelect(AUDIO_INPUT_MIC);
         _micCheck->update(true);
         _lineCheck->update(false);
 
         _slider->setValue(_settings->_audioSettings._micGain);
         //Serial.printf("SetAudio::updateInput: _micGain=%0.2f\n", _settings->_micGain);
     } else if(_settings->_audioSettings._input == Inputs::line) { // Line in
-        _settings->_audio->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
+        _settings->_audioBoard->_audioControl.inputSelect(AUDIO_INPUT_LINEIN);
         _micCheck->update(false);
         _lineCheck->update(true);
 
@@ -91,14 +91,14 @@ void SetAudio::updateLevel(bool getSlider) {
         if(getSlider)
             _settings->_audioSettings._micGain = _slider->_value;
 
-        _settings->_audio->setMicGain();
+        _settings->_audioBoard->setMicGain();
         sprintf(_string, "Mic: %d", (uint16_t)(_settings->_audioSettings._micGain * 100 + 0.5));
         //Serial.printf("SetAudio::updateLevel: MicGain=%0.2f (%d)\n", _settings->_micGain, value);
     } else if(_settings->_audioSettings._input == Inputs::line) { // Line in
         if(getSlider)
             _settings->_audioSettings._lineInLevel = _slider->_value;
     
-        _settings->_audio->setLineInLevel();
+        _settings->_audioBoard->setLineInLevel();
         sprintf(_string, "Line in: %d", (uint16_t)(_settings->_audioSettings._lineInLevel * 100 + 0.5));
         //Serial.printf("SetAudio::updateLevel: LineLevel=%0.2f (%d)\n", _settings->_lineInLevel, value);
     }

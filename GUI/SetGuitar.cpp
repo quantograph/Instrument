@@ -132,7 +132,7 @@ void SetGuitar::onBack(Window* window) {
     //Serial.printf("SetGuitar::onBack: window=%p\n", window);
     _settingsFile->write(_settingsFile->_settings);
 
-    _settings->_audio->setEffects();
+    _settings->_audioBoard->updateEffects();
 
     _settings->_gui->_current = this;
 

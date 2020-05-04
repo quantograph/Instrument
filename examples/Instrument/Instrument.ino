@@ -48,7 +48,7 @@ void setup() {
     g_settingsFile.read(g_settingsFile._settings);
     g_settingsFile._settings._screen = &g_screen;
     g_settingsFile._settings._gui = &g_gui;
-    g_settingsFile._settings._audio = &g_audio;
+    g_settingsFile._settings._audioBoard = &g_audio;
     g_settingsFile._settings._sdCard = &g_sdCard;
     g_settingsFile._settings._midiInput = &g_midiInput;
     g_settingsFile._settings._bluetooth = &g_bluetooth;

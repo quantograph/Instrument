@@ -23,7 +23,7 @@ bool List::init(Settings* settings, Window* parent, ControlId id) {
 
 //=================================================================================================
 void List::activate() {
-    Serial.printf("List::activate\n");
+    //Serial.printf("List::activate\n");
     _ready = false;
     _lastScroll = -1;
     Window::activate();
@@ -80,13 +80,13 @@ void List::draw() {
 //=================================================================================================
 bool List::onTouch(const TS_Point& point) {
     if(!_ready) {
-        Serial.printf("List::onTouch: NOT READY\n");
+        //Serial.printf("List::onTouch: NOT READY\n");
         return false;
     }
 
     Window::onTouch(point);
 
-    Serial.printf("List::onTouch\n");
+    //Serial.printf("List::onTouch\n");
     _touchPoint = point;
 
     return true;
@@ -95,10 +95,11 @@ bool List::onTouch(const TS_Point& point) {
 //=================================================================================================
 bool List::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
     if(_ready) {
-        Serial.printf("List::onRelease: ready\n");
+        //Serial.printf("List::onRelease: ready\n");
         checkRelease(fromPoint, toPoint);
-    } else
-        Serial.printf("List::onRelease: NOT READY\n");
+    } else {
+        //Serial.printf("List::onRelease: NOT READY\n");
+    }
 
     _ready = true;
     return true;
@@ -118,7 +119,7 @@ bool List::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
 
 //=================================================================================================
 void List::checkRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
-    Serial.printf("List::checkRelease\n");
+    //Serial.printf("List::checkRelease\n");
 
     _scroll = getScroll();
     _lastScroll = _scroll;
@@ -130,7 +131,7 @@ void List::checkRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
         index = std::min(index, (int16_t)(_items.size() - 1));
         _selectedString = _items[index].first;
         _selectedId = (ControlId)_items[index].second;
-        Serial.printf("List::onRelease, selected: %s (%d)\n", _selectedString.c_str(), _selectedId);
+        //Serial.printf("List::onRelease, selected: %s (%d)\n", _selectedString.c_str(), _selectedId);
         _parent->onBack(this);
     }
 }

@@ -30,8 +30,6 @@ public:
     void noteOn(byte note, byte velocity);
     void noteOff(byte note);
     void controlChange(byte channel, byte control, byte value);
-    bool createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer, uint8_t mixerInput);
-    bool setEffects();
     bool updateEffects();
 
 private:
@@ -43,6 +41,6 @@ private:
     AudioConnection* _outCord{nullptr}; // Connection from synth output mixer to one of 4 main audio mixers
     InstrumentInfo _instrumentInfo;
     Effects* _effect1{nullptr};
-    Effects* _effect2{nullptr};
+    //AVB Effects* _effect2{nullptr};
     float _volume{0.5};
 };

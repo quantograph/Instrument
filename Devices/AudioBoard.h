@@ -18,9 +18,6 @@ public:
     void peakMeter();
     static void onPlug();
     static void onVolume();
-    void reset();
-    bool createEffect(Effects*& effect, EffectSettings* effectSettings, AudioMixer4* mixer);
-    bool setEffects();
     bool updateEffects();
 
     #define GUITAR_PLUG 3 // Teensy pin connected to guitar plug contact
@@ -49,8 +46,8 @@ public:
     AudioMixer4 _outMixer1;
     AudioMixer4 _outMixer2;
     char _string[64];
-    Effects* _effect1{nullptr};
-    Effects* _effect2{nullptr};
+    /*AVB Effects* _effect1{nullptr};
+    Effects* _effect2{nullptr};*/
     AudioAnalyzePeak _peakLeft;
     AudioAnalyzePeak _peakRight;
 };
