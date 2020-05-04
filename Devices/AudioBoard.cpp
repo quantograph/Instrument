@@ -9,7 +9,7 @@ AudioBoard::AudioBoard() {
 
 //=================================================================================================
 void AudioBoard::init(Gui* gui, Settings* settings) {
-    //Serial.printf("AudioBoard::init\n");
+    Serial.printf("AudioBoard::init ==================================\n");
     _gui = gui;
     _settings = settings;
 
@@ -38,37 +38,28 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
     //notefreq.begin(.15);
 
     // Make effects
-    /*AVB _effect1 = new Effects(&_settings->_guitarInput._effect1, &_input, 0, &_settings->_audioBoard->_mixer1, 0);
-    _effect2 = new Effects(&_settings->_guitarInput._effect2, &_input, 0, &_settings->_audioBoard->_mixer4, 0);*/
+    _effect1 = new Effects(&_settings->_guitarInput._effect1, &_input, 0, &_settings->_audioBoard->_mixer1, 0);
+    _effect1->init();
+    _effect2 = new Effects(&_settings->_guitarInput._effect2, &_input, 0, &_settings->_audioBoard->_mixer4, 0);
+    _effect2->init();
     updateEffects();
+
+    Serial.printf("========================== AudioBoard::init end\n");
+    return true;
 }
 
 //=================================================================================================
 bool AudioBoard::updateEffects() {
-    /*Serial.printf("----- AudioBoard::updateEffects: Effect1: %s (%d). Effect2: %s (%d)\n", 
+    Serial.printf("----- AudioBoard::updateEffects: Effect1: %s (%d). Effect2: %s (%d)\n", 
                   _settings->_guitarInput._effect1._effectName.c_str(), 
                   _settings->_guitarInput._effect1._effectType,
                   _settings->_guitarInput._effect2._effectName.c_str(), 
                   _settings->_guitarInput._effect2._effectType);
 
     _effect1->update();
-    _effect2->update();*/
+    _effect2->update();
 
     return true;
-}
-
-//=================================================================================================
-void AudioBoard::setLineInLevel() {
-    uint16_t value = (uint16_t)(_settings->_audioSettings._lineInLevel * LINE_IN_MAX + 0.5);
-    _settings->_audioBoard->_audioControl.lineInLevel(value);
-    //Serial.printf("AudioBoard::setLineInLevel: %0.2f (%d)\n", _settings->_lineInLevel, value);
-}
-
-//=================================================================================================
-void AudioBoard::setMicGain() {
-    uint16_t value = (uint16_t)(_settings->_audioSettings._micGain * MIC_GAIN_MAX + 0.5);
-    _settings->_audioBoard->_audioControl.micGain(value);
-    //Serial.printf("AudioBoard::setMicGain: %0.2f (%d)\n", _settings->_micGain, value);
 }
 
 //=================================================================================================
@@ -96,6 +87,20 @@ void AudioBoard::setupMixers() {
     // 2 (stereo) output mixers go to the audio output
     _cords.push_back(new AudioConnection(_outMixer1, 0, _audioOutput, 0));
     _cords.push_back(new AudioConnection(_outMixer2, 0, _audioOutput, 1));
+}
+
+//=================================================================================================
+void AudioBoard::setLineInLevel() {
+    uint16_t value = (uint16_t)(_settings->_audioSettings._lineInLevel * LINE_IN_MAX + 0.5);
+    _settings->_audioBoard->_audioControl.lineInLevel(value);
+    //Serial.printf("AudioBoard::setLineInLevel: %0.2f (%d)\n", _settings->_lineInLevel, value);
+}
+
+//=================================================================================================
+void AudioBoard::setMicGain() {
+    uint16_t value = (uint16_t)(_settings->_audioSettings._micGain * MIC_GAIN_MAX + 0.5);
+    _settings->_audioBoard->_audioControl.micGain(value);
+    //Serial.printf("AudioBoard::setMicGain: %0.2f (%d)\n", _settings->_micGain, value);
 }
 
 //=================================================================================================

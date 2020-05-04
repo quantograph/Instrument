@@ -46,8 +46,8 @@ public:
     AudioMixer4 _outMixer1;
     AudioMixer4 _outMixer2;
     char _string[64];
-    /*AVB Effects* _effect1{nullptr};
-    Effects* _effect2{nullptr};*/
+    Effects* _effect1{nullptr};
+    Effects* _effect2{nullptr};
     AudioAnalyzePeak _peakLeft;
     AudioAnalyzePeak _peakRight;
 };

@@ -82,7 +82,7 @@ void setup() {
 //=================================================================================================
 // The main loop. Called after "setup()" is done.
 void loop() {
-    delay(50);
+    //delay(50);
 
     g_midiInput.process();
     g_audio.process();
