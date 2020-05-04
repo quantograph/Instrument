@@ -97,8 +97,8 @@ bool Synth::init(Instrument instrument, Settings* settings) {
     // Make effects
     _effect1 = new Effects(&_settings->_synthInput._effect1, &_outMixer, 0, &_settings->_audioBoard->_mixer1, 1);
     _effect1->init();
-    /*AVB _effect2 = new Effects(&_settings->_synthInput._effect2, &_outMixer, 0, &_settings->_audioBoard->_mixer4, 1);
-    _effect2->init();*/
+    _effect2 = new Effects(&_settings->_synthInput._effect2, &_outMixer, 0, &_settings->_audioBoard->_mixer4, 1);
+    _effect2->init();
     updateEffects();
 
     Serial.printf("========================== Synth::init end \n");
@@ -107,17 +107,14 @@ bool Synth::init(Instrument instrument, Settings* settings) {
 
 //=================================================================================================
 bool Synth::updateEffects() {
-    Serial.printf("----- Synth::updateEffects: Effect1: %s (%d).\n", 
-                  _settings->_synthInput._effect1._effectName.c_str(), 
-                  _settings->_synthInput._effect1._effectType);
-    /*AVB Serial.printf("----- Synth::updateEffects: Effect1: %s (%d). Effect2: %s (%d)\n", 
+    Serial.printf("----- Synth::updateEffects: Effect1: %s (%d). Effect2: %s (%d)\n", 
                   _settings->_synthInput._effect1._effectName.c_str(), 
                   _settings->_synthInput._effect1._effectType,
                   _settings->_synthInput._effect2._effectName.c_str(), 
-                  _settings->_synthInput._effect2._effectType);*/
+                  _settings->_synthInput._effect2._effectType);
 
     _effect1->update();
-    //_effect2->update();
+    _effect2->update();
 
     return true;
 }

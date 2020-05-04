@@ -41,6 +41,6 @@ private:
     AudioConnection* _outCord{nullptr}; // Connection from synth output mixer to one of 4 main audio mixers
     InstrumentInfo _instrumentInfo;
     Effects* _effect1{nullptr};
-    //AVB Effects* _effect2{nullptr};
+    Effects* _effect2{nullptr};
     float _volume{0.5};
 };

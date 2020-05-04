@@ -45,7 +45,7 @@ bool Effects::init() {
     makeConnection(eff_waveshaper, &_waveshaper);
     makeConnection(eff_granular, &_granular);
 
-    showConnections("init", true);
+    //showConnections("init", true);
 
     return true;
 }
@@ -97,14 +97,12 @@ bool Effects::connect(EffectType type) {
 
 //=================================================================================================
 void Effects::showConnections(const char* title, bool showAll) {
-    Serial.printf("%s: %d connecions -------------\n", title, _connections.size());
+    Serial.printf("%s: %d connecions:\n", title, _connections.size());
 
     for(auto connection : _connections) {
         if(connection->_connected || showAll)
             connection->show(title);
     }
-
-    Serial.printf("-------------------------\n");
 }
 
 //=================================================================================================
