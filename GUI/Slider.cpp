@@ -14,10 +14,17 @@ Slider::Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint1
 }
 
 //=================================================================================================
+void Slider::activate() {
+    //Serial.printf("List::activate\n");
+    _ready = false;
+    draw();
+}
+
+//=================================================================================================
 void Slider::setTitle(const char* title) {
     _title = title;
 
-    Serial.printf("Slider::setTitle: %s\n", title);
+    //Serial.printf("Slider::setTitle: %s\n", title);
     _settings->_screen->_screen.fillRect(_x, _y, _width, _titleHeight, ILI9341_BLACK);
     _settings->_screen->_screen.setCursor(_x, _y);
     _settings->_screen->_screen.setTextColor(_textColor);
@@ -67,7 +74,7 @@ void Slider::setValue(float value, float min, float max) {
     _value = scaled;
     point.x = _barLeft + (_barRight - _barLeft) * value;
     point.y = 0;
-    ///Serial.printf("Slider::setValue: value=%0.2f, x=%d\n", value, point.x);
+    //Serial.printf("Slider::setValue: value=%0.2f, x=%d\n", value, point.x);
     
     update(point);
 }
@@ -79,6 +86,11 @@ bool Slider::inside(const TS_Point& point) {
 
 //=================================================================================================
 bool Slider::onTouch(const TS_Point& point) {
+    if(!_ready) {
+        //Serial.printf("Slider::onTouch: NOT READY\n");
+        return false;
+    }
+
     if(!inside(point))
         return false;
 
@@ -91,6 +103,8 @@ bool Slider::onTouch(const TS_Point& point) {
 
 //=================================================================================================
 bool Slider::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
+    _ready = true;
+
     if(!inside(toPoint))
         return false;
 
@@ -103,6 +117,9 @@ bool Slider::onRelease(const TS_Point& fromPoint, const TS_Point& toPoint) {
 
 //=================================================================================================
 bool Slider::onMove(const TS_Point& fromPoint, const TS_Point& toPoint) {
+    if(!_ready)
+        return false;
+
     if(!inside(toPoint))
         return false;
 

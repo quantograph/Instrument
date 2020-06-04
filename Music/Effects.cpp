@@ -3,17 +3,17 @@
 
 // Sound effect names
 std::vector<String> Effects::_effectName {
-    "none",
-    "clean",
-    "chorus",
-    "flange",
-    "reverb",
-    "freeverb",
-    "envelope",
-    "delay",
-    "bitcrusher",
-    "waveshaper",
-    "granular"
+    "No effect",
+    "Clean",
+    "Chorus",
+    "Flange",
+    "Reverb",
+    "Freeverb",
+    "Envelope",
+    "Delay",
+    "Bitcrusher",
+    "Waveshaper",
+    "Granular"
 };
 
 //=================================================================================================
@@ -76,12 +76,18 @@ void Effects::disconnectAll() {
 bool Effects::connect(EffectType type) {
     // Don't reconnect the same connection
     if(_currConnection->_type == type) {
-        Serial.printf("%s already connected\n", _currConnection->_name.c_str());
+        //Serial.printf("%s already connected\n", _currConnection->_name.c_str());
+        return true;
+    }
+
+    disconnectAll();
+
+    if(type == EffectType::eff_none) {
+        Serial.printf("No effect\n", _effectName[type].c_str(), type);
         return true;
     }
 
     // Find the connection to connect
-    disconnectAll();
     Connection* connection{_connections[type]};
     if(!connection) {
         Serial.printf("##### ERROR: connection %s (%d) not found\n", _effectName[type], type);
@@ -109,12 +115,14 @@ void Effects::showConnections(const char* title, bool showAll) {
 // Update settings for the active effect
 bool Effects::update() {
     const char* title{"Effects::update"};
-    Serial.printf("Effects::update: %s (%d) >>>>>>>>>>>>\n",
-                  _settings->_effectName.c_str(), _settings->_effectType);
+    //Serial.printf("Effects::update: %s (%d) >>>>>>>>>>>>\n", _settings->_effectName.c_str(), _settings->_effectType);
 
     connect(_settings->_effectType);
 
     switch(_settings->_effectType) {
+        case EffectType::eff_none:
+            break;
+
         case EffectType::eff_clean:
             break;
 
@@ -188,8 +196,8 @@ bool Effects::update() {
             return false;
     }
 
-    showConnections(title);
+    //showConnections(title);
 
-    Serial.printf("<<<<<<<<<<<<<< Effects::update\n");
+    //Serial.printf("<<<<<<<<<<<<<< Effects::update\n");
     return true;
 }

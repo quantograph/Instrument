@@ -15,10 +15,12 @@ public:
     uint16_t _barHeight{};
     uint16_t _textColor = ILI9341_WHITE;
     int _textSize = 2;
+    bool _ready{false};
 
     // Functions ----------------------------------------------------------------------------------
     Slider(Settings* settings, Window* parent, uint16_t x, uint16_t y, uint16_t width, 
            uint16_t height, ControlId id = ControlId::ctl_none);
+    void activate();
     void update(TS_Point point);
     void drawBar(uint16_t x, uint16_t color);
     void setValue(float value, float min = 0.0, float max = 1.0);

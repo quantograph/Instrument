@@ -1,6 +1,7 @@
 #include "../Devices/Devices.h"
 #include "../Music/Misc.h"
 #include "../Music/Synth.h"
+#include "../Music/Effects.h"
 #include "Gui.h"
 #include "GuiMisc.h"
 #include "Window.h"
@@ -27,7 +28,7 @@ SetEffect::~SetEffect() {
 
 //=================================================================================================
 bool SetEffect::init(Settings* settings, Window* parent) {
-    //Serial.printf("SetEffect::init: parentID=%d\n", parent->_id);
+    Serial.printf("SetEffect::init: parentID=%d\n", parent->_id);
     uint16_t y = 20;
     uint16_t height;
 
@@ -45,20 +46,20 @@ bool SetEffect::init(Settings* settings, Window* parent) {
     // Effects list
     _effectsList = new List();
     _effectsList->init(_settings, this, ControlId::wnd_effect_list);
-    for(int type = EffectType::eff_none + 1; type < EffectType::eff_last; ++type) {
-        String name{getEffectName((EffectType)type)};
+    for(int type = EffectType::eff_none; type < EffectType::eff_last; ++type) {
+        String name{Effects::_effectName[type]};
         _effectsList->_items.push_back(std::make_pair(name, (EffectType)type));
     }
 
     // Sliders
-    /*int id{sld_1};
+    int id{sld_1};
     height = 50;
     for(int i = 0; i < 4; ++i) {
         Slider* slider = new Slider(_settings, this, 30, y, _settings->_screen->_width - 60, height, (ControlId)id++);
         slider->_hidden = true;
         _sliders.push_back(slider);
         y += height + 20;
-    }*/
+    }
 
     // Buttons
     setupButtons();
@@ -68,10 +69,10 @@ bool SetEffect::init(Settings* settings, Window* parent) {
 
 //=================================================================================================
 void SetEffect::activate(EffectSettings* effectSettings) {
-    //Serial.printf("SetEffect::activate\n");
+    Serial.printf("SetEffect::activate\n");
     _effectSettings = effectSettings;
-    showEffect();
     Window::activate();
+    showEffect();
 }
 
 //=================================================================================================
@@ -94,7 +95,7 @@ void SetEffect::reset() {
 
 //=================================================================================================
 void SetEffect::showEffect() {
-    //Slider* slider;
+    Slider* slider;
     float value;
     Serial.printf("SetEffect::showEffect: %s (%d)\n", 
                   _effectSettings->_effectName.c_str(), _effectSettings->_effectType);
@@ -106,15 +107,17 @@ void SetEffect::showEffect() {
             break;
 
         case EffectType::eff_chorus:
-            /*showSliders(2);
+            showSliders(2);
             // Delay
             slider = _sliders[0];
+            slider->activate();
             value = scale(_effectSettings->_chorus._delay, ChorusDelayMin, ChorusDelayMax, 0.0, 1.0);
             slider->setValue(value);
             // Voices
             slider = _sliders[1];
+            slider->activate();
             value = scale(_effectSettings->_chorus._voices, ChorusVoicesMin, ChorusVoicesMax, 0.0, 1.0);
-            slider->setValue(value);*/
+            slider->setValue(value);
             break;
 
         case EffectType::eff_flange:
@@ -146,7 +149,6 @@ void SetEffect::showEffect() {
                           _effectSettings->_effectType);
     }
 
-    Window::draw();
     showTitles();
 }
 
@@ -160,14 +162,14 @@ void SetEffect::showTitles() {
             break;
 
         case EffectType::eff_chorus:
-            /*// Delay
+            // Delay
             slider = _sliders[0];
             sprintf(buffer, "Delay: %d", _effectSettings->_chorus._delay);
             slider->setTitle(buffer);
             // Voices
             slider = _sliders[1];
             sprintf(buffer, "Voices: %d", _effectSettings->_chorus._voices);
-            slider->setTitle(buffer);*/
+            slider->setTitle(buffer);
             break;
 
         case EffectType::eff_flange:
@@ -202,14 +204,14 @@ void SetEffect::showTitles() {
 
 //=================================================================================================
 void SetEffect::showSliders(int number) {
-    /*Slider* slider;
+    Slider* slider;
     for(int i = 0; i < 4; ++i) {
         slider = (Slider*)_sliders[i];
         if(i < number)
             slider->_hidden = false;
         else
             slider->_hidden = true;
-    }*/
+    }
 }
 
 //=================================================================================================
@@ -299,7 +301,7 @@ bool SetEffect::onControl(Control* control) {
 
 //=================================================================================================
 void SetEffect::onBack(Window* window) {
-    //Serial.printf("SetEffect::onBack: ID=%d\n", window->_id);
+    Serial.printf("SetEffect::onBack: ID=%d\n", window->_id);
 
     _settings->_gui->_current = this;
 
