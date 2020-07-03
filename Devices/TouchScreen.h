@@ -10,7 +10,7 @@ public:
     // Screen ---
     // VCC: (+3.3V  1) connected to TFT_RST (RESET 4)
     // GND (GND  2)
-    #define TFT_CS 14 // (Scrn-CS 3)
+    #define TFT_CS 10 // (Scrn-CS 3)
     #define TFT_RST 255 // (RESET 4) connected to VCC (+3.3V 1)
     #define TFT_DC 5 // (Scrn-DC 5)
     #define TFT_MOSI 11 // (6) connected to T_DIN (ScrT-DIN 12)

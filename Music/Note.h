@@ -1,5 +1,7 @@
 #pragma once
 
+class Chord;
+
 class Note {
 public:
     // Note state
@@ -18,6 +20,24 @@ public:
         STATE_CHORD_MARK,   // Mark note for chord type
         STATE_PART_MARK,    // Mark note for song part
         STATE_MEASURE_MARK, // Mark note for measure number
+    };
+
+    // Sharp/flat
+    enum SHIFT {
+        // ############ NOTE! Don't insert, only append ###########
+        NONE,
+        SHARP,
+        FLAT
+        // ############ NOTE! Don't insert, only append ###########
+    };
+
+    // Note type
+    enum TYPE {
+        // ############ NOTE! Don't insert, only append ###########
+        NOTE, // Regular note
+        CHORD, // Mark note for chord type
+        MEASURE // Mark note for measure number
+        // ############ NOTE! Don't insert, only append ###########
     };
 
     // Guitar tab info: string and fret number
@@ -58,14 +78,39 @@ public:
         }
     };
 
+    // Flags
+    #define FLAG_LAST_NOTE (1<<0) // Last note in a song
+
+    int _index{}; // Note's index in the array
+    static const char* _names[]; // Note names
+    static const char* _namesSharp[]; // Note names, wiht #
+    static const char* _namesFlat[]; // Note names, with b
     uint8_t _midiNote{NO_MIDI_NOTE}; // MIDI note number
+    double _frequency{0.0}; // Note's frequency
+    double _freqFrom{0.0}; // Note's frequency range from
+    double _freqTo{0.0}; // Note's frequency range to
     float _volume{0.0}; // Volume: 1.0 - full volume, 0.0 - silence
     float _start{0.0}; // Start time, in seconds
     float _duration{0.0}; // Duration of the note, in seconds
     STATE _state{STATE_NONE};
-    TabInfo _tab; // String and fret for this note, for one particular notation
+    TabInfo _tab{}; // String and fret for this note, for one particular notation
+    TYPE _type{TYPE::NOTE}; // Note type
     uint16_t _channel{0}; // MIDI channel
-    Instrument _instrument{NONE}; // Instrument type
+    Instrument _instrument{Instrument::NONE}; // Instrument type
+    int _scaleIndex{0}; // Index in the scale's list
+    int _scaleInterval{0}; // Scale's interval
+    int _chordInterval{0}; // Interval in a chord
+    int _step{0}; // Number of semi-tones from the previous note
+    int _rootOffset{0}; // Number of semi-tones from the scale's or chord's root note
+    String _name{""}; // Note's name
+    String _nameSharp{""}; // Note's name wtih #, if any
+    String _nameFlat{""}; // Note's name wtih b, if any
+    int _octave{0}; // Note's octave number, from -1 to 9
+    SHIFT _showShift{SHIFT::NONE}; // Whether to show _nameSharp or _nameFlat
+    SHIFT _shift{SHIFT::NONE}; // Sharp/flat
+    int _measure{0}; // Measure (bar) number, for MEASURE note type
+    int _flags{0}; // Bitmask of flags
+    Chord* _chord{nullptr}; // Chord info, for CHORD note type
 
     Note();
     Note(const Note& note) { *this = note; }
@@ -73,10 +118,18 @@ public:
     void reset();
     void show();
     Note& operator = (const Note& note);
+    const char* GetName();
+    int SetNames();
+    void CopyTone(Note note);
+    void setRandDuration(int lengthFrom, int lengthTo, double beatTime, double measureTime);
 };
 
 typedef std::vector<Note> NoteList;
 typedef NoteList::iterator NoteListIter;
 
 bool sortNoteTime(Note note1, Note note2);
+bool sortNoteNumber(Note note1, Note note2);
 void sortNotes(NoteList* notes);
+void addNotes(NoteList& from, NoteList& to, double timeShift);
+void shiftNotes(NoteList& notes, int shift);
+double getNoteTime(double beatTime, int note);

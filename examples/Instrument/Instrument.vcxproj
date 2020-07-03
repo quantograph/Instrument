@@ -51,7 +51,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\Instrument;$(ProjectDir)..\..\..\QuantoGraph;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\Audio;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\Audio\utility;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\Wire;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\Wire\utility;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\EEPROM;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\SPI;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\SD;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\SD\utility;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\ILI9341_t3;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\XPT2046_Touchscreen;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\SerialFlash;$(ProjectDir)..\..\..\Adafruit_MPR121;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\CapacitiveSensor;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\USBHost_t36;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\libraries\USBHost_t36\utility;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy4;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy4\avr;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy4\debug;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy\avr\cores\teensy4\util;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\tools\arm\arm-none-eabi\include;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\tools\arm\lib\gcc\arm-none-eabi\5.4.1\include;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\tools\arm\arm-none-eabi\include\c++\5.4.1;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\tools\arm\arm-none-eabi\include\c++\5.4.1\tr1;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\tools\arm\arm-none-eabi\include\c++\5.4.1\bits;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\tools\arm\arm-none-eabi\include\c++\5.4.1\arm-none-eabi;$(ProjectDir)..\..\Devices;$(ProjectDir)..\..\GUI;$(ProjectDir)..\..\Music;$(ProjectDir)..\..\Sound;$(ProjectDir)..\..\..\..\..\..\..\..\Program Files (x86)\Arduino\hardware\teensy;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedIncludeFiles>$(ProjectDir)__vm\.Instrument.vsarduino.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
-      <PreprocessorDefinitions>__HARDWARE_imxrt1062__;__HARDWARE_IMXRT1062__;__IMXRT1062__;TEENSYDUINO=151;ARDUINO=108012;ARDUINO_TEENSY40;F_CPU=600000000;USB_SERIAL;LAYOUT_US_ENGLISH;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__HARDWARE_imxrt1062__;__HARDWARE_IMXRT1062__;__IMXRT1062__;TEENSYDUINO=153;ARDUINO=108013;ARDUINO_TEENSY40;F_CPU=600000000;USB_SERIAL;LAYOUT_US_ENGLISH;__cplusplus=201103L;_VMICRO_INTELLISENSE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>
       </AdditionalOptions>
       <DisableSpecificWarnings>unused-variable</DisableSpecificWarnings>
@@ -117,13 +117,23 @@
     <ClInclude Include="..\..\GUI\Slider.h" />
     <ClInclude Include="..\..\GUI\TextBox.h" />
     <ClInclude Include="..\..\GUI\Window.h" />
+    <ClInclude Include="..\..\Music\Band.h" />
+    <ClInclude Include="..\..\Music\Bass.h" />
+    <ClInclude Include="..\..\Music\Chord.h" />
+    <ClInclude Include="..\..\Music\Drums.h" />
     <ClInclude Include="..\..\Music\Effects.h" />
     <ClInclude Include="..\..\Music\Fingers.h" />
+    <ClInclude Include="..\..\Music\Keys.h" />
+    <ClInclude Include="..\..\Music\Lead.h" />
     <ClInclude Include="..\..\Music\MidiFile.h" />
     <ClInclude Include="..\..\Music\Misc.h" />
+    <ClInclude Include="..\..\Music\Music.h" />
     <ClInclude Include="..\..\Music\MusicDef.h" />
     <ClInclude Include="..\..\Music\Note.h" />
+    <ClInclude Include="..\..\Music\NoteInfo.h" />
     <ClInclude Include="..\..\Music\Player.h" />
+    <ClInclude Include="..\..\Music\Rhythm.h" />
+    <ClInclude Include="..\..\Music\Scale.h" />
     <ClInclude Include="..\..\Music\Song.h" />
     <ClInclude Include="..\..\Music\Staff.h" />
     <ClInclude Include="..\..\Music\Synth.h" />
@@ -194,12 +204,21 @@
     <ClCompile Include="..\..\GUI\Slider.cpp" />
     <ClCompile Include="..\..\GUI\TextBox.cpp" />
     <ClCompile Include="..\..\GUI\Window.cpp" />
+    <ClCompile Include="..\..\Music\Band.cpp" />
+    <ClCompile Include="..\..\Music\Bass.cpp" />
+    <ClCompile Include="..\..\Music\Chord.cpp" />
+    <ClCompile Include="..\..\Music\Drums.cpp" />
     <ClCompile Include="..\..\Music\Effects.cpp" />
     <ClCompile Include="..\..\Music\Fingers.cpp" />
+    <ClCompile Include="..\..\Music\Keys.cpp" />
+    <ClCompile Include="..\..\Music\Lead.cpp" />
     <ClCompile Include="..\..\Music\MidiFile.cpp" />
     <ClCompile Include="..\..\Music\Misc.cpp" />
     <ClCompile Include="..\..\Music\Note.cpp" />
+    <ClCompile Include="..\..\Music\NoteInfo.cpp" />
     <ClCompile Include="..\..\Music\Player.cpp" />
+    <ClCompile Include="..\..\Music\Rhythm.cpp" />
+    <ClCompile Include="..\..\Music\Scale.cpp" />
     <ClCompile Include="..\..\Music\Song.cpp" />
     <ClCompile Include="..\..\Music\Staff.cpp" />
     <ClCompile Include="..\..\Music\Synth.cpp" />

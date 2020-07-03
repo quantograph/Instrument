@@ -45,7 +45,6 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
     updateEffects();
 
     Serial.printf("========================== AudioBoard::init end\n");
-    return true;
 }
 
 //=================================================================================================

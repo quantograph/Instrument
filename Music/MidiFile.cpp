@@ -8,6 +8,7 @@
 #include "Misc.h"
 #include "Note.h"
 #include "Track.h"
+#include "Scale.h"
 #include "Song.h"
 #include "MidiFile.h"
 
@@ -189,7 +190,7 @@ bool MidiFile::getFileHeader(ChunkInfo& chunk, Song* song) {
 
     // MIDI format.
     // 0 - one track for all notes
-    // 1 - one MIDI track per song track. The first track contains all parameters for the song.
+    // 1 - one MIDI track per song track-> The first track contains all parameters for the song.
     // 2 - many tracks, but not played simultaneously. May be used to store patterns.
     reverse2Bytes((char*)&header->_format);
     _format = header->_format;
@@ -1160,7 +1161,7 @@ uint8_t MidiFile::getMidiDrumNote(Instrument instrument) {
     switch(instrument) {
         /*case DRUM_BASS_DRUM_2:
             return 35; // Bass Drum 2
-        case DRUM_BASS_DRUM_1:
+        case DRUM_BASS1:
             return 36; // Bass Drum 1
 
         case DRUM_SNARE:
@@ -1230,7 +1231,7 @@ bool MidiFile::getDrumInfo(uint32_t midiNote, String& name, Instrument& instrume
         case 33: name = "Metronome1";     instrument = NONE; break;
         case 34: name = "Metronome2";     instrument = NONE; break;
         case 35: name = "Bass Drum 2";    instrument = (Instrument)DRUM_BASS_DRUM_2; break;
-        case 36: name = "Bass Drum 1";    instrument = (Instrument)DRUM_BASS_DRUM_1; break;
+        case 36: name = "Bass Drum 1";    instrument = (Instrument)DRUM_BASS1; break;
         case 37: name = "Side Stick";     instrument = (Instrument)NONE; break;
         case 38: name = "Snare 1";        instrument = (Instrument)DRUM_SNARE; break;
         case 39: name = "Hand Clap";      instrument = NONE; break;
@@ -1620,8 +1621,8 @@ bool MidiFile::SaveTrackNotes(Track* track, Buffer& sTrackData) {
     Note		Note;				// Current note
     float		dPrevTime = 0.0;	// Last note's time
     int32_t		    timeDiff;	        // Time difference
-    NOTES	events;				// List of notes as on/off events
-    NOTES_ITER noteIter;
+    NoteList	events;				// List of notes as on/off events
+    NoteListIter noteIter;
 
     //track->Show();
 
@@ -1639,7 +1640,7 @@ bool MidiFile::SaveTrackNotes(Track* track, Buffer& sTrackData) {
         events.push_back(Note); // Sorted by start time
     }
 
-    std::sort(events.begin(), events.end(), SortNoteTime); // Sort events by start time
+    std::sort(events.begin(), events.end(), sortNoteTime); // Sort events by start time
 
     // Save all note starts and stops
     for(noteIter = events.begin(); noteIter != events.end(); noteIter++) {
@@ -1653,7 +1654,7 @@ bool MidiFile::SaveTrackNotes(Track* track, Buffer& sTrackData) {
         dPrevTime = note->_start;
     }
 
-    // Add a silent note to the end of track. This will prevent MIDI players from cutting the end of track.
+    // Add a silent note to the end of track-> This will prevent MIDI players from cutting the end of track->
     if(!SaveNote(0, true, track->_channel, true, 0, 0.0, sTrackData))
         return false;
 
@@ -1790,21 +1791,21 @@ bool MidiFile::SaveChord(int32_t timeDiff, Note* note, Track* track, Buffer& sTr
     sData += sPair;
 
     // Root # or b
-    if(!NoteManager::NoteTypeToString(note->_ChordInfo._Modifiers._Pitch, sValue))
+    if(!NoteInfo::NoteTypeToString(note->_ChordInfo._Modifiers._Pitch, sValue))
         return false;
 
     sPair.Format("%s%s|", MARKER_FIELD_PITCH, (const char*)sValue);
     sData += sPair;
 
     // Chord type
-    if(!NoteManager::ChordTypeToString(note->_ChordInfo._nType, sValue))
+    if(!NoteInfo::ChordTypeToString(note->_ChordInfo._nType, sValue))
         return false;
 
     sPair.Format("%s%s|", MARKER_FIELD_CHORD_TYPE, (const char*)sValue);
     sData += sPair;
 
     // Chord group
-    if(!NoteManager::GetChordGroupName(note->_ChordInfo._nGroup, sValue))
+    if(!NoteInfo::GetChordGroupName(note->_ChordInfo._nGroup, sValue))
         return false;
 
     sPair.Format("%s%s|", MARKER_FIELD_CHORD_GROUP, (const char*)sValue);
@@ -1815,7 +1816,7 @@ bool MidiFile::SaveChord(int32_t timeDiff, Note* note, Track* track, Buffer& sTr
     sData += sPair;
 
     // Scale
-    if(!NoteManager::GetScaleName(note->_ChordInfo._nScale, sValue))
+    if(!NoteInfo::GetScaleName(note->_ChordInfo._nScale, sValue))
         return false;
 
     sPair.Format("%s%s|", MARKER_FIELD_SCALE, (const char*)sValue);
@@ -1856,25 +1857,25 @@ bool MidiFile::GetChord(const char* pMarker, float trackTime, Song* song, Track*
             Chord._RootNote._ChordInfo._nRoot = atoi(pValue);
         } else if(!strncmp(pField, MARKER_FIELD_PITCH, strlen(MARKER_FIELD_PITCH))) { // Root # or b
             pValue = pField + strlen(MARKER_FIELD_PITCH);
-            if(!NoteManager::StringToNoteType(pValue, Chord._RootNote._Modifiers._Pitch))
+            if(!NoteInfo::StringToNoteType(pValue, Chord._RootNote._Modifiers._Pitch))
                 return false;
         } else if(!strncmp(pField, MARKER_FIELD_CHORD_TYPE, strlen(MARKER_FIELD_CHORD_TYPE))) { // Chord type
             pValue = pField + strlen(MARKER_FIELD_CHORD_TYPE);
-            if(!NoteManager::StringToChordType(pValue, Chord._RootNote._ChordInfo._nType))
+            if(!NoteInfo::StringToChordType(pValue, Chord._RootNote._ChordInfo._nType))
                 return false;
         } else if(!strncmp(pField, MARKER_FIELD_REPEAT, strlen(MARKER_FIELD_REPEAT))) { // Number of times to repeat
             pValue = pField + strlen(MARKER_FIELD_REPEAT);
             Chord._nRepeat = 1; //atoi(pValue);
         } else if(!strncmp(pField, MARKER_FIELD_CHORD_GROUP, strlen(MARKER_FIELD_CHORD_GROUP))) { // Chord group
             pValue = pField + strlen(MARKER_FIELD_CHORD_GROUP);
-            if(!NoteManager::GetChordGroup(pValue, Chord._RootNote._ChordInfo._nGroup))
+            if(!NoteInfo::GetChordGroup(pValue, Chord._RootNote._ChordInfo._nGroup))
                 return false;
         } else if(!strncmp(pField, MARKER_FIELD_NUMBER, strlen(MARKER_FIELD_NUMBER))) { // Chord number in the scale
             pValue = pField + strlen(MARKER_FIELD_NUMBER);
             Chord._RootNote._ChordInfo._nNumber = atoi(pValue);
         } else if(!strncmp(pField, MARKER_FIELD_SCALE, strlen(MARKER_FIELD_SCALE))) { // Scale
             pValue = pField + strlen(MARKER_FIELD_SCALE);
-            if(!NoteManager::GetScaleID(pValue, Chord._RootNote._ChordInfo._nScale))
+            if(!NoteInfo::GetScaleID(pValue, Chord._RootNote._ChordInfo._nScale))
                 return false;
         } else if(!strncmp(pField, MARKER_FIELD_SCALE_ROOT, strlen(MARKER_FIELD_SCALE_ROOT))) { // Scale root note
             pValue = pField + strlen(MARKER_FIELD_SCALE_ROOT);
@@ -2113,7 +2114,7 @@ bool MidiFile::SavePartInfo(int32_t timeDiff, SongPart* pPart, Buffer& sTrackDat
     sData += sPair;
 
     // Scale
-    if(!NoteManager::GetScaleName(pPart->_Part._nScale, sValue))
+    if(!NoteInfo::GetScaleName(pPart->_Part._nScale, sValue))
         return false;
 
     sPair.Format("%s%s|", MARKER_FIELD_SCALE, (const char*)sValue);
@@ -2192,7 +2193,7 @@ bool MidiFile::GetPartInfo(const char* pMarker, float trackTime, Song* song, Tra
             Part._Part._songTime = atof(pValue);
         } else if(!strncmp(pField, MARKER_FIELD_SCALE, strlen(MARKER_FIELD_SCALE))) { // Scale
             pValue = pField + strlen(MARKER_FIELD_SCALE);
-            if(!NoteManager::GetScaleID(pValue, Part._Part._nScale))
+            if(!NoteInfo::GetScaleID(pValue, Part._Part._nScale))
                 return false;
         } else if(!strncmp(pField, MARKER_FIELD_SCALE_ROOT, strlen(MARKER_FIELD_SCALE_ROOT))) { // Scale root note
             pValue = pField + strlen(MARKER_FIELD_SCALE_ROOT);

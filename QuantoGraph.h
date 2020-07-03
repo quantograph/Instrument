@@ -20,19 +20,6 @@
 #include "./GUI/Gui.h"
 
 #include "./Sound/Sound.h"
-
-#include "./Music/MusicDef.h"
-#include "./Music/Misc.h"
-#include "./Music/Note.h"
-#include "./Music/Track.h"
-#include "./Music/Song.h"
-#include "./Music/Fingers.h"
-#include "./Music/Staff.h"
-#include "./Music/Keys.h"
-#include "./Music/Effects.h"
-#include "./Music/Synth.h"
-#include "./Music/MidiFile.h"
-#include "./Music/Player.h"
-
+#include "./Music/Music.h"
 
 #endif

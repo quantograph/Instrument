@@ -2,6 +2,7 @@
 #include "Misc.h"
 #include "Note.h"
 #include "Track.h"
+#include "Scale.h"
 #include "Song.h"
 
 //-----------------------------------------------------------------------------

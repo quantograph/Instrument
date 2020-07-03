@@ -1,5 +1,5 @@
+#include <algorithm>
 #include "../Devices/Devices.h"
-#include "Misc.h"
 #include "Misc.h"
 #include "Note.h"
 #include "Track.h"
@@ -37,3 +37,29 @@ void Track::getAllNotes(NoteList* notes) {
         notes->push_back(endNote);
     }
 }
+
+//-----------------------------------------------------------------------------
+// Resets everything
+void Track::reset() {
+    _notes.clear();
+    _trackName = "";
+    _instrumentName = "";
+    _instrument = Instrument::NONE;
+    _trackNumber = 0;
+    _channel = 0;
+    _pan = 0.0;
+    _volume = 1.0;
+}
+
+//-----------------------------------------------------------------------------
+// Sorts track's notes by their start time
+void Track::sort() {
+    std::sort(_notes.begin(), _notes.end(), sortNoteTime); // Sort notes by start time
+}
+
+//-----------------------------------------------------------------------------
+// Adds notes to the and of track, shifting their start times
+void Track::addNotes(NoteList& notes, double timeShift) {
+    ::addNotes(notes, _notes, timeShift);
+}
+

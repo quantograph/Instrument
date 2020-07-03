@@ -673,6 +673,83 @@ struct SynthSettings {
     }
 };
 
+// Settings for one instrument
+struct InstrumentSettings {
+    // Sound settings
+    bool _play;
+    double _volume;
+    double _pan;
+    Instrument _instrument;
+    // Band settings
+    int _lengthFrom; // Note length, from. Power of 2: 0 for whole note, 1 for 1/2, 2 for 1/4, ... , 6 for 1/32.
+    int _lengthTo; // Note length, to. Power of 2.
+    int _density; // Density of notes vs. pauses, %
+
+    InstrumentSettings() {
+        Reset();
+    }
+
+    void Reset() {
+        _play = true;
+        _volume = 1.0;
+        _pan = 0.0;
+        _instrument = Instrument::NONE;
+        _lengthFrom = 8;
+        _lengthTo = 4;
+        _density = 70;
+    }
+};
+
+// Settings for the Band
+struct ComposerSettings {
+    int _tempo; // Tempo, quarter notes per minute
+    int _measureBeats; // Time signature numerator - number of beats in one measure (3 for 3/4 song)
+    int _beatNote; // Time signature denominator - note duration for one beat, 4 is for a quarter note (4 for 3/4 song)
+    SCALE _scaleType; // Scale type
+    IntList _verseChords; // Verse chord progression
+    IntList _chorusChords; // Chorus chord progression
+    int _move; // Note to note move, in intervals
+    int _moveRange; // Total note move range, in intervals
+    int _repeatRhythm; // Repetition of rhythm, %
+    int _repeatMelody; // Repetition of melody, %
+    InstrumentSettings _lead; // Lead settings
+    InstrumentSettings _rhythm; // Rhythm settings
+    InstrumentSettings _bass; // Bass settings
+    InstrumentSettings _drums; // Drums settings
+
+    ComposerSettings() {
+        Reset();
+    }
+
+    void Reset() {
+        _tempo = 120;
+        _measureBeats = 4;
+        _beatNote = 4;
+        _scaleType = SCALE_C_MAJOR;
+        _verseChords.clear();
+        _chorusChords.clear();
+        _move = 3;
+        _moveRange = 7;
+        _repeatRhythm = 0;
+        _repeatMelody = 0;
+        // Volume
+        _lead._volume = 0.8;
+        _rhythm._volume = 0.5;
+        _bass._volume = 0.9;
+        _drums._volume = 1.0;
+        // Pan
+        _lead._pan = -0.5;
+        _rhythm._pan = 0.5;
+        _bass._pan = 0.0;
+        _drums._pan = 0.0;
+        // Instruments
+        _lead._instrument = DISTORTION_GUITAR;
+        _rhythm._instrument = ELECTRIC_GUITAR_CLEAN;
+        _bass._instrument = ELECTRIC_BASS_FINGER;
+        _drums._instrument = PERCUSSION;
+    }
+};
+
 // All settings
 struct Settings {
     AudioSettings _audioSettings{};
@@ -680,6 +757,7 @@ struct Settings {
     InputSettings _guitarInput{};
     InputSettings _synthInput{};
     SynthSettings _synthSettings{};
+    ComposerSettings _composer{};
 
     void show(String title) const {
         Serial.printf("---------- %s Settings\n", title.c_str());

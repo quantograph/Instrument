@@ -211,6 +211,36 @@
     <ClInclude Include="..\..\Devices\SettingsFile.h">
       <Filter>Devices</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Music\Chord.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Music\Scale.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Music\Band.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Music\Bass.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Music\Drums.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Music\Keys.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Music\Lead.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Music\NoteInfo.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Music\Rhythm.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Music\Music.h">
+      <Filter>Music</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.md" />
@@ -432,6 +462,33 @@
     </ClCompile>
     <ClCompile Include="..\..\Devices\SettingsFile.cpp">
       <Filter>Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Music\Chord.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Music\Scale.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Music\Band.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Music\Bass.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Music\Drums.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Music\Keys.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Music\Lead.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Music\NoteInfo.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Music\Rhythm.cpp">
+      <Filter>Music</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

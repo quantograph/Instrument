@@ -70,6 +70,39 @@ void reverse4Bytes(char* data) {
     data[2] = byte;
 }
 
+//-----------------------------------------------------------------------------
+// Adds an array of integers to integer list
+// Returns: error number
+int addIntList(IntList& list, int* values, int size) {
+    int i;
+
+    for(i = 0; i < size; i++) {
+        list.push_back(values[i]);
+    }
+
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+// Random double
+double randomDouble(double from, double to) {
+    int rand;
+    double fraction = 1000.0;
+
+    rand = random((int)(from * fraction), (int)(to * fraction));
+    return (double)rand / fraction;
+}
+
+//-----------------------------------------------------------------------------
+// 33-40   Bass
+bool isBass(Instrument instrument) {
+    if((instrument >= ACOUSTIC_BASS && instrument <= SYNTH_BASS_2) ||
+       instrument == CONTRABASS) // Contrabass
+        return true;
+    else
+        return false;
+}
+
 // Shows a number as bits
 /*void ShowBits(uint32_t value, String& s) {
     char buffer[8];
