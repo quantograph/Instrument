@@ -28,6 +28,7 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
         _audioControl.inputSelect(AUDIO_INPUT_LINEIN);
         setLineInLevel();
     }
+    Serial.printf("Input\n");
 
     // Peak meters
     _cords.push_back(new AudioConnection(_input, 0, _peakLeft, 0));
@@ -56,7 +57,7 @@ bool AudioBoard::updateEffects() {
                   _settings->_guitarInput._effect2._effectType);
 
     _effect1->update();
-    _effect2->update();
+    //_effect2->update();
 
     return true;
 }

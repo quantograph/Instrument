@@ -22,6 +22,6 @@ public:
     bool init(Settings* settings);
     bool play(Song* song);
     void process();
-    void testMidiFile();
+    void testMidiFile(SdCard* sdCard);
     bool playNote(Note* note);
 };

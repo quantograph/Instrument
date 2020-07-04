@@ -19,6 +19,7 @@
 #include "Scale.h"
 #include "Song.h"
 #include "Synth.h"
+#include "MidiFile.h"
 #include "Player.h"
 
 //=================================================================================================
@@ -202,18 +203,18 @@ bool Player::playNote(Note* note) {
 }
 
 //=================================================================================================
-void Player::testMidiFile() {
-    /*MidiFile file;
+void Player::testMidiFile(SdCard* sdCard) {
+    MidiFile file;
     Song song;
     char* data;
     uint32_t dataSize;
     
     //g_sdCard.readFile("Test1.mid", data, dataSize);
-    g_sdCard.readFile("TEST2.mid", data, dataSize);
+    sdCard->readFile("TEST2.mid", data, dataSize);
     file.read(data, dataSize, &song);
     free(data);
     song.show();
-    play(&song);*/
+    play(&song);
 }
 
 //=================================================================================================

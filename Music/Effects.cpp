@@ -21,8 +21,9 @@ Effects::Effects(EffectSettings* settings, AudioStream* source, uint8_t sourceOu
                  AudioStream* dest, uint8_t destInput) :
     _settings(settings), _source(source), _sourceOutput(sourceOutput), _dest(dest), 
     _destInput(destInput) {
-
+    Serial.printf("Effects::Effects\n");
     memset(_delayLine, 0, DELAY_LINE_LENGTH); // To prevent noise on the first use
+    Serial.printf("Effects::Effects end\n");
 }
 
 //=================================================================================================
@@ -31,6 +32,7 @@ Effects::~Effects() {
 
 //=================================================================================================
 bool Effects::init() {
+    Serial.printf("Effects::init\n");
     _connections.resize(eff_last);
 
     _connections[EffectType::eff_none] = nullptr; // To align the vector with type number
@@ -115,7 +117,8 @@ void Effects::showConnections(const char* title, bool showAll) {
 // Update settings for the active effect
 bool Effects::update() {
     const char* title{"Effects::update"};
-    //Serial.printf("Effects::update: %s (%d) >>>>>>>>>>>>\n", _settings->_effectName.c_str(), _settings->_effectType);
+    Serial.printf("Effects::update: %s (%d) >>>>>>>>>>>>\n", _settings->_effectName.c_str(), _settings->_effectType);
+    //delay(50);
 
     connect(_settings->_effectType);
 
@@ -198,6 +201,6 @@ bool Effects::update() {
 
     //showConnections(title);
 
-    //Serial.printf("<<<<<<<<<<<<<< Effects::update\n");
+    Serial.printf("<<<<<<<<<<<<<< Effects::update\n");
     return true;
 }

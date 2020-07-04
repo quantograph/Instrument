@@ -24,7 +24,7 @@ AudioBoard g_audio = AudioBoard();
 SdCard g_sdCard = SdCard();
 MidiInput g_midiInput = MidiInput();
 Bluetooth g_bluetooth = Bluetooth();
-Player g_player = Player();
+//Player g_player = Player();
 Synth g_synth = Synth();
 
 //Menu g_menu = Menu();
@@ -52,7 +52,7 @@ void setup() {
     g_settingsFile._settings._sdCard = &g_sdCard;
     g_settingsFile._settings._midiInput = &g_midiInput;
     g_settingsFile._settings._bluetooth = &g_bluetooth;
-    g_settingsFile._settings._player = &g_player;
+    //g_settingsFile._settings._player = &g_player;
     g_settingsFile._settings._synth = &g_synth;
 
     // Initialize everything
@@ -61,10 +61,10 @@ void setup() {
     g_audio.init(&g_gui, &g_settingsFile._settings);
 
     // MIDI input
-    g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
-    g_midiInput.init(&g_synth);
+    //g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
+    //g_midiInput.init(&g_synth);
     
-    //g_player.init();
+    //g_player.init(&g_settingsFile._settings);
     //g_bluetooth.init();
 
     //g_cap.init();
@@ -75,8 +75,10 @@ void setup() {
     //g_sdCard.printDirectory(SD.open("/"), 0);
     //g_midi.init();
     //g_midi.test(127);
-    //g_player.test();
+    //g_player.testMidiFile(&g_sdCard);
     //g_settingsFile.test();
+
+    Serial.println("=====> setup end");
 }
 
 //=================================================================================================
