@@ -163,8 +163,11 @@ struct Chorus {
 
     void show(String title) const {
         Serial.printf("---------- %s Chorus\n", title.c_str());
+        //delay(500);
         Serial.printf("delay=%d\n", _delay);
+        //delay(500);
         Serial.printf("voices=%d\n", _voices);
+        delay(500);
     }
 
     void random() {
@@ -402,7 +405,7 @@ struct Granular {
 // Settings for all possible effects for one instrument (synth or guitar)
 struct EffectSettings {
     EffectType _effectType{EffectType::eff_clean};
-    String _effectName{};
+    String _effectName{""};
     Chorus _chorus{};
     Flange _flange{};
     Reverb _reverb{};
@@ -652,7 +655,7 @@ struct GuiSettings {
 // Settings for synth
 struct SynthSettings {
     uint16_t _instrument{};
-    String _instrumentName{};
+    String _instrumentName{""};
 
     void putValues(String& string);
 
@@ -769,14 +772,14 @@ struct Settings {
     }
 
     // All devices, not saved into EEPROM, just to have them available
-    TouchScreen* _screen{};
-    Gui* _gui{};
-    AudioBoard* _audioBoard{};
-    SdCard* _sdCard{};
-    MidiInput* _midiInput{};
-    Bluetooth* _bluetooth{};
-    Player* _player{};
-    Synth* _synth{};
+    TouchScreen* _screen{nullptr};
+    Gui* _gui{nullptr};
+    AudioBoard* _audioBoard{nullptr};
+    SdCard* _sdCard{nullptr};
+    MidiInput* _midiInput{nullptr};
+    Bluetooth* _bluetooth{nullptr};
+    Player* _player{nullptr};
+    Synth* _synth{nullptr};
 
     void random() {
         _audioSettings.random();

@@ -8,7 +8,7 @@ String randomString() {
     String ret{};
     char buffer[8];
 
-    sprintf(buffer, "%d", random(0, 100));
+    sprintf(buffer, "%ld", random(0, 100));
     ret = buffer;
     return ret;
 }

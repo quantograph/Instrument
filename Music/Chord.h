@@ -99,10 +99,10 @@ public:
 
     // Data members -----------------------------------------------------------
 public:
-    Note _root; // Root note
-    NoteList _notes; // Chord notes
-    CHORD _type; // Chord type
-    String _name; // Chord name
+    Note _root{}; // Root note
+    NoteList _notes{}; // Chord notes
+    CHORD _type{}; // Chord type
+    String _name{""}; // Chord name
 
     // Functions --------------------------------------------------------------
 public:

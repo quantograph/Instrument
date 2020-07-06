@@ -21,7 +21,7 @@ public:
     uint16_t _textColor = ILI9341_WHITE;
     int _textSize = 2;
     TS_Point _touchPoint{};
-    String _selectedString{};
+    String _selectedString{""};
     int _selectedId{0};
     bool _ready{false};
 

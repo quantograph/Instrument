@@ -5,7 +5,7 @@ class TouchScreen;
 class Slider : public Control {
 public:
     // Data ---------------------------------------------------------------------------------------
-    String _title{};
+    String _title{""};
     float _value{0.0};
     int16_t _lastX{-1};
     uint16_t _barTop{};

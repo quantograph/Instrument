@@ -63,16 +63,16 @@ public:
     AudioStream* _dest{nullptr};
     uint8_t _destInput{0};
     int16_t* _granularMemory{nullptr};
-    std::vector<Connection*> _connections; // All in/out connecions for all effects
+    std::vector<Connection*> _connections{}; // All in/out connecions for all effects
     Connection* _currConnection{nullptr};
     // Effects
-    AudioEffectChorus _chorus;
-    AudioEffectFlange _flange;
-    AudioEffectReverb _reverb;
-    AudioEffectFreeverb _freeverb;
-    AudioEffectEnvelope _envelope;
-    AudioEffectDelay _delay;
-    AudioEffectBitcrusher _bitcrusher;
-    AudioEffectWaveshaper _waveshaper;
-    AudioEffectGranular _granular;
+    AudioEffectChorus _chorus{};
+    AudioEffectFlange _flange{};
+    AudioEffectReverb _reverb{};
+    AudioEffectFreeverb _freeverb{};
+    AudioEffectEnvelope _envelope{};
+    AudioEffectDelay _delay{};
+    AudioEffectBitcrusher _bitcrusher{};
+    AudioEffectWaveshaper _waveshaper{};
+    AudioEffectGranular _granular{};
 };

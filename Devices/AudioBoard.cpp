@@ -57,7 +57,7 @@ bool AudioBoard::updateEffects() {
                   _settings->_guitarInput._effect2._effectType);
 
     _effect1->update();
-    //_effect2->update();
+    _effect2->update();
 
     return true;
 }

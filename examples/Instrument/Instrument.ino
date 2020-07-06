@@ -24,7 +24,7 @@ AudioBoard g_audio = AudioBoard();
 SdCard g_sdCard = SdCard();
 MidiInput g_midiInput = MidiInput();
 Bluetooth g_bluetooth = Bluetooth();
-//Player g_player = Player();
+Player g_player = Player();
 Synth g_synth = Synth();
 
 //Menu g_menu = Menu();
@@ -52,7 +52,7 @@ void setup() {
     g_settingsFile._settings._sdCard = &g_sdCard;
     g_settingsFile._settings._midiInput = &g_midiInput;
     g_settingsFile._settings._bluetooth = &g_bluetooth;
-    //g_settingsFile._settings._player = &g_player;
+    g_settingsFile._settings._player = &g_player;
     g_settingsFile._settings._synth = &g_synth;
 
     // Initialize everything
@@ -61,8 +61,8 @@ void setup() {
     g_audio.init(&g_gui, &g_settingsFile._settings);
 
     // MIDI input
-    //g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
-    //g_midiInput.init(&g_synth);
+    g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
+    g_midiInput.init(&g_synth);
     
     //g_player.init(&g_settingsFile._settings);
     //g_bluetooth.init();
@@ -78,13 +78,24 @@ void setup() {
     //g_player.testMidiFile(&g_sdCard);
     //g_settingsFile.test();
 
+    // Charger
+    int d0{40};
+    int d1{41};
+    int d2{39};
+    pinMode(d0, OUTPUT);
+    digitalWrite(d0, LOW);
+    pinMode(d1, OUTPUT);
+    digitalWrite(d1, LOW);
+    pinMode(d2, OUTPUT);
+    digitalWrite(d2, HIGH);
+
     Serial.println("=====> setup end");
 }
 
 //=================================================================================================
 // The main loop. Called after "setup()" is done.
 void loop() {
-    //delay(50);
+    delay(50);
 
     g_midiInput.process();
     g_audio.process();

@@ -56,7 +56,7 @@ bool SettingsFile::read(Settings& settings) {
 //=================================================================================================
 // Writes all settings
 bool SettingsFile::write(Settings& settings) {
-    String string{};
+    String string{""};
 
     _writtenValues.clear();
 

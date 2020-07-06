@@ -13,8 +13,8 @@ public:
     NoteList _notes; // Scale notes
     Note _root; // Root note of the scale
     SCALE _type; // Chord type
-    String _name; // Scale name
-    String _key; // Scale's key name
+    String _name{""}; // Scale name
+    String _key{""}; // Scale's key name
     IntList _steps; // Half-tone steps for all notes
 
     // Functions --------------------------------------------------------------

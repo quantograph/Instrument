@@ -21,9 +21,7 @@ Effects::Effects(EffectSettings* settings, AudioStream* source, uint8_t sourceOu
                  AudioStream* dest, uint8_t destInput) :
     _settings(settings), _source(source), _sourceOutput(sourceOutput), _dest(dest), 
     _destInput(destInput) {
-    Serial.printf("Effects::Effects\n");
     memset(_delayLine, 0, DELAY_LINE_LENGTH); // To prevent noise on the first use
-    Serial.printf("Effects::Effects end\n");
 }
 
 //=================================================================================================
@@ -32,7 +30,6 @@ Effects::~Effects() {
 
 //=================================================================================================
 bool Effects::init() {
-    Serial.printf("Effects::init\n");
     _connections.resize(eff_last);
 
     _connections[EffectType::eff_none] = nullptr; // To align the vector with type number
@@ -70,14 +67,15 @@ void Effects::makeConnection(EffectType type, AudioStream* effect) {
 //=================================================================================================
 void Effects::disconnectAll() {
     for(auto connection : _connections) {
-        connection->disconnect();
+        if(connection)
+            connection->disconnect();
     }
 }
 
 //=================================================================================================
 bool Effects::connect(EffectType type) {
     // Don't reconnect the same connection
-    if(_currConnection->_type == type) {
+    if(_currConnection && _currConnection->_type == type) {
         //Serial.printf("%s already connected\n", _currConnection->_name.c_str());
         return true;
     }
@@ -118,7 +116,6 @@ void Effects::showConnections(const char* title, bool showAll) {
 bool Effects::update() {
     const char* title{"Effects::update"};
     Serial.printf("Effects::update: %s (%d) >>>>>>>>>>>>\n", _settings->_effectName.c_str(), _settings->_effectType);
-    //delay(50);
 
     connect(_settings->_effectType);
 
@@ -131,8 +128,7 @@ bool Effects::update() {
 
         case EffectType::eff_chorus:
             _settings->_chorus.show(title);
-            _chorus.begin(_delayLine, max(DELAY_LINE_LENGTH, _settings->_chorus._delay * AUDIO_BLOCK_SAMPLES), 
-                          _settings->_chorus._voices);
+            _chorus.begin(_delayLine, max(DELAY_LINE_LENGTH, _settings->_chorus._delay * AUDIO_BLOCK_SAMPLES), _settings->_chorus._voices);
             _chorus.voices(_settings->_chorus._voices);
             break;
 
