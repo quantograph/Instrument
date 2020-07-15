@@ -111,7 +111,7 @@ public:
     virtual ~Chord();
     void Reset();
     Chord& operator = (const Chord& source);
-    void Show();
+    void show();
     int Make(Scale& scale, int startNote, int rootInterval, CHORD type);
     int SetScaleNote(int chordInterval, Note& scaleNote);
     void Strum(bool down, double start, double delay, double duration, double volume);

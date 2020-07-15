@@ -14,3 +14,8 @@
 #include "./Synth.h"
 #include "./MidiFile.h"
 #include "./Player.h"
+#include "./Drums.h"
+#include "./Lead.h"
+#include "./Rhythm.h"
+#include "./Bass.h"
+#include "./Band.h"

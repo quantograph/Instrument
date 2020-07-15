@@ -18,6 +18,7 @@
 #include "Track.h"
 #include "Scale.h"
 #include "Song.h"
+#include "Band.h"
 #include "Synth.h"
 #include "MidiFile.h"
 #include "Player.h"
@@ -208,13 +209,15 @@ void Player::testMidiFile(SdCard* sdCard) {
     Song song;
     char* data;
     uint32_t dataSize;
-    
-    //g_sdCard.readFile("Test1.mid", data, dataSize);
-    sdCard->readFile("TEST2.mid", data, dataSize);
+    String fileName{"Band.mid"};
+
+    sdCard->readFile(fileName.c_str(), data, dataSize);
     file.read(data, dataSize, &song);
     free(data);
     song.show();
     play(&song);
+
+    free(data);
 }
 
 //=================================================================================================

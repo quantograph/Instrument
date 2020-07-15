@@ -116,7 +116,7 @@ public:
     Note(const Note& note) { *this = note; }
     virtual ~Note();
     void reset();
-    void show();
+    void show(const char* title = nullptr);
     Note& operator = (const Note& note);
     const char* GetName();
     int SetNames();
@@ -127,6 +127,7 @@ public:
 typedef std::vector<Note> NoteList;
 typedef NoteList::iterator NoteListIter;
 
+void showNotes(const char* header, NoteList& notes, const char* noteTitle = "");
 bool sortNoteTime(Note note1, Note note2);
 bool sortNoteNumber(Note note1, Note note2);
 void sortNotes(NoteList* notes);

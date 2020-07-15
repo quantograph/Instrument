@@ -679,14 +679,14 @@ struct SynthSettings {
 // Settings for one instrument
 struct InstrumentSettings {
     // Sound settings
-    bool _play;
-    double _volume;
-    double _pan;
-    Instrument _instrument;
+    bool _play{true};
+    double _volume{1.0};
+    double _pan{0.0};
+    Instrument _instrument{Instrument::NONE};
     // Band settings
-    int _lengthFrom; // Note length, from. Power of 2: 0 for whole note, 1 for 1/2, 2 for 1/4, ... , 6 for 1/32.
-    int _lengthTo; // Note length, to. Power of 2.
-    int _density; // Density of notes vs. pauses, %
+    int _lengthFrom{0}; // Note length, from. Power of 2: 0 for whole note, 1 for 1/2, 2 for 1/4, ... , 6 for 1/32.
+    int _lengthTo{0}; // Note length, to. Power of 2.
+    int _density{0}; // Density of notes vs. pauses, %
 
     InstrumentSettings() {
         Reset();
@@ -709,6 +709,7 @@ struct ComposerSettings {
     int _measureBeats; // Time signature numerator - number of beats in one measure (3 for 3/4 song)
     int _beatNote; // Time signature denominator - note duration for one beat, 4 is for a quarter note (4 for 3/4 song)
     SCALE _scaleType; // Scale type
+    int _scaleRoot; // MIDI note number of the scale's root note
     IntList _verseChords; // Verse chord progression
     IntList _chorusChords; // Chorus chord progression
     int _move; // Note to note move, in intervals
@@ -729,6 +730,7 @@ struct ComposerSettings {
         _measureBeats = 4;
         _beatNote = 4;
         _scaleType = SCALE_C_MAJOR;
+        _scaleRoot = 60; // C
         _verseChords.clear();
         _chorusChords.clear();
         _move = 3;

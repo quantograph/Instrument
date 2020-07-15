@@ -31,7 +31,7 @@ public:
     Band(Settings* settings);
     virtual ~Band();
     void Reset();
-    int Test();
-    int Make();
-    int MakeChords();
+    void test();
+    bool Make();
+    bool MakeChords();
 };

@@ -7,23 +7,23 @@
 #include "Chord.h"
 #include "Scale.h"
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Default constructor
 Chord::Chord() {
     Reset();
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Copy constructor
 Chord::Chord(const Chord& source) {
     *this = source;
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 Chord::~Chord() {
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Resets everything
 void Chord::Reset() {
     _root.reset();
@@ -32,13 +32,13 @@ void Chord::Reset() {
     _name = "";
 }
 
-//-----------------------------------------------------------------------------
-void Chord::Show() {
-    //Serial.printf("Chord '%s', ", (const char*)_name);
-    //ShowNotes("chord notes", _notes);
+//=================================================================================================
+void Chord::show() {
+    Serial.printf("Chord '%s', ", _name.c_str());
+    ::showNotes("chord", _notes, "        chord note");
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Copy operator
 Chord& Chord::operator = (const Chord& source) {
     _root = source._root;
@@ -49,7 +49,7 @@ Chord& Chord::operator = (const Chord& source) {
     return *this;
 }
 
-//=============================================================================================
+//=================================================================================================
 // Gets chord's notes
 // scale - scale for the chord
 // startNote - MIDI number of the lowest note in the scale from which to start looking for the interval
@@ -97,7 +97,7 @@ int Chord::Make(Scale& scale, int startNote, int rootInterval, CHORD type) {
     return 0;
 }
 
-//=============================================================================================
+//=================================================================================================
 // Copies scale's note into chord's interval note
 // number - interval number for the chord note
 int Chord::SetScaleNote(int chordInterval, Note& scaleNote) {
@@ -116,7 +116,7 @@ int Chord::SetScaleNote(int chordInterval, Note& scaleNote) {
     return -1;
 }
 
-//=============================================================================================
+//=================================================================================================
 // Changes chord's notes to sound like a guitar strum
 // down - strum up or down
 // start - chord's start time
@@ -146,7 +146,7 @@ void Chord::Strum(bool down, double start, double delay, double duration, double
     }
 }
 
-//=============================================================================================
+//=================================================================================================
 // Adds a new interval note
 void Chord::AddInterval(int interval) {
     Note note;
@@ -309,7 +309,7 @@ int Chord::SetName() {
     return 0;
 }
 
-//=============================================================================================
+//=================================================================================================
 // Gets a string with chord's note names
 int Chord::GetNoteNames(String& names) {
     int i = 0;
@@ -333,7 +333,7 @@ int Chord::GetNoteNames(String& names) {
     return 0;
 }
 
-//=============================================================================================
+//=================================================================================================
 // Gets full name of the chord: root note and chord type
 int Chord::GetFullName(String& name) {
     Note root = _notes[0];
@@ -345,7 +345,7 @@ int Chord::GetFullName(String& name) {
     return 0;
 }
 
-//=============================================================================================
+//=================================================================================================
 // Gets the root note
 int Chord::GetRoot(Note& note) {
     note = _notes[0];
@@ -514,7 +514,7 @@ int Chord::GetChordProgNumbers(CHORD_PROG prog, IntList& intervals) {
     return 0;
 }
 
-//=============================================================================================
+//=================================================================================================
 int Chord::GetGoodProg(IntList& prog) {
     int curr;
     int next;
@@ -531,7 +531,7 @@ int Chord::GetGoodProg(IntList& prog) {
     return 0;
 }
 
-//=============================================================================================
+//=================================================================================================
 int Chord::GetRandomProg(IntList& prog) {
     for(int i = 0; i < 4; i++)
         prog.push_back(random(1, 6));
@@ -539,7 +539,7 @@ int Chord::GetRandomProg(IntList& prog) {
     return 0;
 }
 
-//=============================================================================================
+//=================================================================================================
 // Gets next chord for the given chord number in a chord progression.
 // current - current chord's interval
 int Chord::GetNextChord(int current) {
@@ -554,7 +554,7 @@ int Chord::GetNextChord(int current) {
     return next;
 }
 
-//=============================================================================================
+//=================================================================================================
 // Gets next chord for the given chord number in a chord progression.
 // current - current chord's interval
 int Chord::GetGoodChords(int current, IntList& intervals) {

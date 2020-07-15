@@ -13,16 +13,16 @@
 #include "Band.h"
 #include "Bass.h"
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Default constructor
 Bass::Bass(Band* band) : _band(band), _settings(band->_settings) {
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 Bass::~Bass() {
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Makes a bass track
 int Bass::Make() {
     Track* track{new Track()};
@@ -42,7 +42,7 @@ int Bass::Make() {
 
     // Notes
     MakePattern(3, patternNotes);
-    //ShowNotes("MakeBassPattern", patternNotes);
+    //showNotes("MakeBassPattern", patternNotes);
     for(iter = _band->_inTrack._notes.begin(); iter != _band->_inTrack._notes.end(); iter++) {
         inNote = &(*iter);
         if(inNote->_type == Note::CHORD) {
@@ -64,7 +64,7 @@ int Bass::Make() {
     return 0;
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Makes chord interval pattern for one bass measure
 // count - number of notes in the chord
 int Bass::MakePattern(int count, NoteList& notes) {
@@ -107,7 +107,7 @@ int Bass::MakePattern(int count, NoteList& notes) {
     return 0;
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Makes one bass measure
 int Bass::MakeMeasure(Chord& chord, NoteList& patternNotes, NoteList& measureNotes) {
     NoteListIter iter;

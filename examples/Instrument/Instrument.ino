@@ -37,7 +37,7 @@ Synth g_synth = Synth();
 // Startup procedure, called before entering the "loop()" function
 void setup() {
     // Open the serial port
-    Serial.begin(38400);
+    Serial.begin(152000);
     while (!Serial && (millis() <= 1000));
     Serial.println("=====> setup");
 
@@ -61,8 +61,8 @@ void setup() {
     g_audio.init(&g_gui, &g_settingsFile._settings);
 
     // MIDI input
-    g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
-    g_midiInput.init(&g_synth);
+    //g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
+    //g_midiInput.init(&g_synth);
     
     //g_player.init(&g_settingsFile._settings);
     //g_bluetooth.init();
@@ -75,19 +75,15 @@ void setup() {
     //g_sdCard.printDirectory(SD.open("/"), 0);
     //g_midi.init();
     //g_midi.test(127);
-    //g_player.testMidiFile(&g_sdCard);
+    //g_player.testMidiFile(&g_settingsFile._settings, &g_sdCard);
     //g_settingsFile.test();
 
-    // Charger
-    int d0{40};
-    int d1{41};
-    int d2{39};
-    pinMode(d0, OUTPUT);
-    digitalWrite(d0, LOW);
-    pinMode(d1, OUTPUT);
-    digitalWrite(d1, LOW);
-    pinMode(d2, OUTPUT);
-    digitalWrite(d2, HIGH);
+    // Band
+    Serial.printf("\n\n\n");
+    Band band(&g_settingsFile._settings);
+    band.test();
+    //g_player.play(&band._outSong);
+    Serial.printf("\n\n\n");
 
     Serial.println("=====> setup end");
 }
@@ -97,9 +93,12 @@ void setup() {
 void loop() {
     delay(50);
 
-    g_midiInput.process();
-    g_audio.process();
-    g_gui.process();
+    //g_midiInput.process();
+    //g_audio.process();
+    //g_gui.process();
+
+    //int value = analogRead(26);
+    //Serial.printf(">>>> Volume change: %d\n", value);
 
     //g_player.process();
 

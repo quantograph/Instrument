@@ -17,11 +17,12 @@ public:
     void noteDetected(float frequency);
     void peakMeter();
     static void onPlug();
+    void checkvolume();
     static void onVolume();
     bool updateEffects();
 
     #define GUITAR_PLUG 3 // Teensy pin connected to guitar plug contact
-    #define VOLUME_PIN 6 /*AVB - 22 in the last wiring */ // Teensy pin connected to guitar plug contact
+    #define VOLUME_PIN 26
     Gui* _gui{};
     Settings* _settings{};
     AudioInputI2S _input; // audio shield: mic or line-in

@@ -50,13 +50,12 @@ void Scale::Reset() {
 
 //-----------------------------------------------------------------------------
 // Prints scale info to the console
-void Scale::Show() {
-    Serial.printf("===== Scale '%s'\n", _name.c_str());
-
-    Serial.printf("Root: %s", _name.c_str());
+void Scale::Show(bool notes) {
+    Serial.printf("===== Scale '%s', root=%d\n", _name.c_str(), _root._midiNote);
     //_root.Show();
 
-    //ShowNotes("Scale", _notes);
+    if(notes)
+        showNotes("Scale", _notes);
 }
 
 //-----------------------------------------------------------------------------
@@ -184,7 +183,7 @@ int Scale::GetNoteNames(String& names) {
 //-----------------------------------------------------------------------------
 // Sets the root note for major and minor scales
 // 60 C, 61 C#/Db, 62 D, 63 D#/Eb, 64 E, 65 F, 66 F#/Gb, 67 G, 68 G#/Ab, 69 A, 70 A#/Bb, 71 B
-int Scale::SetRoot() {
+bool Scale::SetRoot(int root) {
     switch(_type) {
         case SCALE_Cb_MAJOR: _root._midiNote = 59; _root._shift = Note::FLAT; break;
          case SCALE_C_MAJOR:
@@ -216,15 +215,22 @@ int Scale::SetRoot() {
          case SCALE_Bb_MINOR: _root._midiNote = 70; _root._shift = Note::FLAT; break;
          case SCALE_B_MAJOR:
          case SCALE_B_MINOR: _root._midiNote = 71; _root._shift = Note::NONE; break;
-         default: _root._shift = Note::NONE; return -1;
+         default: 
+            if(root == 0)
+                // The root note is not defined by the scale type and not provided
+                Serial.printf("##### ERROR: root note is required for this scale");
+                return false;
+            
+            _root._midiNote = root;
+            _root._shift = Note::NONE; 
     }
 
-    return 0;
+    return true;
 }
 
 //-----------------------------------------------------------------------------
 // Makes the scale
-int Scale::Make(SCALE type, int root) {
+bool Scale::Make(SCALE type, int root /* = 0 */) {
     Note note;
     Note* listNote;
     int start;
@@ -240,7 +246,11 @@ int Scale::Make(SCALE type, int root) {
 
     _type = type;
     _root._midiNote = root;
-    SetRoot(); // Set root note, if the scale's type defines it
+
+    // Set the root note of the scale
+    if(!SetRoot(root))
+        return false;
+
     SetName();
     SetKey();
     GetSteps(_steps);
@@ -325,7 +335,7 @@ int Scale::Make(SCALE type, int root) {
         index++;
     }
 
-    return 0;
+    return true;
 }
 
 //-----------------------------------------------------------------------------

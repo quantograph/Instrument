@@ -9,15 +9,16 @@ const char* Note::_names[] = { "C",  "C#", "D", "D#", "E",  "F",  "F#", "G", "G#
 const char* Note::_namesSharp[] = { "B#", "C#", "D", "D#", "E",  "E#", "F#", "G", "G#", "A", "A#", "B"  }; // Note names, wiht #
 const char* Note::_namesFlat[] = { "C",  "Db", "D", "Eb", "Fb", "F",  "Gb", "G", "Ab", "A", "Bb", "Cb" }; // Note names, with b
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Default constructor
 Note::Note() {
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 Note::~Note() {
 }
 
+//=================================================================================================
 void Note::reset() {
     _midiNote = NO_MIDI_NOTE;
     _volume = 0.0;
@@ -48,6 +49,7 @@ void Note::reset() {
     }
 }
 
+//=================================================================================================
 Note& Note::operator = (const Note& note) {
     _midiNote = note._midiNote;
     _volume = note._volume;
@@ -60,12 +62,23 @@ Note& Note::operator = (const Note& note) {
     return *this;
 }
 
-void Note::show() {
-    Serial.printf("Note: instr=%3d, start=%6.3f, durat=%6.3f, note=%2d, volume=%3.2f\n", 
-                  _instrument, _start, _duration, _midiNote, _volume);
+//=================================================================================================
+void Note::show(const char* title) {
+    if(title)
+        Serial.printf("%s: ", title);
+
+    Serial.printf("note=%3d, strt=%.3f, dur=%.3f, vol=%.1f, name=%-2s, sInd=%d, sInt=%d, cInt=%d, step=%d, "
+           "offs=%2d, flgs=%d, type=%d, freq=%8.2f, octv=%d, instr=%3d\n",
+           _midiNote, _start, _duration, _volume, GetName(), _scaleIndex, _scaleInterval, _chordInterval, _step, 
+           _rootOffset, _flags, _type, _frequency, _octave, _instrument);
+
+    if(_type == TYPE::CHORD && _chord) {
+        Serial.printf("        ");
+        _chord->show();
+    }
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Returns note's proper name for the current scale
 const char* Note::GetName() {
     switch(_showShift) {
@@ -76,7 +89,7 @@ const char* Note::GetName() {
     }
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Sets all note names for the current MIDI note number
 int Note::SetNames() {
     int index;
@@ -92,7 +105,7 @@ int Note::SetNames() {
     return 0;
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Copies note's tone info
 void Note::CopyTone(Note note) {
     _octave = note._octave;
@@ -106,7 +119,7 @@ void Note::CopyTone(Note note) {
         _chordInterval = note._chordInterval;
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Sets random duration
 // lengthFrom - shortest note (1/16)
 // lengthTo - longest note (1/4)
@@ -129,18 +142,26 @@ void Note::setRandDuration(int lengthFrom, int lengthTo, double beatTime, double
         _duration = measureTime - _start;
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 void sortNotes(NoteList* notes) {
     std::sort(notes->begin(), notes->end(), sortNoteTime);
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Comparison function for sorting notes by their MIDI numbers
 bool sortNoteNumber(Note note1, Note note2) {
     return (note1._midiNote < note2._midiNote);
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
+// Shows all notes in the note list
+void showNotes(const char* header, NoteList& notes, const char* noteTitle) {
+    Serial.printf("'%s' notes (%d) ---\n", header, (int)notes.size());
+    for(auto iter : notes)
+        iter.show(noteTitle);
+}
+
+//=================================================================================================
 bool sortNoteTime(Note note1, Note note2) {
     if(note1._start > note2._start)
         return false;
@@ -155,7 +176,7 @@ bool sortNoteTime(Note note1, Note note2) {
     }
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Adds notes to the and of a note list, shifting their start times
 void addNotes(NoteList& from, NoteList& to, double timeShift) {
     NoteListIter iter;
@@ -170,7 +191,7 @@ void addNotes(NoteList& from, NoteList& to, double timeShift) {
     }
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Shifts note numbers
 void shiftNotes(NoteList& notes, int shift) {
     NoteListIter iter;
@@ -182,7 +203,7 @@ void shiftNotes(NoteList& notes, int shift) {
     }
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Gets duration of the note: 8 for 1/8, in seconds
 double getNoteTime(double beatTime, int note) {
     return beatTime * (4.0 / note);

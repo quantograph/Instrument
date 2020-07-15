@@ -7,8 +7,6 @@ USBHost _usbHost;
 MIDIDevice _midiDevice(_usbHost);
 
 void MidiInput::init(Synth* synth) {
-    Serial.begin(115200);
-    
     _synth = synth;
 
   // Wait 1.5 seconds before turning on USB Host.  If connected USB devices
@@ -42,7 +40,7 @@ void MidiInput::init(Synth* synth) {
   // more specific ones are not set.
   _midiDevice.setHandleRealTimeSystem(myRealTimeSystem);
 
-  //Serial.println("MidiInput::Init");
+  Serial.println("MidiInput::Init");
 }
 
 void MidiInput::process() {

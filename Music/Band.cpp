@@ -15,7 +15,7 @@
 #include "Drums.h"
 #include "Band.h"
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 Band::Band(Settings* settings) : _settings(settings), _measureTime(0.0), _noteTime(0.0),
         _lead(NULL), _rhythm(NULL), _bass(NULL), _drums(NULL) {
     _lead = new Lead(this);
@@ -24,7 +24,7 @@ Band::Band(Settings* settings) : _settings(settings), _measureTime(0.0), _noteTi
     _drums = new Drums(this);
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 Band::~Band() {
     Reset();
     delete _lead;
@@ -33,7 +33,7 @@ Band::~Band() {
     delete _drums;
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Resets everything
 void Band::Reset() {
     _inTrack.reset();
@@ -45,31 +45,39 @@ void Band::Reset() {
     _chordProg.clear();
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Makes a test song
-int Band::Test() {
+void Band::test() {
     Reset();
 
-    return 0;
+    _outSong._tempo = 120;
+    _settings->_composer._measureBeats = 4;
+    _settings->_composer._beatNote = 4;
+    _settings->_composer._scaleType = SCALE_C_MAJOR;
+    _settings->_composer._verseChords.push_back(Chord::CHORD_PROG_1625);
+    _settings->_composer._chorusChords.push_back(Chord::CHORD_PROG_2511);
+    Make();
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Makes a song
-int Band::Make() {
+bool Band::Make() {
     Reset();
 
     // Make sure the parameters are set
     if(!_settings->_composer._verseChords.size() && !_settings->_composer._chorusChords.size()) {
-        return -1;
+        return false;
     }
 
     // Copy some settings into the song
+    _outSong._name = "Band song";
     _outSong._tempo = _settings->_composer._tempo;
     _outSong._measureBeats = _settings->_composer._measureBeats;
     _outSong._beatNote = _settings->_composer._beatNote;
     _outSong._measures = 4;
     _outSong._scaleType = _settings->_composer._scaleType;
-    _outSong._scale.Make(_outSong._scaleType, 60);
+    _outSong._scale.Make(_outSong._scaleType, _settings->_composer._scaleRoot);
+    _outSong._scale.Show(false);
 
     // Measure time for the current time signature
     _outSong._beatTime = 60.0 / _outSong._tempo;
@@ -95,14 +103,14 @@ int Band::Make() {
     if(_settings->_composer._drums._play)
         _drums->Make();
 
-    //_outSong.Show();
+    _outSong.show();
 
-    return 0;
+    return true;
 }
 
-//-----------------------------------------------------------------------------
+//=================================================================================================
 // Makes a list of all chords
-int Band::MakeChords() {
+bool Band::MakeChords() {
     Note note;
     Note lastNote;
     IntList intervals;
@@ -113,7 +121,7 @@ int Band::MakeChords() {
     int interval;
     Chord::CHORD_PROG prog;
 
-    //printf("MakeChords ========================================\n");
+    Serial.printf("MakeChords ========================================\n");
 
     note._start = 0.0;
     note._volume = 1.0;
@@ -124,7 +132,7 @@ int Band::MakeChords() {
     // Make chords sequences for all progressions
     for(progIter = _chordProg.begin(); progIter != _chordProg.end(); progIter++) {
         prog = (Chord::CHORD_PROG)*progIter;
-        //printf("===== Progression '%s'\n", Chord::GetChordProgName(prog));
+        Serial.printf("\n===== Progression '%s'\n", Chord::GetChordProgName(prog));
         intervals.clear();
         Chord::GetChordProgNumbers(prog, intervals);
         chordCounter = 0;
@@ -137,7 +145,7 @@ int Band::MakeChords() {
             note._type = Note::CHORD;
             note._scaleInterval = interval;
             note._chord->Make(_outSong._scale, 40, interval, Chord::CHORD_135);
-            //note.Show();
+            note.show();
             _inTrack._notes.push_back(note);
             if(chordCounter == 0) // Last note is the same as first one in progression
                 lastNote = note;
@@ -146,7 +154,7 @@ int Band::MakeChords() {
             if(progCounter == 0 && chordCounter == 0) { // Set note range for the song based on root of the first chord
                 _outSong._scale.GetIntervalNote(note._chord->_root, _minNote, -(_settings->_composer._moveRange / 2));
                 _outSong._scale.GetIntervalNote(_minNote, _maxNote, _settings->_composer._moveRange);
-                //printf("Song range: %d-%d\n", _minNote._midiNote, _maxNote._midiNote);
+                //Serial.printf("Song range: %d-%d\n", _minNote._midiNote, _maxNote._midiNote);
             }
 
             // Measure
@@ -180,7 +188,7 @@ int Band::MakeChords() {
 
     _inTrack.sort();
     //_inTrack.Show("inTrack");
-    //printf("======================================== MakeChords\n");
+    Serial.printf("======================================== MakeChords\n");
 
-    return 0;
+    return true;
 }

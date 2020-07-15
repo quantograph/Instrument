@@ -24,13 +24,13 @@ public:
     virtual ~Scale();
     Scale& operator = (const Scale& source);
     void Reset();
-    void Show();
+    void Show(bool notes);
     int SetName();
     void SetKey();
     int GetNoteNames(String& names);
-    int SetRoot();
+    bool SetRoot(int root);
     int GetSteps(IntList& steps);
-    int Make(SCALE type, int root);
+    bool Make(SCALE type, int root = 0);
     int GetIntervalNote(Note& from, Note& to, int interval);
     int GetIndexNote(Note& from, Note& to, int index);
     int MoveToChordNote(Note& note, Chord& chord);

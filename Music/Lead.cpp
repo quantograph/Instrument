@@ -50,7 +50,7 @@ int Lead::Make() {
         if(inNote->_type == Note::CHORD) {
             //printf("######## Measure %d\n", i);
             //inNote._chord.Show();
-            //ShowNotes("prevNotes", prevNotes);
+            //showNotes("prevNotes", prevNotes);
             MakeMeasure(*inNote->_chord, lastNote, measureNotes, prevNotes);
 
             // Save this measure's notes, they may be repeated in the next measure
@@ -86,12 +86,12 @@ int Lead::MakeMeasure(Chord& chord, Note& lastNote, NoteList& notes, NoteList& p
     // Rhythm
     RepeatRhythm(notes, prevNotes);
     MakeRhythm(notes);
-    //ShowNotes("LeadRhythm", notes);
+    //showNotes("LeadRhythm", notes);
 
     // Melody
     RepeatMelody(chord, lastNote, notes, prevNotes);
     MakeMelody(notes, lastNote);
-    //ShowNotes("LeadMelody", notes);
+    //showNotes("LeadMelody", notes);
 
     return 0;
 }
@@ -119,7 +119,7 @@ int Lead::RepeatRhythm(NoteList& notes, NoteList& prevNotes) {
         notes.push_back(note);
     }
 
-    //ShowNotes("Rhythm repeated", notes);
+    //showNotes("Rhythm repeated", notes);
 
     return 0;
 }
@@ -219,7 +219,7 @@ int Lead::RepeatMelody(Chord& chord, Note& lastNote, NoteList& notes, NoteList& 
         prevNote1 = prevNote2;
     }
 
-    //ShowNotes("Melody repeated", notes);
+    //showNotes("Melody repeated", notes);
 
     return 0;
 }

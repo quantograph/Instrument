@@ -15,7 +15,7 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
 
     AudioMemory(120);
     attachInterrupt(GUITAR_PLUG, onPlug, CHANGE);
-    //attachInterrupt(6, onVolume, CHANGE);
+    //attachInterrupt(VOLUME_PIN, onVolume, CHANGE);
 
     _audioControl.enable();
     _audioControl.volume(0.6);
@@ -107,6 +107,7 @@ void AudioBoard::setMicGain() {
 // Audio loop
 void AudioBoard::process() {
     //noteFrequency();
+    //checkvolume();
     peakMeter();
     //test();
 
@@ -215,9 +216,17 @@ void AudioBoard::onPlug() {
 }
 
 //=================================================================================================
+void AudioBoard::checkvolume() {
+    int value;
+
+    value = analogRead(VOLUME_PIN);
+    Serial.printf(">>>> Volume: %d\n", value);
+}
+
+//=================================================================================================
 void AudioBoard::onVolume() {
     /*int value;
 
-    value = analogRead(VOLUME_PIN);*/
-    //Serial.printf(">>>> Volume change: %d\n", value);
+    value = analogRead(VOLUME_PIN);
+    Serial.printf(">>>> Volume change: %d\n", value);*/
 }
