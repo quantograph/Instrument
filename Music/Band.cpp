@@ -37,6 +37,7 @@ Band::~Band() {
 // Resets everything
 void Band::Reset() {
     _inTrack.reset();
+    _inTrack._name = "InTrack";
     _outSong.reset();
     _measureTime = 0.0;
     _noteTime = 0.0;
@@ -93,7 +94,7 @@ bool Band::Make() {
     // Make all tracks
     if(_settings->_composer._lead._play)
         _lead->Make();
-
+/*
     if(_settings->_composer._rhythm._play)
         _rhythm->Make();
 
@@ -102,8 +103,8 @@ bool Band::Make() {
 
     if(_settings->_composer._drums._play)
         _drums->Make();
-
-    _outSong.show();
+*/
+    //_outSong.show();
 
     return true;
 }
@@ -186,9 +187,12 @@ bool Band::MakeChords() {
     lastNote._measure = 1;
     _inTrack._notes.push_back(lastNote);
 
+    Serial.printf("\n\n\n sort =========\n");
     _inTrack.sort();
-    //_inTrack.Show("inTrack");
+    _inTrack.show(true);
+    
     Serial.printf("======================================== MakeChords\n");
+    delay(100);
 
     return true;
 }

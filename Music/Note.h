@@ -113,7 +113,7 @@ public:
     Chord* _chord{nullptr}; // Chord info, for CHORD note type
 
     Note();
-    Note(const Note& note) { *this = note; }
+    Note(const Note& source);
     virtual ~Note();
     void reset();
     void show(const char* title = nullptr);

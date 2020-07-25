@@ -19,13 +19,13 @@
 
 SettingsFile g_settingsFile = SettingsFile();
 TouchScreen g_screen = TouchScreen();
-Gui g_gui = Gui();
+//Gui g_gui = Gui();
 AudioBoard g_audio = AudioBoard();
 SdCard g_sdCard = SdCard();
 MidiInput g_midiInput = MidiInput();
 Bluetooth g_bluetooth = Bluetooth();
 Player g_player = Player();
-Synth g_synth = Synth();
+//Synth g_synth = Synth();
 
 //Menu g_menu = Menu();
 //CapSensor g_cap = CapSensor();
@@ -47,43 +47,32 @@ void setup() {
     g_sdCard.makeDir("system");
     g_settingsFile.read(g_settingsFile._settings);
     g_settingsFile._settings._screen = &g_screen;
-    g_settingsFile._settings._gui = &g_gui;
+    //g_settingsFile._settings._gui = &g_gui;
     g_settingsFile._settings._audioBoard = &g_audio;
     g_settingsFile._settings._sdCard = &g_sdCard;
     g_settingsFile._settings._midiInput = &g_midiInput;
     g_settingsFile._settings._bluetooth = &g_bluetooth;
     g_settingsFile._settings._player = &g_player;
-    g_settingsFile._settings._synth = &g_synth;
+    //g_settingsFile._settings._synth = &g_synth;
 
     // Initialize everything
     g_screen.init();
-    g_gui.init(&g_settingsFile, &g_settingsFile._settings);
-    g_audio.init(&g_gui, &g_settingsFile._settings);
+    //g_gui.init(&g_settingsFile, &g_settingsFile._settings);
+    g_audio.init(/*&g_gui,*/ &g_settingsFile._settings);
 
     // MIDI input
     //g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
     //g_midiInput.init(&g_synth);
     
-    //g_player.init(&g_settingsFile._settings);
+    g_player.init(&g_settingsFile._settings);
     //g_bluetooth.init();
 
-    //g_cap.init();
-    //g_keys.init();
-    //g_menu.init();
-    //g_led.init(0.04);
-    //g_sdCard.test();
-    //g_sdCard.printDirectory(SD.open("/"), 0);
-    //g_midi.init();
-    //g_midi.test(127);
-    //g_player.testMidiFile(&g_settingsFile._settings, &g_sdCard);
-    //g_settingsFile.test();
-
     // Band
-    Serial.printf("\n\n\n");
+    /*Serial.printf("\n\n\n");
     Band band(&g_settingsFile._settings);
     band.test();
-    //g_player.play(&band._outSong);
-    Serial.printf("\n\n\n");
+    g_player.play(&band._outSong);
+    Serial.printf("\n\n\n");*/
 
     Serial.println("=====> setup end");
 }
@@ -94,32 +83,9 @@ void loop() {
     delay(50);
 
     //g_midiInput.process();
-    //g_audio.process();
+    g_audio.process();
     //g_gui.process();
+    g_player.process();
 
-    //int value = analogRead(26);
-    //Serial.printf(">>>> Volume change: %d\n", value);
-
-    //g_player.process();
-
-    /*if(g_bluetooth.receive()) {
-        Serial.printf("BT: %s\n", g_bluetooth._buffer);
-        //g_bluetooth.send(g_bluetooth._buffer, g_bluetooth._received - 1);
-        g_bluetooth._received = 0;
-    }*/
-
-    // Get the sensors touched
-    /*uint32_t touched = 0;
-    if(g_cap.GetTouched(touched, false, true) && g_menu._current == nullptr) { // Not in menu mode
-        g_keys.Play(touched);
-    }*/
-
-    // All tests
-    //g_audio.test(0);
-    //g_audio.testDrums(500);
-    //Serial.printf("Pressure: %5d\n", analogRead(A22));
-    //g_bluetooth.test();
-    //g_cap.test();
-    //g_led.test();
     //Serial.println("=====> loop()");
 }

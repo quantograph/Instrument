@@ -12,6 +12,13 @@ const char* Note::_namesFlat[] = { "C",  "Db", "D", "Eb", "Fb", "F",  "Gb", "G",
 //=================================================================================================
 // Default constructor
 Note::Note() {
+    reset();
+}
+
+//=================================================================================================
+// Copy constructor
+Note::Note(const Note& source) {
+    *this = source;
 }
 
 //=================================================================================================
@@ -50,15 +57,47 @@ void Note::reset() {
 }
 
 //=================================================================================================
-Note& Note::operator = (const Note& note) {
-    _midiNote = note._midiNote;
-    _volume = note._volume;
-    _start = note._start;
-    _duration = note._duration;
-    _state = note._state;
-    _tab = note._tab;
-    _channel = note._channel;
-    _instrument = note._instrument;
+Note& Note::operator = (const Note& source) {
+    _index = source._index;
+    _type = source._type;
+    _midiNote = source._midiNote;
+    _frequency = source._frequency;
+    _freqFrom = source._freqFrom;
+    _freqTo = source._freqTo;
+    _scaleIndex = source._scaleIndex;
+    _scaleInterval = source._scaleInterval;
+    _chordInterval = source._chordInterval;
+    _step = source._step;
+    _rootOffset = source._rootOffset;
+    _start = source._start;
+    _duration = source._duration;
+    _volume = source._volume;
+    _name = source._name;
+    _nameSharp = source._nameSharp;
+    _nameFlat = source._nameFlat;
+    _octave = source._octave;
+    _showShift = source._showShift;
+    _shift = source._shift;
+    _measure = source._measure;
+    _flags = source._flags;
+    _tab = source._tab;
+    _instrument = source._instrument;
+    _state = source._state;
+    _channel = source._channel;
+
+    // Copy the chord
+    if(source._chord && source._type == Note::CHORD) {
+        if(!_chord)
+            _chord = new Chord();
+
+        *_chord = *(source._chord);
+    } else { // No chord
+        if(_chord) {
+            delete _chord;
+            _chord = NULL;
+        }
+    }
+
     return *this;
 }
 
@@ -67,7 +106,7 @@ void Note::show(const char* title) {
     if(title)
         Serial.printf("%s: ", title);
 
-    Serial.printf("note=%3d, strt=%.3f, dur=%.3f, vol=%.1f, name=%-2s, sInd=%d, sInt=%d, cInt=%d, step=%d, "
+    Serial.printf("note=%3d, strt=%6.3f, dur=%.3f, vol=%.1f, name=%-2s, sInd=%2d, sInt=%2d, cInt=%2d, step=%2d, "
            "offs=%2d, flgs=%d, type=%d, freq=%8.2f, octv=%d, instr=%3d\n",
            _midiNote, _start, _duration, _volume, GetName(), _scaleIndex, _scaleInterval, _chordInterval, _step, 
            _rootOffset, _flags, _type, _frequency, _octave, _instrument);

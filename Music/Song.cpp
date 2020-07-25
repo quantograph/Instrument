@@ -26,7 +26,7 @@ void Song::reset() {
 }
 
 //-----------------------------------------------------------------------------
-void Song::show() {
+void Song::show(bool showAll) {
     // Show song info
     Serial.printf("\n\n===== Song '%s', tempo=%d, time=%6.2f, beatTime=%6.2f, %d/%d\n",
                   _name.c_str(), _tempo, _songTime, _beatTime, _measureBeats, _beatNotes);
@@ -35,7 +35,7 @@ void Song::show() {
     Serial.printf("%d tracks:\n", _tracks.size());
     for(auto track : _tracks) {
         Serial.printf("----------------------------\n");
-        track->show();
+        track->show(showAll);
     }
 
     Serial.printf("----------------------------\n");

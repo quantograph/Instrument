@@ -1,14 +1,14 @@
 #pragma once
 
 class Effects;
-class Gui;
+//class Gui;
 class Storage;
 
 class AudioBoard
 {
 public:
     AudioBoard();
-	void init(Gui* gui, Settings* settings);
+	void init(/*Gui* gui,*/ Settings* settings);
     void setLineInLevel();
     void setMicGain();
     void setupMixers();
@@ -23,7 +23,7 @@ public:
 
     #define GUITAR_PLUG 3 // Teensy pin connected to guitar plug contact
     #define VOLUME_PIN 26
-    Gui* _gui{};
+    //Gui* _gui{};
     Settings* _settings{};
     AudioInputI2S _input; // audio shield: mic or line-in
     std::list<AudioConnection*> _cords;

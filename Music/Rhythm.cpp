@@ -32,7 +32,8 @@ int Rhythm::Make() {
     Note note;
 
     // Track info
-    track->_trackName = "Rhythm";
+    track->_trackNumber = 2;
+    track->_name = "Rhythm";
     track->_channel = 2;
     track->_instrument = _settings->_composer._rhythm._instrument;
     track->_instrumentName = _instrumentNames[track->_instrument];

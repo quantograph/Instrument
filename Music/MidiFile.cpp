@@ -1560,12 +1560,12 @@ bool MidiFile::SaveTrackInfo(Track* track, Buffer& sTrackData) {
 
     // Add to the report
     Serial.printf("Save track %d '%s' (%s) -------------",
-                   track->_trackNumber, (const char*)track->_trackName, (const char*)track->_instrumentName);
+                   track->_trackNumber, (const char*)track->_name, (const char*)track->_instrumentName);
     Log((const char*)string);
 
     // Name
-    if(track->_trackName.Length()) {
-        if(!SaveMetaEvent(0, META_TRACK_NAME, track->_channel, (const char*)track->_trackName, track->_trackName.Length(), sTrackData))
+    if(track->_name.Length()) {
+        if(!SaveMetaEvent(0, META_TRACK_NAME, track->_channel, (const char*)track->_name, track->_name.Length(), sTrackData))
             return false;
     }
 

@@ -9,18 +9,25 @@
 Track::Track() {
 }
 
+// Copy constructor
+Track::Track(const Track& source) {
+    *this = source;
+}
+
 //-----------------------------------------------------------------------------
 Track::~Track() {
 }
 
-void Track::show() {
+void Track::show(bool showAll) {
     // Show track info
     Serial.printf("Track %d '%s', intrument=(%d)'%s', %d notes\n", 
                   _trackNumber, _name.c_str(), _instrument, _instrumentName.c_str(), _notes.size());
 
     // Show all notes
-    for(auto note : _notes) {
-        note.show();
+    if(showAll) {
+        for(auto note : _notes) {
+            note.show();
+        }
     }
 }
 
@@ -42,13 +49,27 @@ void Track::getAllNotes(NoteList* notes) {
 // Resets everything
 void Track::reset() {
     _notes.clear();
-    _trackName = "";
+    _name = "";
     _instrumentName = "";
     _instrument = Instrument::NONE;
     _trackNumber = 0;
     _channel = 0;
     _pan = 0.0;
     _volume = 1.0;
+}
+
+// Copy operator
+Track& Track::operator = (const Track& source) {
+    _notes = source._notes;
+    _name = source._name;
+    _instrumentName = source._instrumentName;
+    _instrument = source._instrument;
+    _trackNumber = source._trackNumber;
+    _channel = source._channel;
+    _pan = source._pan;
+    _volume = source._volume;
+
+    return *this;
 }
 
 //-----------------------------------------------------------------------------

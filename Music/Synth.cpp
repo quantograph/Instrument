@@ -46,14 +46,16 @@ bool Synth::init(Instrument instrument, Settings* settings) {
     _settings = settings;
 
     // Load the sound sample for the selected instrument
+    Serial.printf("1\n");
     if(!getInstrument(instrument, _settings->_audioBoard, _instrumentInfo)) {
         Serial.printf("##### ERROR: Can't load instrument %d\n", instrument);
         return false;
     }
 
-    //Serial.printf("Synch loaded instrument %d: %s (%d)\n", instrument, _instrumentInfo._name.c_str(), _instrumentInfo._instrument);
+    Serial.printf("Synch loaded instrument %d: %s (%d)\n", instrument, _instrumentInfo._name.c_str(), _instrumentInfo._instrument);
 
     // Synth has only 4 mixers with 4 channels each
+    Serial.printf("2\n");
     if(_instrumentInfo._voices > 16) {
         Serial.printf("##### ERROR: Synth can't have more than 16 voices\n");
         return false;
@@ -77,16 +79,16 @@ bool Synth::init(Instrument instrument, Settings* settings) {
             voiceMixer->gain(1, 1.0f);
             voiceMixer->gain(2, 1.0f);
             voiceMixer->gain(3, 1.0f);
-            //Serial.printf("New mixer %d\n", mixerIndex);
+            Serial.printf("New mixer %d\n", mixerIndex);
         }
 
         voice->_cord = new AudioConnection(voice->_sound, 0, *voiceMixer, channelIndex);
-        //Serial.printf("Synth voice %d, mixer %d, channel %d, voices=%d\n", i, mixerIndex, channelIndex, _synthVoices.size());
+        Serial.printf("Synth voice %d, mixer %d, channel %d, voices=%d\n", i, mixerIndex, channelIndex, _synthVoices.size());
 
         // Connect this mixer to the synth output mixer
         AudioConnection* mixerCord{_cords[mixerIndex]};
         if(!mixerCord) {
-            //Serial.printf("--- New cable\n");
+            Serial.printf("--- New cable\n");
             mixerCord = new AudioConnection(*voiceMixer, 0, _outMixer, mixerIndex);
             _cords[mixerIndex] = mixerCord;
         }
@@ -95,6 +97,7 @@ bool Synth::init(Instrument instrument, Settings* settings) {
     }
 
     // Make effects
+    Serial.printf("3\n");
     _effect1 = new Effects(&_settings->_synthInput._effect1, &_outMixer, 0, &_settings->_audioBoard->_mixer1, 1);
     _effect1->init();
     _effect2 = new Effects(&_settings->_synthInput._effect2, &_outMixer, 0, &_settings->_audioBoard->_mixer4, 1);
@@ -141,7 +144,7 @@ void Synth::noteOn(byte note, byte velocity) {
     SynthVoice* voice{nullptr};
     SynthVoice* oldestVoice{nullptr};
     uint32_t minTime{0};
-    //Serial.printf("Synth::noteOn: %d, %d\n", note, velocity);
+    Serial.printf("Synth::noteOn: %d, %d\n", note, velocity);
 
     // Find a voice to use for this note
     for(int i = 0; i < _instrumentInfo._voices; ++i) {

@@ -1,5 +1,5 @@
 #include "Devices.h"
-#include "../GUI/Gui.h"
+//#include "../GUI/Gui.h"
 #include "../Music/Effects.h"
 #include "AudioBoard.h"
 
@@ -8,9 +8,9 @@ AudioBoard::AudioBoard() {
 }
 
 //=================================================================================================
-void AudioBoard::init(Gui* gui, Settings* settings) {
+void AudioBoard::init(/*Gui* gui,*/ Settings* settings) {
     Serial.printf("AudioBoard::init ==================================\n");
-    _gui = gui;
+    //_gui = gui;
     _settings = settings;
 
     AudioMemory(120);
@@ -18,7 +18,7 @@ void AudioBoard::init(Gui* gui, Settings* settings) {
     //attachInterrupt(VOLUME_PIN, onVolume, CHANGE);
 
     _audioControl.enable();
-    _audioControl.volume(0.6);
+    _audioControl.volume(0.0);
 
     // Input
     if(_settings->_audioSettings._input == Inputs::mic) {
@@ -107,7 +107,7 @@ void AudioBoard::setMicGain() {
 // Audio loop
 void AudioBoard::process() {
     //noteFrequency();
-    //checkvolume();
+    checkvolume();
     peakMeter();
     //test();
 
@@ -187,7 +187,7 @@ void AudioBoard::peakMeter() {
     if (_peakLeft.available() && _peakRight.available()) {
         float left = _peakLeft.read();
         float right = _peakRight.read();
-        _gui->onPeakMeter(left, right);
+        //_gui->onPeakMeter(left, right);
 
         /*for (cnt = 0; cnt < width - leftPeak; cnt++) {
             Serial.print(" ");

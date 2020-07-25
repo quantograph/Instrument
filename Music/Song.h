@@ -18,6 +18,6 @@ public:
     Song();
     virtual ~Song();
     void reset();
-    void show();
+    void show(bool showAll = true);
     void getAllNotes(NoteList* notes, InstrumentList* instruments);
 };

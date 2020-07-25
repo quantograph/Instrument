@@ -33,7 +33,8 @@ int Drums::Make() {
     Note note;
 
     // Track info
-    track->_trackName = "Drums";
+    track->_trackNumber = 4;
+    track->_name = "Drums";
     track->_instrumentName = "Drums";
     track->_instrument = PERCUSSION;
     track->_channel = 9;
@@ -146,7 +147,7 @@ void Drums::Test() {
     Track* track{new Track()};
 
     // Track info
-    track->_trackName = "Drums";
+    track->_name = "Drums";
     track->_instrumentName = "Drums";
     track->_instrument = PERCUSSION;
     track->_channel = 9;

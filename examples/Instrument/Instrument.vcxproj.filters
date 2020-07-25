@@ -150,9 +150,6 @@
     <ClInclude Include="..\..\Sound\piano_samples.h">
       <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Sound\recorder_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\Sound\Sound.h">
       <Filter>Sound</Filter>
     </ClInclude>
@@ -169,9 +166,6 @@
       <Filter>Sound</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Sound\trombone_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\trumpet_samples.h">
       <Filter>Sound</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Sound\tuba_samples.h">
@@ -247,8 +241,6 @@
     <None Include="Instrument.ino" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Components.txt" />
-    <Text Include="..\..\..\..\..\Users\Homer\Documents\Arduino\libraries\QuantoGraph\readme.txt" />
     <Text Include="..\..\Music\Keys.txt">
       <Filter>Music</Filter>
     </Text>
@@ -409,9 +401,6 @@
     <ClCompile Include="..\..\Sound\piano_samples.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Sound\recorder_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Sound\standard_DRUMS_samples.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
@@ -425,9 +414,6 @@
       <Filter>Sound</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Sound\trombone_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\trumpet_samples.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Sound\tuba_samples.cpp">

@@ -33,7 +33,8 @@ int Lead::Make() {
     NoteListIter inIter;
 
     // Track info
-    track->_trackName = "Lead";
+    track->_trackNumber = 1;
+    track->_name = "Lead";
     track->_channel = 1;
     track->_instrument = _settings->_composer._lead._instrument;
     track->_instrumentName = _instrumentNames[track->_instrument];
@@ -48,9 +49,6 @@ int Lead::Make() {
             continue;
 
         if(inNote->_type == Note::CHORD) {
-            //printf("######## Measure %d\n", i);
-            //inNote._chord.Show();
-            //showNotes("prevNotes", prevNotes);
             MakeMeasure(*inNote->_chord, lastNote, measureNotes, prevNotes);
 
             // Save this measure's notes, they may be repeated in the next measure
@@ -91,7 +89,7 @@ int Lead::MakeMeasure(Chord& chord, Note& lastNote, NoteList& notes, NoteList& p
     // Melody
     RepeatMelody(chord, lastNote, notes, prevNotes);
     MakeMelody(notes, lastNote);
-    //showNotes("LeadMelody", notes);
+    showNotes("LeadMelody", notes);
 
     return 0;
 }
@@ -184,7 +182,7 @@ int Lead::RepeatMelody(Chord& chord, Note& lastNote, NoteList& notes, NoteList& 
     // First note of the measure
     note = notes[0];
     note._volume = 1.0;
-    if(lastNote._midiNote != -1) {
+    if(lastNote._midiNote != NO_MIDI_NOTE) {
         interval = random(-_settings->_composer._move, _settings->_composer._move);
         _band->_outSong._scale.GetIntervalNote(lastNote, note, interval);
         _band->_outSong._scale.MoveToChordNote(note, chord);
@@ -238,7 +236,7 @@ int Lead::MakeMelody(NoteList& notes, Note& lastNote) {
     for(iter = notes.begin(); iter != notes.end(); iter++) {
         note = &(*iter);
         note->_instrument = _settings->_composer._lead._instrument;
-        if(note->_midiNote != -1) { // Melody for this note is already set
+        if(note->_midiNote != NO_MIDI_NOTE) { // Melody for this note is already set
             lastNote = *note;
             continue;
         }

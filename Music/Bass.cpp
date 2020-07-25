@@ -33,7 +33,8 @@ int Bass::Make() {
     Note note;
 
     // Track info
-    track->_trackName = "Bass";
+    track->_trackNumber = 3;
+    track->_name = "Bass";
     track->_channel = 3;
     track->_instrument = _settings->_composer._bass._instrument;
     track->_instrumentName = _instrumentNames[track->_instrument];

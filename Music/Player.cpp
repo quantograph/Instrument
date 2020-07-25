@@ -110,11 +110,11 @@ bool Player::setupDrums() {
     _drums[DRUM_TOM_HIGH] = drum;
 
     // Crash
-    drum = new AudioSynthWavetable();
+    /*drum = new AudioSynthWavetable();
     drum->setInstrument(drumCrash);
     drum->amplitude(1);
     _cords.push_back(new AudioConnection(*drum, 0, _settings->_audioBoard->_mixer1, 2));
-    _drums[DRUM_CRASH1] = drum;
+    _drums[DRUM_CRASH1] = drum;*/
 
     // Ride
     drum = new AudioSynthWavetable();
