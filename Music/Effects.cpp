@@ -21,7 +21,11 @@ Effects::Effects(EffectSettings* settings, AudioStream* source, uint8_t sourceOu
                  AudioStream* dest, uint8_t destInput) :
     _settings(settings), _source(source), _sourceOutput(sourceOutput), _dest(dest), 
     _destInput(destInput) {
+    Serial.printf(">> memset\n");
+    delay(100);
     memset(_delayLine, 0, DELAY_LINE_LENGTH); // To prevent noise on the first use
+    Serial.printf(">>--- memset\n");
+    delay(100);
 }
 
 //=================================================================================================

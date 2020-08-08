@@ -97,12 +97,21 @@ bool Synth::init(Instrument instrument, Settings* settings) {
     }
 
     // Make effects
-    Serial.printf("3\n");
+    /*Serial.printf("3\n");
+    delay(100);
     _effect1 = new Effects(&_settings->_synthInput._effect1, &_outMixer, 0, &_settings->_audioBoard->_mixer1, 1);
+    Serial.printf("4\n");
+    delay(100);
     _effect1->init();
+    Serial.printf("5\n");
+    delay(100);
     _effect2 = new Effects(&_settings->_synthInput._effect2, &_outMixer, 0, &_settings->_audioBoard->_mixer4, 1);
+    Serial.printf("6\n");
+    delay(100);
     _effect2->init();
-    updateEffects();
+    Serial.printf("7\n");
+    delay(100);
+    updateEffects();*/
 
     Serial.printf("========================== Synth::init end \n");
     return true;

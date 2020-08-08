@@ -220,7 +220,7 @@ void AudioBoard::checkvolume() {
     int value;
 
     value = analogRead(VOLUME_PIN);
-    Serial.printf(">>>> Volume: %d\n", value);
+    //Serial.printf(">>>> Volume: %d\n", value);
 }
 
 //=================================================================================================

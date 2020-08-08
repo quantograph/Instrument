@@ -1,3 +1,4 @@
+#include <TimeLib.h>
 #include <list>
 #include <vector>
 
@@ -19,12 +20,13 @@
 
 SettingsFile g_settingsFile = SettingsFile();
 TouchScreen g_screen = TouchScreen();
-//Gui g_gui = Gui();
+Gui g_gui = Gui();
 AudioBoard g_audio = AudioBoard();
 SdCard g_sdCard = SdCard();
 MidiInput g_midiInput = MidiInput();
 Bluetooth g_bluetooth = Bluetooth();
 Player g_player = Player();
+RealTime g_time = RealTime();
 //Synth g_synth = Synth();
 
 //Menu g_menu = Menu();
@@ -42,12 +44,13 @@ void setup() {
     Serial.println("=====> setup");
 
     g_sdCard.init();
+    g_time.init();
 
     // Get the settings
     g_sdCard.makeDir("system");
     g_settingsFile.read(g_settingsFile._settings);
     g_settingsFile._settings._screen = &g_screen;
-    //g_settingsFile._settings._gui = &g_gui;
+    g_settingsFile._settings._gui = &g_gui;
     g_settingsFile._settings._audioBoard = &g_audio;
     g_settingsFile._settings._sdCard = &g_sdCard;
     g_settingsFile._settings._midiInput = &g_midiInput;
@@ -58,7 +61,7 @@ void setup() {
     // Initialize everything
     g_screen.init();
     //g_gui.init(&g_settingsFile, &g_settingsFile._settings);
-    g_audio.init(/*&g_gui,*/ &g_settingsFile._settings);
+    g_audio.init(&g_settingsFile._settings);
 
     // MIDI input
     //g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
@@ -68,13 +71,13 @@ void setup() {
     //g_bluetooth.init();
 
     // Band
-    /*Serial.printf("\n\n\n");
+    Serial.printf("\n\n\n");
     Band band(&g_settingsFile._settings);
     band.test();
     g_player.play(&band._outSong);
-    Serial.printf("\n\n\n");*/
+    Serial.printf("\n\n\n");
 
-    Serial.println("=====> setup end");
+    //Serial.println("=====> setup end");
 }
 
 //=================================================================================================
@@ -82,10 +85,11 @@ void setup() {
 void loop() {
     delay(50);
 
-    //g_midiInput.process();
+    g_midiInput.process();
     g_audio.process();
     //g_gui.process();
-    g_player.process();
+    //g_player.process();
+    //g_time.show();
 
     //Serial.println("=====> loop()");
 }

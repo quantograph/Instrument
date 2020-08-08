@@ -223,20 +223,10 @@ bool getInstrument(Instrument instrument, AudioBoard* audio, InstrumentInfo& inf
     switch(instrument) {
         case Instrument::ACOUSTIC_GRAND_PIANO:
         case Instrument::BRIGHT_ACOUSTIC_PIANO:
-            /*info._name = "Acc. piano";
-            info._sample = &epiano;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 1;
-            break;*/
         case Instrument::ELECTRIC_GRAND_PIANO:
         case Instrument::HONKY_TONK_PIANO:
         case Instrument::ELECTRIC_PIANO_1:
         case Instrument::ELECTRIC_PIANO_2:
-            /*info._name = "El. piano";
-            info._sample = &epiano;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 1;
-            break;*/
         case Instrument::HARPSICHORD:
         case Instrument::CLAVI:
         case Instrument::CELESTA:
@@ -247,12 +237,6 @@ bool getInstrument(Instrument instrument, AudioBoard* audio, InstrumentInfo& inf
         case Instrument::XYLOPHONE:
         case Instrument::TUBULAR_BELLS:
         case Instrument::DULCIMER:
-            /*info._name = "Vibraphone";
-            info._sample = &epiano;
-            //info._sample = &vibraphone;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 1;
-            break;*/
         case Instrument::DRAWBAR_ORGAN:
         case Instrument::PERCUSSIVE_ORGAN:
         case Instrument::ROCK_ORGAN:
@@ -261,51 +245,31 @@ bool getInstrument(Instrument instrument, AudioBoard* audio, InstrumentInfo& inf
         case Instrument::ACCORDION:
         case Instrument::HARMONICA:
         case Instrument::TANGO_ACCORDION:
-            info._name = "Accordion";
+            /*info._name = "Piano";
             info._sample = &epiano;
-            //info._sample = &harmonica;
+            info._voices = 10;
             info._mixer = &audio->_mixer4;
             info._mixerChannel = 1;
-            break;
+            break;*/
         case Instrument::ACOUSTIC_GUITAR_NYLON:
-            info._name = "Guitar (nylon)";
-            info._sample = &steelstrgtr;
-            //info._sample = &nylonstrgtr;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 1;
-            break;
         case Instrument::ACOUSTIC_GUITAR_STEEL:
         case Instrument::ELECTRIC_GUITAR_JAZZ:
         case Instrument::ELECTRIC_GUITAR_CLEAN:
             info._name = "Guitar (steel)";
             info._sample = &steelstrgtr;
-            //info._voices = 6;
+            info._voices = 6;
             info._mixer = &audio->_mixer2;
             info._mixerChannel = 1;
             break;
         case Instrument::ELECTRIC_GUITAR_MUTED:
-            /*info._name = "Guitar (muted)";
-            info._sample = &steelstrgtr;
-            //info._sample = &mutedgtr;
-            //info._voices = 6;
-            info._mixer = &audio->_mixer2;
-            info._mixerChannel = 1;
-            break;*/
         case Instrument::OVERDRIVEN_GUITAR:
-            /*info._name = "Guitar (overdr.)";
+        case Instrument::DISTORTION_GUITAR:
+            /*info._name = "Guitar (dist.)";
             info._sample = &distortiongt;
-            //info._sample = &overdrivegt;
-            //info._voices = 6;
+            info._voices = 6;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 0;
             break;*/
-        case Instrument::DISTORTION_GUITAR:
-            info._name = "Guitar (dist.)";
-            info._sample = &distortiongt;
-            //info._voices = 6;
-            info._mixer = &audio->_mixer3;
-            info._mixerChannel = 0;
-            break;
         case Instrument::GUITAR_HARMONICS:
         case Instrument::ACOUSTIC_BASS:
         case Instrument::ELECTRIC_BASS_FINGER:
@@ -316,8 +280,8 @@ bool getInstrument(Instrument instrument, AudioBoard* audio, InstrumentInfo& inf
         case Instrument::SYNTH_BASS_1:
         case Instrument::SYNTH_BASS_2:
             info._name = "Bass";
-            info._sample = &nylonstrgtr;
-            //info._voices = 4;
+            info._sample = &steelstrgtr;
+            info._voices = 4;
             info._mixer = &audio->_mixer2;
             info._mixerChannel = 0;
             break;
@@ -328,66 +292,19 @@ bool getInstrument(Instrument instrument, AudioBoard* audio, InstrumentInfo& inf
         case Instrument::TREMOLO_STRINGS:
         case Instrument::PIZZICATO_STRINGS:
         case Instrument::ORCHESTRAL_HARP:
-            info._name = "Violin";
-            info._sample = &steelstrgtr;
-            //info._sample = &harp;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer3;
-            info._mixerChannel = 2;
-            break;
         case Instrument::TIMPANI:
-            info._name = "Timpani";
-            info._sample = &steelstrgtr;
-            //info._sample = &timpani;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer3;
-            info._mixerChannel = 2;
-            break;
         case Instrument::STRING_ENSEMBLE_1:
         case Instrument::STRING_ENSEMBLE_2:
         case Instrument::SYNTHSTRINGS_1:
         case Instrument::SYNTHSTRINGS_2:
-            info._name = "Strings";
-            info._sample = &strings;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 1;
-            break;
         case Instrument::CHOIR_AAHS:
         case Instrument::VOICE_OOHS:
         case Instrument::SYNTH_VOICE:
         case Instrument::ORCHESTRA_HIT:
         case Instrument::TRUMPET:
-            /*info._name = "Trumpet";
-            info._sample = &trumpet;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::TROMBONE:
-            /*info._name = "Trombone";
-            info._sample = &trumpet;
-            //info._sample = &trombone;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer3;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::TUBA:
-            /*info._name = "Tuba";
-            info._sample = &trumpet;
-            //info._sample = &tuba;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer3;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::MUTED_TRUMPET:
-        case Instrument::FRENCH_HORN:
-            /*info._name = "French horn";
-            info._sample = &trumpet;
-            //info._sample = &frenchhorn;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer3;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::BRASS_SECTION:
         case Instrument::SYNTHBRASS_1:
         case Instrument::SYNTHBRASS_2:
@@ -396,48 +313,20 @@ bool getInstrument(Instrument instrument, AudioBoard* audio, InstrumentInfo& inf
         case Instrument::TENOR_SAX:
         case Instrument::BARITONE_SAX:
         case Instrument::OBOE:
-            /*info._name = "Oboe";
-            info._sample = &trumpet;
-            //info._sample = &oboe;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::ENGLISH_HORN:
         case Instrument::BASSOON:
-            /*info._name = "Bassoon";
-            info._sample = &trumpet;
-            //info._sample = &bassoon;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer3;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::CLARINET:
-            /*info._name = "Clarinet";
-            info._sample = &trumpet;
-            //info._sample = &clarinet;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer3;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::PICCOLO:
         case Instrument::FLUTE:
             info._name = "Flute";
             info._sample = &flute;
-            //info._voices = 1;
+            info._voices = 1;
             info._mixer = &audio->_mixer3;
             info._mixerChannel = 2;
             break;
         case Instrument::RECORDER:
         case Instrument::PAN_FLUTE:
         case Instrument::BLOWN_BOTTLE:
-            /*info._name = "Recorder";
-            info._sample = &flute;
-            //info._sample = &recorder;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer3;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::SHAKUHACHI:
         case Instrument::WHISTLE:
         case Instrument::OCARINA:
@@ -476,26 +365,12 @@ bool getInstrument(Instrument instrument, AudioBoard* audio, InstrumentInfo& inf
         case Instrument::TINKLE_BELL:
         case Instrument::AGOGO:
         case Instrument::STEEL_DRUMS:
-            /*info._name = "Steel drums";
-            info._sample = &trumpet;
-            //info._sample = &vibraphone;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::WOODBLOCK:
         case Instrument::TAIKO_DRUM:
         case Instrument::MELODIC_TOM:
         case Instrument::SYNTH_DRUM:
         case Instrument::REVERSE_CYMBAL:
         case Instrument::GUITAR_FRET_NOISE:
-            /*info._name = "Melodic tom";
-            info._sample = &trumpet;
-            //info._sample = &gtfretnoise;
-            //info._voices = 1;
-            info._mixer = &audio->_mixer4;
-            info._mixerChannel = 2;
-            break;*/
         case Instrument::BREATH_NOISE:
         case Instrument::SEASHORE:
         case Instrument::BIRD_TWEET:

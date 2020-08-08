@@ -235,6 +235,9 @@
     <ClInclude Include="..\..\Music\Music.h">
       <Filter>Music</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Devices\RealTime.h">
+      <Filter>Devices</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.md" />
@@ -475,6 +478,9 @@
     </ClCompile>
     <ClCompile Include="..\..\Music\Rhythm.cpp">
       <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Devices\RealTime.cpp">
+      <Filter>Devices</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

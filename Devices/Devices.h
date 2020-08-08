@@ -20,6 +20,7 @@
 #include <WireKinetis.h>
 #include <CapacitiveSensor.h> // Must be the included the last to avoid conflicts with ILI9341_t3.h
 #include <USBHost_t36.h>
+#include <TimeLib.h>
 
 #include "Definitions.h"
 #include "AudioBoard.h"
@@ -29,5 +30,6 @@
 #include "TouchScreen.h"
 #include "Storage.h"
 #include "SettingsFile.h"
+#include "RealTime.h"
 
 #endif
