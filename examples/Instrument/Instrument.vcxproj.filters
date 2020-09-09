@@ -1,252 +1,257 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="__vm\.Arduino.vsarduino.h" />
-    <ClInclude Include="__vm\.Instrument.vsarduino.h" />
-    <ClInclude Include="..\..\Devices\AudioBoard.h">
+    <ClInclude Include="..\..\src\Devices\AudioBoard.h">
       <Filter>Devices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Devices\Bluetooth.h">
+    <ClInclude Include="..\..\src\Devices\Bluetooth.h">
       <Filter>Devices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Devices\Devices.h">
+    <ClInclude Include="..\..\src\Devices\Definitions.h">
       <Filter>Devices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Devices\MidiInput.h">
+    <ClInclude Include="..\..\src\Devices\Devices.h">
       <Filter>Devices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Devices\SdCard.h">
+    <ClInclude Include="..\..\src\Devices\Led.h">
       <Filter>Devices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Devices\TouchScreen.h">
+    <ClInclude Include="..\..\src\Devices\MidiInput.h">
       <Filter>Devices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GUI\Button.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\Control.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\Gui.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\GuiMisc.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\Main.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\PeakMeter.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\SetAudio.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\Slider.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\Window.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Effects.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Fingers.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\MidiFile.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Misc.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\MusicDef.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Note.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Player.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Song.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Staff.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Synth.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Music\Track.h">
-      <Filter>Music</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\bassoon_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\clarinet_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\distortiongt_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\drumBass_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\drumBlock_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\drumCrash_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\drumHat_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\drumRide_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\drumSnare_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\drumTomHigh_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\drumTomLow_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\epiano_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\flute_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\frenchhorn_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\glockenspiel_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\gtfretnoise_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\harmonica_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\harp_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\mutedgtr_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\nylonstrgtr_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\oboe_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\overdrivegt_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\piano_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\Sound.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\standard_DRUMS_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\steelstrgtr_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\strings_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\timpani_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\trombone_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\tuba_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Sound\vibraphone_samples.h">
-      <Filter>Sound</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\QuantoGraph.h" />
-    <ClInclude Include="..\..\GUI\CheckBox.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\TextBox.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\SetBand.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\SetGuitar.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\GUI\SetSynth.h">
-      <Filter>GUI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Devices\Definitions.h">
+    <ClInclude Include="..\..\src\Devices\Motion.h">
       <Filter>Devices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Devices\Storage.h">
+    <ClInclude Include="..\..\src\Devices\RealTime.h">
       <Filter>Devices</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GUI\List.h">
+    <ClInclude Include="..\..\src\Devices\SdCard.h">
+      <Filter>Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Devices\SettingsFile.h">
+      <Filter>Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Devices\Storage.h">
+      <Filter>Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Devices\TouchScreen.h">
+      <Filter>Devices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\Button.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\GUI\SetEffect.h">
+    <ClInclude Include="..\..\src\GUI\CheckBox.h">
       <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Devices\SettingsFile.h">
-      <Filter>Devices</Filter>
+    <ClInclude Include="..\..\src\GUI\Control.h">
+      <Filter>GUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\Chord.h">
+    <ClInclude Include="..\..\src\GUI\Gui.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\GuiMisc.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\List.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\Main.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\PeakMeter.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\SetAudio.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\SetBand.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\SetEffect.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\SetGuitar.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\SetSynth.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\Slider.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\TextBox.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GUI\Window.h">
+      <Filter>GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\Band.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\Scale.h">
+    <ClInclude Include="..\..\src\Music\Bass.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\Band.h">
+    <ClInclude Include="..\..\src\Music\Chord.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\Bass.h">
+    <ClInclude Include="..\..\src\Music\Drums.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\Drums.h">
+    <ClInclude Include="..\..\src\Music\Effects.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\Keys.h">
+    <ClInclude Include="..\..\src\Music\Fingers.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\Lead.h">
+    <ClInclude Include="..\..\src\Music\Keys.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\NoteInfo.h">
+    <ClInclude Include="..\..\src\Music\Lead.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\Rhythm.h">
+    <ClInclude Include="..\..\src\Music\MidiFile.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Music\Music.h">
+    <ClInclude Include="..\..\src\Music\Misc.h">
       <Filter>Music</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Devices\RealTime.h">
-      <Filter>Devices</Filter>
+    <ClInclude Include="..\..\src\Music\Music.h">
+      <Filter>Music</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Music\MusicDef.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\Note.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\NoteInfo.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\Player.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\Rhythm.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\Scale.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\Song.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\Staff.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\Synth.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Music\Track.h">
+      <Filter>Music</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\bassoon_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\clarinet_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\distortiongt_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\drumBass_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\drumBlock_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\drumCrash_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\drumHat_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\drumRide_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\drumSnare_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\drumTomHigh_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\drumTomLow_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\epiano_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\flute_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\frenchhorn_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\glockenspiel_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\gtfretnoise_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\harmonica_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\harp_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\mutedgtr_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\nylonstrgtr_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\oboe_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\overdrivegt_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\piano_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\recorder_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\Sound.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\standard_DRUMS_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\steelstrgtr_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\strings_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\timpani_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\trombone_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\trumpet_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\tuba_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\Sound\vibraphone_samples.h">
+      <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\QuantoGraph.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.md" />
     <None Include="Instrument.ino" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="..\..\Music\Keys.txt">
-      <Filter>Music</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Devices">
@@ -263,224 +268,241 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Devices\AudioBoard.cpp">
+    <ClCompile Include="..\..\src\Devices\AudioBoard.cpp">
       <Filter>Devices</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Devices\Bluetooth.cpp">
+    <ClCompile Include="..\..\src\Devices\Bluetooth.cpp">
       <Filter>Devices</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Devices\MidiInput.cpp">
+    <ClCompile Include="..\..\src\Devices\Led.cpp">
       <Filter>Devices</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Devices\SdCard.cpp">
+    <ClCompile Include="..\..\src\Devices\MidiInput.cpp">
       <Filter>Devices</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Devices\TouchScreen.cpp">
+    <ClCompile Include="..\..\src\Devices\Motion.cpp">
       <Filter>Devices</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\GUI\Button.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\Control.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\Gui.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\GuiMisc.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\Main.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\PeakMeter.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\SetAudio.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\Slider.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\Window.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Effects.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Fingers.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\MidiFile.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Misc.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Note.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Player.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Song.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Staff.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Synth.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Track.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\bassoon_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\clarinet_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\distortiongt_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\drumBass_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\drumBlock_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\drumCrash_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\drumHat_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\drumRide_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\drumSnare_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\drumTomHigh_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\drumTomLow_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\epiano_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\flute_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\frenchhorn_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\glockenspiel_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\gtfretnoise_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\harmonica_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\harp_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\mutedgtr_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\nylonstrgtr_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\oboe_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\overdrivegt_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\piano_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\standard_DRUMS_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\steelstrgtr_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\strings_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\timpani_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\trombone_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\tuba_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Sound\vibraphone_samples.cpp">
-      <Filter>Sound</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\CheckBox.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\TextBox.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\SetBand.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\SetGuitar.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\SetSynth.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Devices\Storage.cpp">
+    <ClCompile Include="..\..\src\Devices\RealTime.cpp">
       <Filter>Devices</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\GUI\List.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\GUI\SetEffect.cpp">
-      <Filter>GUI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Devices\SettingsFile.cpp">
+    <ClCompile Include="..\..\src\Devices\SdCard.cpp">
       <Filter>Devices</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Music\Chord.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Scale.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Band.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Bass.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Drums.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Keys.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Lead.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\NoteInfo.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Music\Rhythm.cpp">
-      <Filter>Music</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Devices\RealTime.cpp">
+    <ClCompile Include="..\..\src\Devices\SettingsFile.cpp">
       <Filter>Devices</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\Devices\Storage.cpp">
+      <Filter>Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Devices\TouchScreen.cpp">
+      <Filter>Devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\Button.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\CheckBox.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\Control.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\Gui.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\GuiMisc.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\List.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\Main.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\PeakMeter.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\SetAudio.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\SetBand.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\SetEffect.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\SetGuitar.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\SetSynth.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\Slider.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\TextBox.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\GUI\Window.cpp">
+      <Filter>GUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Band.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Bass.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Chord.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Drums.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Effects.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Fingers.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Keys.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Lead.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\MidiFile.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Misc.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Note.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\NoteInfo.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Player.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Rhythm.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Scale.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Song.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Staff.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Synth.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Music\Track.cpp">
+      <Filter>Music</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\bassoon_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\clarinet_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\distortiongt_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\drumBass_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\drumBlock_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\drumCrash_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\drumHat_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\drumRide_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\drumSnare_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\drumTomHigh_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\drumTomLow_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\epiano_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\flute_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\frenchhorn_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\glockenspiel_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\gtfretnoise_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\harmonica_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\harp_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\mutedgtr_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\nylonstrgtr_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\oboe_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\overdrivegt_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\piano_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\recorder_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\standard_DRUMS_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\steelstrgtr_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\strings_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\timpani_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\trombone_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\trumpet_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\tuba_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Sound\vibraphone_samples.cpp">
+      <Filter>Sound</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\src\Music\Keys.txt">
+      <Filter>Music</Filter>
+    </Text>
   </ItemGroup>
 </Project>

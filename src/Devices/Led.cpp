@@ -115,6 +115,9 @@ bool Led::SetColor(byte red, byte green, byte blue) {
 //=================================================================================================
 // Test of LED linear brightness
 void Led::Test() {
+	Serial.println("LedTest");
+	
+/*
     static int red = 127;
     static int green = 127;
     static int blue = 127;
@@ -135,6 +138,7 @@ void Led::Test() {
 
     //hue += 1;
     //delay(30);
+*/
 }
 
 //=================================================================================================

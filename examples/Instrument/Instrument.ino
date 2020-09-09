@@ -27,7 +27,7 @@ MidiInput g_midiInput = MidiInput();
 Bluetooth g_bluetooth = Bluetooth();
 Player g_player = Player();
 RealTime g_time = RealTime();
-//Synth g_synth = Synth();
+Synth g_synth = Synth();
 
 //Menu g_menu = Menu();
 //CapSensor g_cap = CapSensor();
@@ -64,18 +64,18 @@ void setup() {
     g_audio.init(&g_settingsFile._settings);
 
     // MIDI input
-    //g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
-    //g_midiInput.init(&g_synth);
+    g_synth.init((Instrument)g_settingsFile._settings._synthSettings._instrument, &g_settingsFile._settings);
+    g_midiInput.init(&g_synth);
     
     g_player.init(&g_settingsFile._settings);
     //g_bluetooth.init();
 
     // Band
-    Serial.printf("\n\n\n");
+    /*Serial.printf("\n\n\n");
     Band band(&g_settingsFile._settings);
     band.test();
     g_player.play(&band._outSong);
-    Serial.printf("\n\n\n");
+    Serial.printf("\n\n\n");*/
 
     //Serial.println("=====> setup end");
 }
