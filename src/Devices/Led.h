@@ -6,11 +6,6 @@
 
 class Led {
 public:
-    // RGB LED pins
-    #define RED_LED 36 // PWM pin for red LED
-    #define GREEN_LED 37 // PWM pin for green LED
-    #define BLUE_LED 38 // PWM pin for blue LED
-
     // Color
     struct COLOR {
         COLOR() : _red(0), _green(0), _blue(0) {};
@@ -20,7 +15,9 @@ public:
         byte _blue;
     };
 
-    // Global variables
+    int _redPin{14};  // PWM pin for red LED
+    int _greenPin{24} ;  // PWM pin for green LED
+    int _bluePin{15} ; // PWM pin for blue LED
     int _hue = 0; // Current hue
     #define HUES 256 * 6 // Number of color hues
     COLOR _hues[HUES]; // All color hueues
@@ -45,7 +42,7 @@ public:
     184, 186, 189, 191, 193, 195, 197, 199, 201, 204, 206, 208, 210, 212, 215, 217,
     219, 221, 224, 226, 228, 231, 233, 235, 238, 240, 243, 245, 248, 250, 253, 255 };
 
-    bool Init(float level = 0.5);
+    bool Init(int redPin, int greenPin, int bluePin, float level = 0.5);
     void SetLevel(float level);
     bool GetAllHues();
     bool GetHues(int& index, const COLOR& color, int redMove, int greenMove, int blueMove);

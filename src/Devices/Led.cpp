@@ -1,15 +1,14 @@
-// LED.ino - all functions for the LED's
+// LED - all functions for the LED's
 #include "LED.h"
 
 //=================================================================================================
-// Initializes the LED shield
-bool Led::Init(float level) {
+bool Led::Init(int redPin, int greenPin, int bluePin, float level) {
     _level = level;
 
     // RGB LED pins
-    pinMode(RED_LED, OUTPUT);
-    pinMode(GREEN_LED, OUTPUT);
-    pinMode(BLUE_LED, OUTPUT);
+    pinMode(_redPin, OUTPUT);
+    pinMode(_greenPin, OUTPUT);
+    pinMode(_bluePin, OUTPUT);
 
     GetAllHues();
     SetPwmFrequency(10000);
@@ -19,9 +18,9 @@ bool Led::Init(float level) {
 
 //=================================================================================================
 void Led::SetPwmFrequency(int frequency) {
-    analogWriteFrequency(RED_LED, frequency);
-    analogWriteFrequency(GREEN_LED, frequency);
-    analogWriteFrequency(BLUE_LED, frequency);
+    analogWriteFrequency(_redPin, frequency);
+    analogWriteFrequency(_greenPin, frequency);
+    analogWriteFrequency(_bluePin, frequency);
 }
 
 //=================================================================================================
@@ -101,13 +100,13 @@ void Led::SetRandomHue() {
 // Sets color of RGB LED's
 // All values are from 0 to 255
 bool Led::SetColor(byte red, byte green, byte blue) {
-    analogWrite(RED_LED, red);
-    analogWrite(GREEN_LED, green);
-    analogWrite(BLUE_LED, blue);
+    analogWrite(_redPin, red);
+    analogWrite(_greenPin, green);
+    analogWrite(_bluePin, blue);
 
-    /*analogWrite(RED_LED, _ledTable[red]);
-    analogWrite(GREEN_LED, _ledTable[green]);
-    analogWrite(BLUE_LED, _ledTable[blue]);*/
+    /*analogWrite(_redPin, _ledTable[red]);
+    analogWrite(_greenPin, _ledTable[green]);
+    analogWrite(_bluePin, _ledTable[blue]);*/
 
     return true;
 }
@@ -117,7 +116,6 @@ bool Led::SetColor(byte red, byte green, byte blue) {
 void Led::Test() {
 	Serial.println("LedTest");
 	
-/*
     static int red = 127;
     static int green = 127;
     static int blue = 127;
@@ -137,8 +135,6 @@ void Led::Test() {
     NextColor(blue, blueInc);
 
     //hue += 1;
-    //delay(30);
-*/
 }
 
 //=================================================================================================

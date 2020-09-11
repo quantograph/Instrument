@@ -1,0 +1,186 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{273d39fc-b261-414d-8438-6605752bf42c}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)readme.txt" />
+    <Text Include="$(MSBuildThisFileDirectory)library.properties" />
+    <Text Include="$(MSBuildThisFileDirectory)src\Music\Keys.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- <ClInclude Include="$(MSBuildThisFileDirectory)QuantoGraph.h" /> -->
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\AudioBoard.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\Bluetooth.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\Definitions.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\Devices.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\Led.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\MidiInput.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\Motion.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\RealTime.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\SdCard.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\SettingsFile.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\Storage.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Devices\TouchScreen.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\Button.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\CheckBox.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\Control.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\Gui.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\GuiMisc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\List.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\Main.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\PeakMeter.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\SetAudio.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\SetBand.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\SetEffect.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\SetGuitar.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\SetSynth.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\Slider.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\TextBox.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\GUI\Window.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Band.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Bass.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Chord.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Drums.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Effects.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Fingers.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Keys.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Lead.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\MidiFile.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Misc.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Music.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\MusicDef.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Note.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\NoteInfo.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Player.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Rhythm.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Scale.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Song.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Staff.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Synth.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Music\Track.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\QuantoGraph.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\bassoon_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\clarinet_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\distortiongt_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\drumBass_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\drumBlock_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\drumCrash_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\drumHat_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\drumRide_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\drumSnare_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\drumTomHigh_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\drumTomLow_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\epiano_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\flute_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\frenchhorn_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\glockenspiel_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\gtfretnoise_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\harmonica_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\harp_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\mutedgtr_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\nylonstrgtr_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\oboe_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\overdrivegt_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\piano_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\recorder_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\Sound.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\standard_DRUMS_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\steelstrgtr_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\strings_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\timpani_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\trombone_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\trumpet_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\tuba_samples.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\Sound\vibraphone_samples.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\AudioBoard.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\Bluetooth.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\Led.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\MidiInput.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\Motion.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\RealTime.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\SdCard.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\SettingsFile.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\Storage.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Devices\TouchScreen.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\Button.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\CheckBox.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\Control.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\Gui.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\GuiMisc.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\List.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\Main.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\PeakMeter.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\SetAudio.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\SetBand.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\SetEffect.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\SetGuitar.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\SetSynth.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\Slider.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\TextBox.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\GUI\Window.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Band.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Bass.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Chord.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Drums.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Effects.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Fingers.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Keys.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Lead.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\MidiFile.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Misc.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Note.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\NoteInfo.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Player.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Rhythm.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Scale.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Song.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Staff.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Synth.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Music\Track.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\bassoon_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\clarinet_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\distortiongt_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\drumBass_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\drumBlock_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\drumCrash_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\drumHat_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\drumRide_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\drumSnare_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\drumTomHigh_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\drumTomLow_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\epiano_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\flute_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\frenchhorn_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\glockenspiel_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\gtfretnoise_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\harmonica_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\harp_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\mutedgtr_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\nylonstrgtr_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\oboe_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\overdrivegt_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\piano_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\recorder_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\standard_DRUMS_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\steelstrgtr_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\strings_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\timpani_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\trombone_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\trumpet_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\tuba_samples.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\Sound\vibraphone_samples.cpp" />
+  </ItemGroup>
+</Project>

@@ -6,41 +6,41 @@ Synth* MidiInput::_synth{nullptr};
 USBHost _usbHost;
 MIDIDevice _midiDevice(_usbHost);
 
-void MidiInput::init(Synth* synth) {
+void MidiInput::init(Synth* synth /* = nullptr */) {
     _synth = synth;
 
-  // Wait 1.5 seconds before turning on USB Host.  If connected USB devices
-  // use too much power, Teensy at least completes USB enumeration, which
-  // makes isolating the power issue easier.
-  delay(1500);
-  _usbHost.begin();
+    // Wait 1.5 seconds before turning on USB Host.  If connected USB devices
+    // use too much power, Teensy at least completes USB enumeration, which
+    // makes isolating the power issue easier.
+    delay(1500);
+    _usbHost.begin();
 
-  _midiDevice.setHandleNoteOn(myNoteOn);
-  _midiDevice.setHandleNoteOff(myNoteOff);
-  _midiDevice.setHandleAfterTouchPoly(myAfterTouchPoly);
-  _midiDevice.setHandleControlChange(myControlChange);
-  _midiDevice.setHandleProgramChange(myProgramChange);
-  _midiDevice.setHandleAfterTouchChannel(myAfterTouchChannel);
-  _midiDevice.setHandlePitchChange(myPitchChange);
-  // Only one of these System Exclusive handlers will actually be
-  // used.  See the comments below for the difference between them.
-  _midiDevice.setHandleSystemExclusive(mySystemExclusiveChunk);
-  _midiDevice.setHandleSystemExclusive(mySystemExclusive); 
-  _midiDevice.setHandleTimeCodeQuarterFrame(myTimeCodeQuarterFrame);
-  _midiDevice.setHandleSongPosition(mySongPosition);
-  _midiDevice.setHandleSongSelect(mySongSelect);
-  _midiDevice.setHandleTuneRequest(myTuneRequest);
-  _midiDevice.setHandleClock(myClock);
-  _midiDevice.setHandleStart(myStart);
-  _midiDevice.setHandleContinue(myContinue);
-  _midiDevice.setHandleStop(myStop);
-  _midiDevice.setHandleActiveSensing(myActiveSensing);
-  _midiDevice.setHandleSystemReset(mySystemReset);
-  // This generic System Real Time handler is only used if the
-  // more specific ones are not set.
-  _midiDevice.setHandleRealTimeSystem(myRealTimeSystem);
+    _midiDevice.setHandleNoteOn(myNoteOn);
+    _midiDevice.setHandleNoteOff(myNoteOff);
+    _midiDevice.setHandleAfterTouchPoly(myAfterTouchPoly);
+    _midiDevice.setHandleControlChange(myControlChange);
+    _midiDevice.setHandleProgramChange(myProgramChange);
+    _midiDevice.setHandleAfterTouchChannel(myAfterTouchChannel);
+    _midiDevice.setHandlePitchChange(myPitchChange);
+    // Only one of these System Exclusive handlers will actually be
+    // used.  See the comments below for the difference between them.
+    _midiDevice.setHandleSystemExclusive(mySystemExclusiveChunk);
+    _midiDevice.setHandleSystemExclusive(mySystemExclusive); 
+    _midiDevice.setHandleTimeCodeQuarterFrame(myTimeCodeQuarterFrame);
+    _midiDevice.setHandleSongPosition(mySongPosition);
+    _midiDevice.setHandleSongSelect(mySongSelect);
+    _midiDevice.setHandleTuneRequest(myTuneRequest);
+    _midiDevice.setHandleClock(myClock);
+    _midiDevice.setHandleStart(myStart);
+    _midiDevice.setHandleContinue(myContinue);
+    _midiDevice.setHandleStop(myStop);
+    _midiDevice.setHandleActiveSensing(myActiveSensing);
+    _midiDevice.setHandleSystemReset(mySystemReset);
+    // This generic System Real Time handler is only used if the
+    // more specific ones are not set.
+    _midiDevice.setHandleRealTimeSystem(myRealTimeSystem);
 
-  Serial.println("MidiInput::Init");
+    Serial.println("MidiInput::Init");
 }
 
 void MidiInput::process() {
@@ -56,25 +56,27 @@ void MidiInput::myNoteOn(byte channel, byte note, byte velocity) {
   // When a USB device with multiple virtual cables is used,
   // _midiDevice.getCable() can be used to read which of the virtual
   // MIDI cables received this message.
-  /*Serial.print("Note On, ch=");
+  Serial.print("Note On, ch=");
   Serial.print(channel, DEC);
   Serial.print(", note=");
   Serial.print(note, DEC);
   Serial.print(", velocity=");
-  Serial.println(velocity, DEC);*/
+  Serial.println(velocity, DEC);
 
-  _synth->noteOn(note, velocity);
+  if (_synth)
+    _synth->noteOn(note, velocity);
 }
 
 void MidiInput::myNoteOff(byte channel, byte note, byte velocity) {
-  /*Serial.print("Note Off, ch=");
+  Serial.print("Note Off, ch=");
   Serial.print(channel, DEC);
   Serial.print(", note=");
   Serial.print(note, DEC);
   Serial.print(", velocity=");
-  Serial.println(velocity, DEC);*/
+  Serial.println(velocity, DEC);
 
-  _synth->noteOff(note);
+  if (_synth)
+      _synth->noteOff(note);
 }
 
 void MidiInput::myAfterTouchPoly(byte channel, byte note, byte velocity) {
@@ -93,7 +95,9 @@ void MidiInput::myControlChange(byte channel, byte control, byte value) {
   Serial.print(control, DEC);
   Serial.print(", value=");
   Serial.println(value, DEC);*/
-  _synth->controlChange(channel, control, value);
+
+  if (_synth)
+      _synth->controlChange(channel, control, value);
 }
 
 void MidiInput::myProgramChange(byte channel, byte program) {
