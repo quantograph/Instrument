@@ -13,6 +13,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Instrument", "examples\Inst
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MidiInput", "examples\MidiInput\MidiInput.vcxproj", "{6D9D49A6-0A52-4609-8E3D-7E86490619D3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Screen", "examples\Screen\Screen.vcxproj", "{EABDDB2E-78B8-408A-9A1D-CF30327AA981}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{9F4F51F3-221E-4D2A-80D0-0CD8299AF0CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -35,6 +39,10 @@ Global
 		{6D9D49A6-0A52-4609-8E3D-7E86490619D3}.Debug|x86.Build.0 = Debug|Win32
 		{6D9D49A6-0A52-4609-8E3D-7E86490619D3}.Release|x86.ActiveCfg = Release|Win32
 		{6D9D49A6-0A52-4609-8E3D-7E86490619D3}.Release|x86.Build.0 = Release|Win32
+		{EABDDB2E-78B8-408A-9A1D-CF30327AA981}.Debug|x86.ActiveCfg = Debug|Win32
+		{EABDDB2E-78B8-408A-9A1D-CF30327AA981}.Debug|x86.Build.0 = Debug|Win32
+		{EABDDB2E-78B8-408A-9A1D-CF30327AA981}.Release|x86.ActiveCfg = Release|Win32
+		{EABDDB2E-78B8-408A-9A1D-CF30327AA981}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

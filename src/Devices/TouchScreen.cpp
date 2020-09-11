@@ -22,7 +22,7 @@ void TouchScreen::init() {
     _height = _screen.height();
 
     pinMode(TFT_LED, OUTPUT);
-    light(0.0);
+    light(1.0);
 
     //attachInterrupt(T_IRQ, onTouched, FALLING);
 }

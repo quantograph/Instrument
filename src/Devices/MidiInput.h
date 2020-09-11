@@ -4,7 +4,7 @@ class Synth;
 
 class MidiInput {
 public:
-    void init(Synth* synth = nullptr);
+    void init(Synth* synth = nullptr, bool debug = false);
     void process();
     static void myNoteOn(byte channel, byte note, byte velocity);
     static void myNoteOff(byte channel, byte note, byte velocity);
@@ -29,4 +29,5 @@ public:
     static void printBytes(const byte *data, unsigned int size);
 
     static Synth* _synth;
+    static bool _debug;
 };

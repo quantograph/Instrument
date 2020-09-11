@@ -3,11 +3,13 @@
 #include "MidiInput.h"
 
 Synth* MidiInput::_synth{nullptr};
+bool MidiInput::_debug{false};
 USBHost _usbHost;
 MIDIDevice _midiDevice(_usbHost);
 
-void MidiInput::init(Synth* synth /* = nullptr */) {
+void MidiInput::init(Synth* synth /* = nullptr */, bool debug /* = false */) {
     _synth = synth;
+    _debug = debug;
 
     // Wait 1.5 seconds before turning on USB Host.  If connected USB devices
     // use too much power, Teensy at least completes USB enumeration, which
@@ -22,8 +24,6 @@ void MidiInput::init(Synth* synth /* = nullptr */) {
     _midiDevice.setHandleProgramChange(myProgramChange);
     _midiDevice.setHandleAfterTouchChannel(myAfterTouchChannel);
     _midiDevice.setHandlePitchChange(myPitchChange);
-    // Only one of these System Exclusive handlers will actually be
-    // used.  See the comments below for the difference between them.
     _midiDevice.setHandleSystemExclusive(mySystemExclusiveChunk);
     _midiDevice.setHandleSystemExclusive(mySystemExclusive); 
     _midiDevice.setHandleTimeCodeQuarterFrame(myTimeCodeQuarterFrame);
@@ -36,89 +36,95 @@ void MidiInput::init(Synth* synth /* = nullptr */) {
     _midiDevice.setHandleStop(myStop);
     _midiDevice.setHandleActiveSensing(myActiveSensing);
     _midiDevice.setHandleSystemReset(mySystemReset);
-    // This generic System Real Time handler is only used if the
-    // more specific ones are not set.
     _midiDevice.setHandleRealTimeSystem(myRealTimeSystem);
 
-    Serial.println("MidiInput::Init");
+    if(_debug)
+        Serial.println("MidiInput::Init");
 }
 
 void MidiInput::process() {
-  // The handler functions are called when _midiDevice reads data.  They
-  // will not be called automatically.  You must call _midiDevice.read()
-  // regularly from loop() for _midiDevice to actually read incoming
-  // data and run the handler functions as messages arrive.
   _usbHost.Task();
   _midiDevice.read();
 }
 
 void MidiInput::myNoteOn(byte channel, byte note, byte velocity) {
-  // When a USB device with multiple virtual cables is used,
-  // _midiDevice.getCable() can be used to read which of the virtual
-  // MIDI cables received this message.
-  Serial.print("Note On, ch=");
-  Serial.print(channel, DEC);
-  Serial.print(", note=");
-  Serial.print(note, DEC);
-  Serial.print(", velocity=");
-  Serial.println(velocity, DEC);
+    if(_debug) {
+        Serial.print(" Note On, ch=");
+        Serial.print(channel, DEC);
+        Serial.print(", note=");
+        Serial.print(note, DEC);
+        Serial.print(", velocity=");
+        Serial.println(velocity, DEC);
+    }
 
-  if (_synth)
-    _synth->noteOn(note, velocity);
+    if (_synth)
+        _synth->noteOn(note, velocity);
 }
 
 void MidiInput::myNoteOff(byte channel, byte note, byte velocity) {
-  Serial.print("Note Off, ch=");
-  Serial.print(channel, DEC);
-  Serial.print(", note=");
-  Serial.print(note, DEC);
-  Serial.print(", velocity=");
-  Serial.println(velocity, DEC);
+    if(_debug) {
+        Serial.print("Note Off, ch=");
+        Serial.print(channel, DEC);
+        Serial.print(", note=");
+        Serial.print(note, DEC);
+        Serial.print(", velocity=");
+        Serial.println(velocity, DEC);
+    }
 
-  if (_synth)
-      _synth->noteOff(note);
+    if (_synth)
+        _synth->noteOff(note);
 }
 
 void MidiInput::myAfterTouchPoly(byte channel, byte note, byte velocity) {
-  Serial.print("AfterTouch Change, ch=");
-  Serial.print(channel, DEC);
-  Serial.print(", note=");
-  Serial.print(note, DEC);
-  Serial.print(", velocity=");
-  Serial.println(velocity, DEC);
+    if(_debug) {
+        Serial.print("AfterTouch Change, ch=");
+        Serial.print(channel, DEC);
+        Serial.print(", note=");
+        Serial.print(note, DEC);
+        Serial.print(", velocity=");
+        Serial.println(velocity, DEC);
+    }
 }
 
 void MidiInput::myControlChange(byte channel, byte control, byte value) {
-  /*Serial.print("Control Change, ch=");
-  Serial.print(channel, DEC);
-  Serial.print(", control=");
-  Serial.print(control, DEC);
-  Serial.print(", value=");
-  Serial.println(value, DEC);*/
+    if(_debug) {
+        Serial.print("Control Change, ch=");
+        Serial.print(channel, DEC);
+        Serial.print(", control=");
+        Serial.print(control, DEC);
+        Serial.print(", value=");
+        Serial.println(value, DEC);
+    }
 
-  if (_synth)
-      _synth->controlChange(channel, control, value);
+    if (_synth)
+        _synth->controlChange(channel, control, value);
 }
 
 void MidiInput::myProgramChange(byte channel, byte program) {
-  Serial.print("Program Change, ch=");
-  Serial.print(channel, DEC);
-  Serial.print(", program=");
-  Serial.println(program, DEC);
+    if(_debug) {
+        Serial.print("Program Change, ch=");
+        Serial.print(channel, DEC);
+        Serial.print(", program=");
+        Serial.println(program, DEC);
+    }
 }
 
 void MidiInput::myAfterTouchChannel(byte channel, byte pressure) {
-  Serial.print("After Touch, ch=");
-  Serial.print(channel, DEC);
-  Serial.print(", pressure=");
-  Serial.println(pressure, DEC);
+    if(_debug) {
+        Serial.print("After Touch, ch=");
+        Serial.print(channel, DEC);
+        Serial.print(", pressure=");
+        Serial.println(pressure, DEC);
+    }
 }
 
 void MidiInput::myPitchChange(byte channel, int pitch) {
-  Serial.print("Pitch Change, ch=");
-  Serial.print(channel, DEC);
-  Serial.print(", pitch=");
-  Serial.println(pitch, DEC);
+    if(_debug) {
+        Serial.print("Pitch Change, ch=");
+        Serial.print(channel, DEC);
+        Serial.print(", pitch=");
+        Serial.println(pitch, DEC);
+    }
 }
 
 // This 3-input System Exclusive function is more complex, but allows you to
@@ -141,9 +147,11 @@ void MidiInput::mySystemExclusiveChunk(const byte *data, uint16_t length, bool l
 // no way to receive the data which did not fit in the buffer.  If both types
 // of SysEx functions are set, the 3-input version will be called by _midiDevice.
 void MidiInput::mySystemExclusive(byte *data, unsigned int length) {
-  //Serial.print("SysEx Message: ");
-  printBytes(data, length);
-  Serial.println();
+    if(_debug) {
+        Serial.print("SysEx Message: ");
+        printBytes(data, length);
+        Serial.println();
+    }
 }
 
 void MidiInput::myTimeCodeQuarterFrame(byte data) {
