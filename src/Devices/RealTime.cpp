@@ -8,8 +8,6 @@ bool RealTime::init() {
         Serial.println("##### ERROR: can't sync with RTC");
     }
 
-    sync();
-
     return true;
 }
 
