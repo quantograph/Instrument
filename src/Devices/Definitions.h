@@ -595,7 +595,7 @@ struct InputSettings {
 // Audio setting
 struct AudioSettings {
     Inputs _input{Inputs::mic}; // Mic or line in
-    float _micGain{0.5}; // Microphone gain (0 - 63)
+    float _micGain{0.7}; // Microphone gain (0 - 63)
     float _lineInLevel{0.5}; // 0 - 15
 
     void putValues(String& string);

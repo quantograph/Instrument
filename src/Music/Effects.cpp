@@ -19,13 +19,10 @@ std::vector<String> Effects::_effectName {
 //=================================================================================================
 Effects::Effects(EffectSettings* settings, AudioStream* source, uint8_t sourceOutput, 
                  AudioStream* dest, uint8_t destInput) :
-    _settings(settings), _source(source), _sourceOutput(sourceOutput), _dest(dest), 
-    _destInput(destInput) {
-    Serial.printf(">> memset\n");
-    delay(100);
+        _settings(settings), _source(source), _sourceOutput(sourceOutput), _dest(dest), 
+        _destInput(destInput) {
+    //Serial.printf(">> Effects::Effects: _source=%p, _sourceOutput=%d, _dest=%p, _destInput=%d\n", _source, _sourceOutput, _dest, _destInput);
     memset(_delayLine, 0, DELAY_LINE_LENGTH); // To prevent noise on the first use
-    Serial.printf(">>--- memset\n");
-    delay(100);
 }
 
 //=================================================================================================
@@ -58,6 +55,7 @@ void Effects::makeConnection(EffectType type, AudioStream* effect) {
     Connection* connection = new Connection(_effectName[type].c_str(), type);
 
     if(type == EffectType::eff_clean) {
+        Serial.printf(">> type == EffectType::eff_clean,  \n");
         connection->_out = new AudioConnection(*_source, _sourceOutput, *_dest, _destInput);
     } else {
         connection->_in = new AudioConnection(*_source, _sourceOutput, *effect, 0);
