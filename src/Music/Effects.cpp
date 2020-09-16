@@ -55,7 +55,6 @@ void Effects::makeConnection(EffectType type, AudioStream* effect) {
     Connection* connection = new Connection(_effectName[type].c_str(), type);
 
     if(type == EffectType::eff_clean) {
-        Serial.printf(">> type == EffectType::eff_clean,  \n");
         connection->_out = new AudioConnection(*_source, _sourceOutput, *_dest, _destInput);
     } else {
         connection->_in = new AudioConnection(*_source, _sourceOutput, *effect, 0);

@@ -10,7 +10,7 @@ void setup() {
     Serial.begin(152000);
     while (!Serial && (millis() <= 1000));
 
-    g_settings._audioSettings._input = Inputs::mic;
+    g_settings._audioSettings._input = Inputs::line;
     g_audio.init(&g_settings);
 }
 

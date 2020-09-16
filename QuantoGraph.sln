@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Screen", "examples\Screen\S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{9F4F51F3-221E-4D2A-80D0-0CD8299AF0CF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LineIn", "examples\LineIn\LineIn.vcxproj", "{7291C55E-876B-49A7-9723-3920A0C5BB67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -43,6 +45,10 @@ Global
 		{EABDDB2E-78B8-408A-9A1D-CF30327AA981}.Debug|x86.Build.0 = Debug|Win32
 		{EABDDB2E-78B8-408A-9A1D-CF30327AA981}.Release|x86.ActiveCfg = Release|Win32
 		{EABDDB2E-78B8-408A-9A1D-CF30327AA981}.Release|x86.Build.0 = Release|Win32
+		{7291C55E-876B-49A7-9723-3920A0C5BB67}.Debug|x86.ActiveCfg = Debug|Win32
+		{7291C55E-876B-49A7-9723-3920A0C5BB67}.Debug|x86.Build.0 = Debug|Win32
+		{7291C55E-876B-49A7-9723-3920A0C5BB67}.Release|x86.ActiveCfg = Release|Win32
+		{7291C55E-876B-49A7-9723-3920A0C5BB67}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +59,7 @@ Global
 		{E2976680-AD7E-4B2C-A8D4-4A07C30B907C} = {9F4F51F3-221E-4D2A-80D0-0CD8299AF0CF}
 		{6D9D49A6-0A52-4609-8E3D-7E86490619D3} = {9F4F51F3-221E-4D2A-80D0-0CD8299AF0CF}
 		{EABDDB2E-78B8-408A-9A1D-CF30327AA981} = {9F4F51F3-221E-4D2A-80D0-0CD8299AF0CF}
+		{7291C55E-876B-49A7-9723-3920A0C5BB67} = {9F4F51F3-221E-4D2A-80D0-0CD8299AF0CF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A72EE42-BC43-4F77-AD74-A7AC147D91C0}

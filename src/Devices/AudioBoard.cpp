@@ -89,14 +89,14 @@ void AudioBoard::setupMixers() {
 void AudioBoard::setLineInLevel() {
     uint16_t value = (uint16_t)(_settings->_audioSettings._lineInLevel * LINE_IN_MAX + 0.5);
     _audioControl.lineInLevel(value);
-    Serial.printf("AudioBoard::setLineInLevel: %0.2f (%d)\n", _settings->_audioSettings._lineInLevel, value);
+    //Serial.printf("AudioBoard::setLineInLevel: %0.2f (%d)\n", _settings->_audioSettings._lineInLevel, value);
 }
 
 //=================================================================================================
 void AudioBoard::setMicGain() {
     uint16_t value = (uint16_t)(_settings->_audioSettings._micGain * MIC_GAIN_MAX + 0.5);
     _audioControl.micGain(value);
-    Serial.printf("AudioBoard::setMicGain: %0.2f (%d)\n", _settings->_audioSettings._micGain, value);
+    //Serial.printf("AudioBoard::setMicGain: %0.2f (%d)\n", _settings->_audioSettings._micGain, value);
 }
 
 //=================================================================================================
